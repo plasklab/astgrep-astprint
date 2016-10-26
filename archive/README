@@ -1,5 +1,0 @@
-tar zxvf llvm.tar.gz
-(cd llvm/tools; tar zxvf clang.tar.gz)
-(cd llvm/projects; tar zxvf compiler-rt.tar.gz)
-(cd llvm/tools/clang/tools; tar zxvf extra.tar.gz)
-
