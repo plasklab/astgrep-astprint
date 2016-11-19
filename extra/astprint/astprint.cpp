@@ -23,350 +23,6 @@ using namespace clang::tooling;
 using namespace llvm;
 using namespace llvm::opt;
 
-class Node {
-public:
-  std::string kind;
-  std::string beginFile;
-  int beginLine;
-  int beginColumn;
-  std::string endFile;
-  int endLine;
-  int endColumn;
-};
-
-class Declation : public Node {
-public:
-  std::string name;
-};
-
-class FieldDeclation : public Declation {
-public:
-  std::string scope;
-  //Type type;
-
-  FieldDeclation();
-};
-
-FieldDeclation::FieldDeclation() : scope("member") {
-  kind = "FieldDecl";
-}
-
-class ObjectDeclation : public Declation {
-public:
-  //Type type;
-  std::string displayType;
-};
-
-class DeclationOfVariables : public Declation {
-public:
-  std::string scope;
-};
-
-class ParameterDeclation : public DeclationOfVariables {
-public:
-  ParameterDeclation();
-};
-
-ParameterDeclation::ParameterDeclation() {
-  kind = "ParmDecl";
-}
-
-class VariableDeclation : public DeclationOfVariables {
-public:
-  //Expression init;
-  VariableDeclation();
-};
-
-VariableDeclation::VariableDeclation() {
-  kind = "VarDecl";
-}
-
-class FunctionDeclation : public Declation {
-public:
-  std::vector<ParameterDeclation> parm;
-  std::vector<Node> body;
-  FunctionDeclation();
-};
-
-FunctionDeclation::FunctionDeclation() {
-  kind = "FuncDecl";
-}
-
-class TypeDeclation : public Declation {
-public:
-  std::vector<FieldDeclation> member;
-};
-
-class StructDeclation : public TypeDeclation {
-public:
-  StructDeclation();
-};
-
-StructDeclation::StructDeclation() {
-  kind = "StructDecl";
-}
-
-class UnionDeclation : public TypeDeclation {
-public:
-  UnionDeclation();
-};
-
-UnionDeclation::UnionDeclation() {
-  kind = "UnionDecl";
-}
-
-class Expression : public Node {
-public:
-  //std::vector<Type> type;
-};
-
-
-class Reference : public Expression {
-public:
-  std::string name;
-};
-
-class DeclationReferenceExpression : public Reference {
-public:
-  std::string scope;
-  DeclationReferenceExpression();
-};
-
-DeclationReferenceExpression::DeclationReferenceExpression() {
-  kind = "DRE";
-}
-
-class MemberReference : public Reference {
-public:
-  std::string scope;
-  MemberReference();
-};
-
-MemberReference::MemberReference() : scope("member") {
-  kind = "Field";
-}
-
-class StructReference : public Reference {
-public:
-  std::vector<DeclationReferenceExpression> structs;
-  MemberReference structMember;
-};
-
-class Operator : public Expression {
-};
-
-class BinOp : public Operator {
-public:
-  std::string op;
-  std::vector<Expression> left;
-  std::vector<Expression> right;
-  BinOp();
-};
-
-BinOp::BinOp() {
-  kind = "BinOp";
-}
-
-class UnOp : public Operator {
-public:
-  std::string op;
-  std::vector<Expression> operand;
-  UnOp();
-};
-
-UnOp::UnOp() {
-  kind = "UnOp";
-}
-
-class ConditionalOp : public Operator {
-public:
-  BinOp condition;
-  std::vector<Operator> then;
-  std::vector<Operator> denial;
-  ConditionalOp();
-};
-
-ConditionalOp::ConditionalOp() {
-  kind = "ConditionalOp";
-}
-
-class Literal : public Expression {
-public:
-};
-
-class IntLiteral : public Literal {
-public:
-  int value;
-  IntLiteral();
-};
-
-IntLiteral::IntLiteral() {
-  kind = "IntegerLiteral";
-}
-
-class CharLiteral : public Literal {
-public:
-  char value;
-  CharLiteral();
-};
-
-CharLiteral::CharLiteral() {
-  kind = "CharacterLiteral";
-}
-
-class FloatLiteral : public Literal {
-public:
-  double value;
-  FloatLiteral();
-};
-
-FloatLiteral::FloatLiteral() {
-  kind = "FloatingLiteral";
-}
-
-class ArrayReference : public Reference {
-public:
-  DeclationReferenceExpression array;
-  Literal index;
-  ArrayReference();
-};
-
-ArrayReference::ArrayReference() {
-  kind = "ArrayRef";
-}
-
-class FunctionCall : public Expression {
-public:
-  DeclationReferenceExpression func;
-  std::vector<DeclationReferenceExpression> parm;
-  FunctionCall();
-};
-
-FunctionCall::FunctionCall() {
-  kind = "FuncCall";
-}
-
-class Statement : public Node {
-};
-
-class RepetitionStatement : public Statement {
-public:
-  Expression condition;
-  std::vector<Expression> body;
-};
-
-class WhileStatement : public RepetitionStatement {
-public:
-  WhileStatement();
-};
-
-WhileStatement::WhileStatement() {
-  kind = "While";
-}
-
-class DoStatement : public RepetitionStatement {
-public:
-  DoStatement();
-};
-
-DoStatement::DoStatement() {
-  kind = "Do";
-}
-
-class ForStatement : public RepetitionStatement {
-public:
-  std::vector<Operator> init;
-  std::vector<Operator> update;
-  ForStatement();
-};
-
-ForStatement::ForStatement() {
-  kind = "For";
-}
-
-class BranchStatement : public Statement {
-public:
-  Expression condition;
-};
-
-class IfStatement : public BranchStatement {
-public:
-  std::vector<Expression> then;
-  std::vector<Expression> denial;
-  IfStatement();
-};
-
-IfStatement::IfStatement() {
-  kind = "If";
-}
-
-class SwitchStatement : public BranchStatement {
-public:
-  std::vector<Expression> body;
-  SwitchStatement();
-};
-
-SwitchStatement::SwitchStatement() {
-  kind = "switch";
-}
-
-class LabelStatement : public Statement {
-public:
-  LabelStatement();
-};
-
-LabelStatement::LabelStatement() {
-  kind = "Label";
-}
-
-class CaseStatement : public Statement {
-public:
-  Literal value;
-  CaseStatement();
-};
-
-CaseStatement::CaseStatement() {
-  kind = "Case";
-}
-
-class GotoStatement : public Statement {
-public:
-  std::string jump;
-  GotoStatement();
-};
-
-GotoStatement::GotoStatement() {
-  kind = "Goto";
-}
-
-class ContinueStatement : public Statement {
-public:
-  ContinueStatement();
-};
-
-ContinueStatement::ContinueStatement() {
-  kind = "Continue";
-}
-
-class BreakStatement : public Statement {
-public:
-  BreakStatement();
-};
-
-BreakStatement::BreakStatement() {
-  kind = "Break";
-}
-
-class ReturnStatement : public Statement {
-public:
-  Expression value;
-  ReturnStatement();
-};
-
-ReturnStatement::ReturnStatement() {
-  kind = "Ret";
-}
-
 class DataType {
 public:
   std::string kind;
@@ -546,6 +202,369 @@ class RenameType : public DataType {
 RenameType::RenameType() {
   kind = "TypedefType";
 }
+
+class Node {
+public:
+  std::string kind;
+  std::string beginFile;
+  int beginLine;
+  int beginColumn;
+  std::string endFile;
+  int endLine;
+  int endColumn;
+
+  //virtual void printAST();
+};
+
+class Expression : public Node {
+public:
+  std::vector<DataType> type;
+};
+
+class Reference : public Expression {
+public:
+  std::string name;
+};
+
+class DeclationReferenceExpression : public Reference {
+public:
+  std::string scope;
+  DeclationReferenceExpression();
+};
+
+DeclationReferenceExpression::DeclationReferenceExpression() {
+  kind = "DRE";
+}
+
+class MemberReference : public Reference {
+public:
+  std::string scope;
+  MemberReference();
+};
+
+MemberReference::MemberReference() : scope("member") {
+  kind = "Field";
+}
+
+class StructReference : public Reference {
+public:
+  std::vector<DeclationReferenceExpression> structs;
+  MemberReference structMember;
+};
+
+class Operator : public Expression {
+};
+
+class BinOp : public Operator {
+public:
+  std::string op;
+  std::vector<Expression> left;
+  std::vector<Expression> right;
+  BinOp();
+};
+
+BinOp::BinOp() {
+  kind = "BinOp";
+}
+
+class UnOp : public Operator {
+public:
+  std::string op;
+  std::vector<Expression> operand;
+  UnOp();
+};
+
+UnOp::UnOp() {
+  kind = "UnOp";
+}
+
+class ConditionalOp : public Operator {
+public:
+  BinOp condition;
+  std::vector<Operator> then;
+  std::vector<Operator> denial;
+  ConditionalOp();
+};
+
+ConditionalOp::ConditionalOp() {
+  kind = "ConditionalOp";
+}
+
+class Literal : public Expression {
+public:
+};
+
+class IntLiteral : public Literal {
+public:
+  int value;
+  IntLiteral();
+};
+
+IntLiteral::IntLiteral() {
+  kind = "IntegerLiteral";
+}
+
+class CharLiteral : public Literal {
+public:
+  char value;
+  CharLiteral();
+};
+
+CharLiteral::CharLiteral() {
+  kind = "CharacterLiteral";
+}
+
+class FloatLiteral : public Literal {
+public:
+  double value;
+  FloatLiteral();
+};
+
+FloatLiteral::FloatLiteral() {
+  kind = "FloatingLiteral";
+}
+
+class ArrayReference : public Reference {
+public:
+  DeclationReferenceExpression array;
+  Literal index;
+  ArrayReference();
+};
+
+ArrayReference::ArrayReference() {
+  kind = "ArrayRef";
+}
+
+class FunctionCall : public Expression {
+public:
+  DeclationReferenceExpression func;
+  std::vector<DeclationReferenceExpression> parm;
+  FunctionCall();
+};
+
+FunctionCall::FunctionCall() {
+  kind = "FuncCall";
+}
+
+class Declation : public Node {
+public:
+  std::string name;
+};
+
+class FieldDeclation : public Declation {
+public:
+  std::string scope;
+  DataType type;
+
+  FieldDeclation();
+};
+
+FieldDeclation::FieldDeclation() : scope("member") {
+  kind = "FieldDecl";
+}
+
+class ObjectDeclation : public Declation {
+public:
+  DataType type;
+  std::string displayType;
+};
+
+class DeclationOfVariables : public Declation {
+public:
+  std::string scope;
+};
+
+class ParameterDeclation : public DeclationOfVariables {
+public:
+  ParameterDeclation();
+
+  //void printAST();
+};
+
+ParameterDeclation::ParameterDeclation() {
+  kind = "ParmDecl";
+}
+
+//void ParameterDeclation::printAST() {
+//  llvm::outs() << "{:kind \"" << kind << "\" 
+
+class VariableDeclation : public DeclationOfVariables {
+public:
+  Expression init;
+  VariableDeclation();
+
+  //void printAST();
+};
+
+VariableDeclation::VariableDeclation() {
+  kind = "VarDecl";
+}
+/*
+void VariableDeclation::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :scope \""
+               << scope << "\" :display-type \"" << displayType << "\" :type " << type;
+  if (init != null) {
+    llvm::outs() << ":init " << init;
+  }
+  llvm::outs() << ":loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
+               << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn;
+}
+*/
+class FunctionDeclation : public Declation {
+public:
+  std::vector<ParameterDeclation> parm;
+  std::vector<Node> body;
+  FunctionDeclation();
+};
+
+FunctionDeclation::FunctionDeclation() {
+  kind = "FuncDecl";
+}
+
+class TypeDeclation : public Declation {
+public:
+  std::vector<FieldDeclation> member;
+};
+
+class StructDeclation : public TypeDeclation {
+public:
+  StructDeclation();
+};
+
+StructDeclation::StructDeclation() {
+  kind = "StructDecl";
+}
+
+class UnionDeclation : public TypeDeclation {
+public:
+  UnionDeclation();
+};
+
+UnionDeclation::UnionDeclation() {
+  kind = "UnionDecl";
+}
+
+class Statement : public Node {
+};
+
+class RepetitionStatement : public Statement {
+public:
+  Expression condition;
+  std::vector<Expression> body;
+};
+
+class WhileStatement : public RepetitionStatement {
+public:
+  WhileStatement();
+};
+
+WhileStatement::WhileStatement() {
+  kind = "While";
+}
+
+class DoStatement : public RepetitionStatement {
+public:
+  DoStatement();
+};
+
+DoStatement::DoStatement() {
+  kind = "Do";
+}
+
+class ForStatement : public RepetitionStatement {
+public:
+  std::vector<Operator> init;
+  std::vector<Operator> update;
+  ForStatement();
+};
+
+ForStatement::ForStatement() {
+  kind = "For";
+}
+
+class BranchStatement : public Statement {
+public:
+  Expression condition;
+};
+
+class IfStatement : public BranchStatement {
+public:
+  std::vector<Expression> then;
+  std::vector<Expression> denial;
+  IfStatement();
+};
+
+IfStatement::IfStatement() {
+  kind = "If";
+}
+
+class SwitchStatement : public BranchStatement {
+public:
+  std::vector<Expression> body;
+  SwitchStatement();
+};
+
+SwitchStatement::SwitchStatement() {
+  kind = "switch";
+}
+
+class LabelStatement : public Statement {
+public:
+  LabelStatement();
+};
+
+LabelStatement::LabelStatement() {
+  kind = "Label";
+}
+
+class CaseStatement : public Statement {
+public:
+  Literal value;
+  CaseStatement();
+};
+
+CaseStatement::CaseStatement() {
+  kind = "Case";
+}
+
+class GotoStatement : public Statement {
+public:
+  std::string jump;
+  GotoStatement();
+};
+
+GotoStatement::GotoStatement() {
+  kind = "Goto";
+}
+
+class ContinueStatement : public Statement {
+public:
+  ContinueStatement();
+};
+
+ContinueStatement::ContinueStatement() {
+  kind = "Continue";
+}
+
+class BreakStatement : public Statement {
+public:
+  BreakStatement();
+};
+
+BreakStatement::BreakStatement() {
+  kind = "Break";
+}
+
+class ReturnStatement : public Statement {
+public:
+  Expression value;
+  ReturnStatement();
+};
+
+ReturnStatement::ReturnStatement() {
+  kind = "Ret";
+}
+
 
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
 public:
