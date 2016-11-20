@@ -26,7 +26,13 @@ using namespace llvm::opt;
 class DataType {
 public:
   std::string kind;
+
+  void printType();
 };
+
+void DataType::printType() {
+  llvm::outs() << "Type";
+}
 
 class SignedType : public DataType {
 };
@@ -213,13 +219,25 @@ public:
   int endLine;
   int endColumn;
 
+  //virtual void printAST() = 0;
   //virtual void printAST();
+  void printAST();
 };
+
+void Node::printAST() {
+  llvm::outs() << "test";
+}
 
 class Expression : public Node {
 public:
   std::vector<DataType> type;
+
+  void printAST();
 };
+
+void Expression::printAST() {
+  llvm::outs() << "Expression";
+}
 
 class Reference : public Expression {
 public:
@@ -230,6 +248,7 @@ class DeclationReferenceExpression : public Reference {
 public:
   std::string scope;
   DeclationReferenceExpression();
+  void printAST();
 };
 
 DeclationReferenceExpression::DeclationReferenceExpression() {
@@ -240,6 +259,7 @@ class MemberReference : public Reference {
 public:
   std::string scope;
   MemberReference();
+  void printAST();
 };
 
 MemberReference::MemberReference() : scope("member") {
@@ -261,6 +281,7 @@ public:
   std::vector<Expression> left;
   std::vector<Expression> right;
   BinOp();
+  void printAST();
 };
 
 BinOp::BinOp() {
@@ -272,6 +293,7 @@ public:
   std::string op;
   std::vector<Expression> operand;
   UnOp();
+  void printAST();
 };
 
 UnOp::UnOp() {
@@ -284,6 +306,7 @@ public:
   std::vector<Operator> then;
   std::vector<Operator> denial;
   ConditionalOp();
+  void printAST();
 };
 
 ConditionalOp::ConditionalOp() {
@@ -298,6 +321,7 @@ class IntLiteral : public Literal {
 public:
   int value;
   IntLiteral();
+  void printAST();
 };
 
 IntLiteral::IntLiteral() {
@@ -308,6 +332,7 @@ class CharLiteral : public Literal {
 public:
   char value;
   CharLiteral();
+  void printAST();
 };
 
 CharLiteral::CharLiteral() {
@@ -318,6 +343,7 @@ class FloatLiteral : public Literal {
 public:
   double value;
   FloatLiteral();
+  void printAST();
 };
 
 FloatLiteral::FloatLiteral() {
@@ -329,6 +355,7 @@ public:
   DeclationReferenceExpression array;
   Literal index;
   ArrayReference();
+  void printAST();
 };
 
 ArrayReference::ArrayReference() {
@@ -340,6 +367,7 @@ public:
   DeclationReferenceExpression func;
   std::vector<DeclationReferenceExpression> parm;
   FunctionCall();
+  void printAST();
 };
 
 FunctionCall::FunctionCall() {
@@ -357,6 +385,7 @@ public:
   DataType type;
 
   FieldDeclation();
+  void printAST();
 };
 
 FieldDeclation::FieldDeclation() : scope("member") {
@@ -369,7 +398,7 @@ public:
   std::string displayType;
 };
 
-class DeclationOfVariables : public Declation {
+class DeclationOfVariables : public ObjectDeclation {
 public:
   std::string scope;
 };
@@ -379,6 +408,7 @@ public:
   ParameterDeclation();
 
   //void printAST();
+  void printAST();
 };
 
 ParameterDeclation::ParameterDeclation() {
@@ -393,28 +423,30 @@ public:
   Expression init;
   VariableDeclation();
 
-  //void printAST();
+  void printAST();
 };
 
 VariableDeclation::VariableDeclation() {
   kind = "VarDecl";
 }
-/*
+
 void VariableDeclation::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :scope \""
-               << scope << "\" :display-type \"" << displayType << "\" :type " << type;
-  if (init != null) {
-    llvm::outs() << ":init " << init;
-  }
+               << scope << "\" :display-type \"" << displayType << "\" :type ";
+  type.printType();
+  //if (!init) {
+    init.printAST();
+ // }
   llvm::outs() << ":loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
-               << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn;
+               << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]}";
 }
-*/
+
 class FunctionDeclation : public Declation {
 public:
   std::vector<ParameterDeclation> parm;
   std::vector<Node> body;
   FunctionDeclation();
+  void printAST();
 };
 
 FunctionDeclation::FunctionDeclation() {
@@ -429,6 +461,7 @@ public:
 class StructDeclation : public TypeDeclation {
 public:
   StructDeclation();
+  void printAST();
 };
 
 StructDeclation::StructDeclation() {
@@ -438,6 +471,7 @@ StructDeclation::StructDeclation() {
 class UnionDeclation : public TypeDeclation {
 public:
   UnionDeclation();
+  void printAST();
 };
 
 UnionDeclation::UnionDeclation() {
@@ -456,6 +490,7 @@ public:
 class WhileStatement : public RepetitionStatement {
 public:
   WhileStatement();
+  void printAST();
 };
 
 WhileStatement::WhileStatement() {
@@ -465,6 +500,7 @@ WhileStatement::WhileStatement() {
 class DoStatement : public RepetitionStatement {
 public:
   DoStatement();
+  void printAST();
 };
 
 DoStatement::DoStatement() {
@@ -476,6 +512,7 @@ public:
   std::vector<Operator> init;
   std::vector<Operator> update;
   ForStatement();
+  void printAST();
 };
 
 ForStatement::ForStatement() {
@@ -492,6 +529,7 @@ public:
   std::vector<Expression> then;
   std::vector<Expression> denial;
   IfStatement();
+  void printAST();
 };
 
 IfStatement::IfStatement() {
@@ -502,6 +540,7 @@ class SwitchStatement : public BranchStatement {
 public:
   std::vector<Expression> body;
   SwitchStatement();
+  void printAST();
 };
 
 SwitchStatement::SwitchStatement() {
@@ -511,6 +550,7 @@ SwitchStatement::SwitchStatement() {
 class LabelStatement : public Statement {
 public:
   LabelStatement();
+  void printAST();
 };
 
 LabelStatement::LabelStatement() {
@@ -521,6 +561,7 @@ class CaseStatement : public Statement {
 public:
   Literal value;
   CaseStatement();
+  void printAST();
 };
 
 CaseStatement::CaseStatement() {
@@ -531,6 +572,7 @@ class GotoStatement : public Statement {
 public:
   std::string jump;
   GotoStatement();
+  void printAST();
 };
 
 GotoStatement::GotoStatement() {
@@ -540,6 +582,7 @@ GotoStatement::GotoStatement() {
 class ContinueStatement : public Statement {
 public:
   ContinueStatement();
+  void printAST();
 };
 
 ContinueStatement::ContinueStatement() {
@@ -549,6 +592,7 @@ ContinueStatement::ContinueStatement() {
 class BreakStatement : public Statement {
 public:
   BreakStatement();
+  void printAST();
 };
 
 BreakStatement::BreakStatement() {
@@ -559,14 +603,22 @@ class ReturnStatement : public Statement {
 public:
   Expression value;
   ReturnStatement();
+  void printAST();
 };
 
 ReturnStatement::ReturnStatement() {
   kind = "Ret";
 }
 
+class ASTProg {
+public:
+  std::vector<Node> prog;
+};
 
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
+private:
+  ASTProg prog;
+
 public:
   explicit MyAstVisitor(ASTContext *Context, llvm::StringRef InFile) : Context(Context), source_file(InFile) {}
   // TraverseDecl
@@ -575,7 +627,7 @@ public:
       //llvm::outs() << " ?Decl? " << decl->getDeclKindName() << "\n";
       switch (decl->getKind()) {
       case Decl::Field:
-        llvm::outs() << "decl:1";
+        //llvm::outs() << "decl:1";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -585,7 +637,7 @@ public:
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::Function: 
-        llvm::outs() << "decl:2";
+        //llvm::outs() << "decl:2";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -595,7 +647,7 @@ public:
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::ParmVar: 
-        llvm::outs() << "decl:3";
+        //llvm::outs() << "decl:3";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -605,7 +657,7 @@ public:
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::TranslationUnit: 
-        llvm::outs() << "decl:4";
+        //llvm::outs() << "decl:4";
 	linefeedflag = 0;
 	linefeedbody = 0;
 	caseflag = 0;
@@ -617,11 +669,11 @@ public:
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::Typedef: 
-        llvm::outs() << "decl:5";
+        //llvm::outs() << "decl:5";
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::Record: 
-        llvm::outs() << "decl:6";
+        //llvm::outs() << "decl:6";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -631,7 +683,7 @@ public:
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::Var: 
-        llvm::outs() << "decl:7";
+        //llvm::outs() << "decl:7";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -641,20 +693,20 @@ public:
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::Enum: 
-        llvm::outs() << "decl:8";
+        //llvm::outs() << "decl:8";
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::EnumConstant: 
-        llvm::outs() << "decl:9";
+        //llvm::outs() << "decl:9";
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
 	//以下c++関係のもの
       case Decl::ClassTemplate: 
-        llvm::outs() << "decl:10";
+        //llvm::outs() << "decl:10";
       case Decl::CXXRecord: 
-        llvm::outs() << "decl:11";
+        //llvm::outs() << "decl:11";
       case Decl::CXXMethod: 
-        llvm::outs() << "decl:12";
+        //llvm::outs() << "decl:12";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -664,41 +716,41 @@ public:
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::ClassTemplateSpecialization: 
-        llvm::outs() << "decl:13";
+        //llvm::outs() << "decl:13";
 	//RecursiveASTVisitor::TraverseDecl(decl);
 	//	llvm::outs() << " ?Decl? " << decl->getDeclKindName();
 	break;
       case Decl::ClassTemplatePartialSpecialization: 
-        llvm::outs() << "decl:14";
+        //llvm::outs() << "decl:14";
       case Decl::CXXConstructor: 
-        llvm::outs() << "decl:15";
+        //llvm::outs() << "decl:15";
       case Decl::CXXConversion: 
-        llvm::outs() << "decl:16";
+        //llvm::outs() << "decl:16";
       case Decl::CXXDestructor: 
-        llvm::outs() << "decl:17";
+        //llvm::outs() << "decl:17";
       case Decl::Empty: 
-        llvm::outs() << "decl:18";
+        //llvm::outs() << "decl:18";
       case Decl::FunctionTemplate: 
-        llvm::outs() << "decl:19";
+        //llvm::outs() << "decl:19";
       case Decl::LinkageSpec: 
-        llvm::outs() << "decl:20";
+        //llvm::outs() << "decl:20";
       case Decl::Namespace: 
-        llvm::outs() << "decl:21";
+        //llvm::outs() << "decl:21";
       case Decl::NonTypeTemplateParm: 
-        llvm::outs() << "decl:22";
+        //llvm::outs() << "decl:22";
       case Decl::TemplateTypeParm: 
-        llvm::outs() << "decl:23";
+        //llvm::outs() << "decl:23";
       case Decl::Using: 
-        llvm::outs() << "decl:24";
+        //llvm::outs() << "decl:24";
       case Decl::UsingDirective: 
-        llvm::outs() << "decl:25";
+        //llvm::outs() << "decl:25";
       case Decl::UsingShadow: 
-        llvm::outs() << "decl:26";
+        //llvm::outs() << "decl:26";
 	//llvm::outs() << " ?Decl? " << decl->getDeclKindName();
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       default : 
-        llvm::outs() << "decl:27";
+        //llvm::outs() << "decl:27";
 	llvm::outs() << " ?Decl? " << decl->getDeclKindName();
 	RecursiveASTVisitor::TraverseDecl(decl);
       }
@@ -1406,37 +1458,37 @@ public:
       switch (stmt->getStmtClass()) {
       case Stmt::BreakStmtClass:
 	llvm::outs() << "\n";
-        llvm::outs() << "stmt:1";
+        //llvm::outs() << "stmt:1";
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CaseStmtClass:
-        llvm::outs() << "stmt:2";
+        //llvm::outs() << "stmt:2";
 	caseflag = 1;
 	casetoji = 1;
 	labelflag++;
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CompoundStmtClass: 
-        llvm::outs() << "stmt:3";
+        //llvm::outs() << "stmt:3";
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ContinueStmtClass: 
-        llvm::outs() << "stmt:4";
+        //llvm::outs() << "stmt:4";
 	llvm::outs() << "\n";
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::DeclStmtClass: 
-        llvm::outs() << "stmt:5";
+        //llvm::outs() << "stmt:5";
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::DefaultStmtClass: 
-        llvm::outs() << "stmt:6";
+        //llvm::outs() << "stmt:6";
 	caseflag = 1;
 	labelflag++;
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::DoStmtClass: 
-        llvm::outs() << "stmt:7";
+        //llvm::outs() << "stmt:7";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1446,7 +1498,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ForStmtClass: 
-        llvm::outs() << "stmt:8";
+        //llvm::outs() << "stmt:8";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1456,7 +1508,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::GotoStmtClass: 
-        llvm::outs() << "stmt:9";
+        //llvm::outs() << "stmt:9";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1466,7 +1518,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::IfStmtClass: 
-        llvm::outs() << "stmt:10";
+        //llvm::outs() << "stmt:10";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1476,13 +1528,13 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::LabelStmtClass: 
-        llvm::outs() << "stmt:11";
+        //llvm::outs() << "stmt:11";
 	caseflag = 1;
 	labelflag++;
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::SwitchStmtClass: 
-        llvm::outs() << "stmt:12";
+        //llvm::outs() << "stmt:12";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1492,7 +1544,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::WhileStmtClass: 
-        llvm::outs() << "stmt:13";
+        //llvm::outs() << "stmt:13";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1502,7 +1554,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ReturnStmtClass: 
-        llvm::outs() << "stmt:14";
+        //llvm::outs() << "stmt:14";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1512,7 +1564,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ArraySubscriptExprClass: 
-        llvm::outs() << "stmt:15";
+        //llvm::outs() << "stmt:15";
 	if (FuncCall == 1) {
 	  FuncCall = 0;
 	} else if (ArraySub == 1) {
@@ -1528,7 +1580,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CallExprClass: 
-        llvm::outs() << "stmt:16";
+        //llvm::outs() << "stmt:16";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1539,12 +1591,12 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CStyleCastExprClass: 
-        llvm::outs() << "stmt:17";
+        //llvm::outs() << "stmt:17";
 	castflag = 1;
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::DeclRefExprClass: 
-        llvm::outs() << "stmt:18";
+        //llvm::outs() << "stmt:18";
 	if (FuncCall == 1 || ArraySub == 1 || linefeedflag == 0 || linefeedbody == 0) {
 	  FuncCall = 0;
 	  ArraySub = 0;
@@ -1556,7 +1608,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ImplicitCastExprClass: 
-        llvm::outs() << "stmt:19";
+        //llvm::outs() << "stmt:19";
 	castflag = 1;
 	if (dyn_cast<ImplicitCastExpr>(stmt)->getSubExpr()->getStmtClass() == 68) {
 	  llvm::outs() << "{:kind \"NULL\" :value \"Null\"}";
@@ -1565,7 +1617,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::InitListExprClass: 
-        llvm::outs() << "stmt:20";
+        //llvm::outs() << "stmt:20";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1577,7 +1629,7 @@ public:
 	llvm::outs() << "]";
 	break;
       case Stmt::MemberExprClass: 
-        llvm::outs() << "stmt:21";
+        //llvm::outs() << "stmt:21";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1587,14 +1639,14 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ParenExprClass: 
-        llvm::outs() << "stmt:22";
+        //llvm::outs() << "stmt:22";
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::UnaryExprOrTypeTraitExprClass:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::BinaryOperatorClass: 
-        llvm::outs() << "stmt:23";
+        //llvm::outs() << "stmt:23";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1604,7 +1656,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ConditionalOperatorClass: 
-        llvm::outs() << "stmt:24";
+        //llvm::outs() << "stmt:24";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1614,11 +1666,11 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CompoundAssignOperatorClass: 
-        llvm::outs() << "stmt:25";
+        //llvm::outs() << "stmt:25";
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::UnaryOperatorClass: 
-        llvm::outs() << "stmt:26";
+        //llvm::outs() << "stmt:26";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1628,7 +1680,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CharacterLiteralClass: 
-        llvm::outs() << "stmt:27";
+        //llvm::outs() << "stmt:27";
 	if (linefeedflag == 0) {
 	  linefeedflag = 1;
 	} else {
@@ -1637,7 +1689,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::FloatingLiteralClass: 
-        llvm::outs() << "stmt:28";
+        //llvm::outs() << "stmt:28";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1647,7 +1699,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::IntegerLiteralClass: 
-        llvm::outs() << "stmt:29";
+        //llvm::outs() << "stmt:29";
 	if (linefeedflag == 0) {
 	  linefeedflag = 1;
 	} else {
@@ -1656,7 +1708,7 @@ public:
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::StringLiteralClass: 
-        llvm::outs() << "stmt:30";
+        //llvm::outs() << "stmt:30";
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
@@ -1667,74 +1719,74 @@ public:
 	break;
 	//以下C++に関係
       case Stmt::CXXNewExprClass: 
-        llvm::outs() << "stmt:31";
+        //llvm::outs() << "stmt:31";
       case Stmt::CXXUnresolvedConstructExprClass: 
-        llvm::outs() << "stmt:32";
+        //llvm::outs() << "stmt:32";
       case Stmt::ParenListExprClass: 
-        llvm::outs() << "stmt:33";
+        //llvm::outs() << "stmt:33";
 	llvm::outs() << "[";
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	llvm::outs() << "]";
 	break;
       case Stmt::CXXCatchStmtClass: 
-        llvm::outs() << "stmt:34";
+        //llvm::outs() << "stmt:34";
       case Stmt::CXXTryStmtClass: 
-        llvm::outs() << "stmt:35";
+        //llvm::outs() << "stmt:35";
       case Stmt::NullStmtClass: 
-        llvm::outs() << "stmt:36";
+        //llvm::outs() << "stmt:36";
       case Stmt::AtomicExprClass: 
-        llvm::outs() << "stmt:37";
+        //llvm::outs() << "stmt:37";
       case Stmt::CXXBindTemporaryExprClass: 
-        llvm::outs() << "stmt:38";
+        //llvm::outs() << "stmt:38";
       case Stmt::CXXBoolLiteralExprClass: 
-        llvm::outs() << "stmt:39";
+        //llvm::outs() << "stmt:39";
       case Stmt::CXXConstCastExprClass: 
-        llvm::outs() << "stmt:40";
+        //llvm::outs() << "stmt:40";
       case Stmt::CXXConstructExprClass: 
-        llvm::outs() << "stmt:41";
+        //llvm::outs() << "stmt:41";
       case Stmt::CXXDeleteExprClass: 
-        llvm::outs() << "stmt:42";
+        //llvm::outs() << "stmt:42";
       case Stmt::CXXDependentScopeMemberExprClass: 
-        llvm::outs() << "stmt:43";
+        //llvm::outs() << "stmt:43";
       case Stmt::CXXDynamicCastExprClass: 
-        llvm::outs() << "stmt:44";
+        //llvm::outs() << "stmt:44";
       case Stmt::CXXFunctionalCastExprClass: 
-        llvm::outs() << "stmt:45";
+        //llvm::outs() << "stmt:45";
       case Stmt::CXXMemberCallExprClass: 
-        llvm::outs() << "stmt:46";
+        //llvm::outs() << "stmt:46";
       case Stmt::CXXOperatorCallExprClass: 
-        llvm::outs() << "stmt:47";
+        //llvm::outs() << "stmt:47";
       case Stmt::CXXPseudoDestructorExprClass: 
-        llvm::outs() << "stmt:48";
+        //llvm::outs() << "stmt:48";
       case Stmt::CXXReinterpretCastExprClass: 
-        llvm::outs() << "stmt:49";
+        //llvm::outs() << "stmt:49";
       case Stmt::CXXScalarValueInitExprClass: 
-        llvm::outs() << "stmt:50";
+        //llvm::outs() << "stmt:50";
       case Stmt::CXXStaticCastExprClass: 
-        llvm::outs() << "stmt:51";
+        //llvm::outs() << "stmt:51";
       case Stmt::CXXThisExprClass: 
-        llvm::outs() << "stmt:52";
+        //llvm::outs() << "stmt:52";
       case Stmt::CXXThrowExprClass: 
-        llvm::outs() << "stmt:53";
+        //llvm::outs() << "stmt:53";
       case Stmt::DependentScopeDeclRefExprClass: 
-        llvm::outs() << "stmt:54";
+        //llvm::outs() << "stmt:54";
       case Stmt::GNUNullExprClass: 
-        llvm::outs() << "stmt:55";
+        //llvm::outs() << "stmt:55";
       case Stmt::MaterializeTemporaryExprClass: 
-        llvm::outs() << "stmt:56";
+        //llvm::outs() << "stmt:56";
       case Stmt::UnaryTypeTraitExprClass: 
-        llvm::outs() << "stmt:57";
+        //llvm::outs() << "stmt:57";
       case Stmt::UnresolvedLookupExprClass: 
-        llvm::outs() << "stmt:58";
+        //llvm::outs() << "stmt:58";
       case Stmt::UnresolvedMemberExprClass: 
-        llvm::outs() << "stmt:59";
+        //llvm::outs() << "stmt:59";
       case Stmt::ExprWithCleanupsClass: 
-        llvm::outs() << "stmt:60";
+        //llvm::outs() << "stmt:60";
 	//llvm::outs() << "?Stmt? " << stmt->getStmtClassName();	
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       default: 
-        llvm::outs() << "stmt:61";
+        //llvm::outs() << "stmt:61";
 	llvm::outs() << "?Stmt? " << stmt->getStmtClassName();	
 	RecursiveASTVisitor::TraverseStmt(stmt);
       }
@@ -2565,10 +2617,16 @@ public:
     }
   }
   
-  /*void printAST() {
-   * llvm::outs() << os.str();
-   *}
-   */
+  void printAST() {
+    int i;
+    Node n;
+
+    for (i = 0; i != (int)prog.prog.size(); i++) {
+      n = prog.prog[i];
+      n.printAST();
+    }
+  }
+  
   
 private:
   ASTContext *Context;
@@ -2597,7 +2655,8 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    //Visitor.printAST();
+    llvm::outs() << "-----------------------------------------------";
+    Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
 
