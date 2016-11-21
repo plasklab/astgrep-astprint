@@ -218,26 +218,13 @@ public:
   std::string endFile;
   int endLine;
   int endColumn;
-
-  //virtual void printAST() = 0;
-  //virtual void printAST();
-  void printAST();
+  
 };
-
-void Node::printAST() {
-  llvm::outs() << "test";
-}
 
 class Expression : public Node {
 public:
   std::vector<DataType> type;
-
-  void printAST();
 };
-
-void Expression::printAST() {
-  llvm::outs() << "Expression";
-}
 
 class Reference : public Expression {
 public:
@@ -248,7 +235,7 @@ class DeclationReferenceExpression : public Reference {
 public:
   std::string scope;
   DeclationReferenceExpression();
-  void printAST();
+  
 };
 
 DeclationReferenceExpression::DeclationReferenceExpression() {
@@ -259,7 +246,7 @@ class MemberReference : public Reference {
 public:
   std::string scope;
   MemberReference();
-  void printAST();
+  
 };
 
 MemberReference::MemberReference() : scope("member") {
@@ -281,7 +268,7 @@ public:
   std::vector<Expression> left;
   std::vector<Expression> right;
   BinOp();
-  void printAST();
+  
 };
 
 BinOp::BinOp() {
@@ -293,7 +280,7 @@ public:
   std::string op;
   std::vector<Expression> operand;
   UnOp();
-  void printAST();
+  
 };
 
 UnOp::UnOp() {
@@ -306,7 +293,7 @@ public:
   std::vector<Operator> then;
   std::vector<Operator> denial;
   ConditionalOp();
-  void printAST();
+  
 };
 
 ConditionalOp::ConditionalOp() {
@@ -321,7 +308,7 @@ class IntLiteral : public Literal {
 public:
   int value;
   IntLiteral();
-  void printAST();
+  
 };
 
 IntLiteral::IntLiteral() {
@@ -332,7 +319,7 @@ class CharLiteral : public Literal {
 public:
   char value;
   CharLiteral();
-  void printAST();
+  
 };
 
 CharLiteral::CharLiteral() {
@@ -343,7 +330,7 @@ class FloatLiteral : public Literal {
 public:
   double value;
   FloatLiteral();
-  void printAST();
+  
 };
 
 FloatLiteral::FloatLiteral() {
@@ -355,7 +342,7 @@ public:
   DeclationReferenceExpression array;
   Literal index;
   ArrayReference();
-  void printAST();
+  
 };
 
 ArrayReference::ArrayReference() {
@@ -367,7 +354,7 @@ public:
   DeclationReferenceExpression func;
   std::vector<DeclationReferenceExpression> parm;
   FunctionCall();
-  void printAST();
+  
 };
 
 FunctionCall::FunctionCall() {
@@ -385,7 +372,7 @@ public:
   DataType type;
 
   FieldDeclation();
-  void printAST();
+  
 };
 
 FieldDeclation::FieldDeclation() : scope("member") {
@@ -406,23 +393,17 @@ public:
 class ParameterDeclation : public DeclationOfVariables {
 public:
   ParameterDeclation();
-
-  //void printAST();
-  void printAST();
 };
 
 ParameterDeclation::ParameterDeclation() {
   kind = "ParmDecl";
 }
 
-//void ParameterDeclation::printAST() {
-//  llvm::outs() << "{:kind \"" << kind << "\" 
 
 class VariableDeclation : public DeclationOfVariables {
 public:
   Expression init;
   VariableDeclation();
-
   void printAST();
 };
 
@@ -431,14 +412,18 @@ VariableDeclation::VariableDeclation() {
 }
 
 void VariableDeclation::printAST() {
+  /*
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :scope \""
-               << scope << "\" :display-type \"" << displayType << "\" :type ";
+	 << scope << "\" :display-type \"" << displayType << "\" :type ";
   type.printType();
-  //if (!init) {
-    init.printAST();
- // }
+  if (!init) {
+  init.printAST();
+  }
   llvm::outs() << ":loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
-               << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]}";
+	   << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]}";
+  */
+  llvm::outs() << name << "\n";
+  llvm::outs() << "{:kind \"" << kind << "\"}";
 }
 
 class FunctionDeclation : public Declation {
@@ -446,7 +431,6 @@ public:
   std::vector<ParameterDeclation> parm;
   std::vector<Node> body;
   FunctionDeclation();
-  void printAST();
 };
 
 FunctionDeclation::FunctionDeclation() {
@@ -461,7 +445,6 @@ public:
 class StructDeclation : public TypeDeclation {
 public:
   StructDeclation();
-  void printAST();
 };
 
 StructDeclation::StructDeclation() {
@@ -471,7 +454,6 @@ StructDeclation::StructDeclation() {
 class UnionDeclation : public TypeDeclation {
 public:
   UnionDeclation();
-  void printAST();
 };
 
 UnionDeclation::UnionDeclation() {
@@ -490,7 +472,6 @@ public:
 class WhileStatement : public RepetitionStatement {
 public:
   WhileStatement();
-  void printAST();
 };
 
 WhileStatement::WhileStatement() {
@@ -500,7 +481,6 @@ WhileStatement::WhileStatement() {
 class DoStatement : public RepetitionStatement {
 public:
   DoStatement();
-  void printAST();
 };
 
 DoStatement::DoStatement() {
@@ -512,7 +492,6 @@ public:
   std::vector<Operator> init;
   std::vector<Operator> update;
   ForStatement();
-  void printAST();
 };
 
 ForStatement::ForStatement() {
@@ -529,7 +508,6 @@ public:
   std::vector<Expression> then;
   std::vector<Expression> denial;
   IfStatement();
-  void printAST();
 };
 
 IfStatement::IfStatement() {
@@ -540,7 +518,6 @@ class SwitchStatement : public BranchStatement {
 public:
   std::vector<Expression> body;
   SwitchStatement();
-  void printAST();
 };
 
 SwitchStatement::SwitchStatement() {
@@ -550,7 +527,6 @@ SwitchStatement::SwitchStatement() {
 class LabelStatement : public Statement {
 public:
   LabelStatement();
-  void printAST();
 };
 
 LabelStatement::LabelStatement() {
@@ -561,7 +537,6 @@ class CaseStatement : public Statement {
 public:
   Literal value;
   CaseStatement();
-  void printAST();
 };
 
 CaseStatement::CaseStatement() {
@@ -572,7 +547,6 @@ class GotoStatement : public Statement {
 public:
   std::string jump;
   GotoStatement();
-  void printAST();
 };
 
 GotoStatement::GotoStatement() {
@@ -582,7 +556,6 @@ GotoStatement::GotoStatement() {
 class ContinueStatement : public Statement {
 public:
   ContinueStatement();
-  void printAST();
 };
 
 ContinueStatement::ContinueStatement() {
@@ -592,7 +565,6 @@ ContinueStatement::ContinueStatement() {
 class BreakStatement : public Statement {
 public:
   BreakStatement();
-  void printAST();
 };
 
 BreakStatement::BreakStatement() {
@@ -603,21 +575,16 @@ class ReturnStatement : public Statement {
 public:
   Expression value;
   ReturnStatement();
-  void printAST();
 };
 
 ReturnStatement::ReturnStatement() {
   kind = "Ret";
 }
 
-class ASTProg {
-public:
-  std::vector<Node> prog;
-};
-
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
 private:
-  ASTProg prog;
+  std::vector<std::string> order;
+  std::vector<VariableDeclation> VarDeclArray;
 
 public:
   explicit MyAstVisitor(ASTContext *Context, llvm::StringRef InFile) : Context(Context), source_file(InFile) {}
@@ -915,6 +882,8 @@ public:
 
   // VarDecl
   bool VisitVarDecl(VarDecl *Decl) {
+    VariableDeclation VD;
+    //VarDeclArray.push_back(new VariableDeclation());
     if (Decl->getKind() == 50) {
       return true;
     }
@@ -938,6 +907,16 @@ public:
       TraverseStmt(Decl->getInit());
     }
     llvm::outs() << "}";
+
+    order.push_back(VD.kind);
+    VD.name = Decl -> getNameAsString();
+    VD.scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
+    //VD.printAST();
+    //VarDeclArray.push_back(VD);
+    //VarDeclArray[VarDeclArray.end()].name = Decl -> getNameAsString();
+    //VarDeclArray[VarDeclArray.end()].scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
+    VarDeclArray.push_back(VD);
+
     return false;
   }
   
@@ -2617,13 +2596,21 @@ public:
     }
   }
   
+  // ASTの出力
   void printAST() {
     int i;
-    Node n;
+    for (i = 0; i != (int)order.size(); i++) {
+      checkKind(order[i]);
+    }
+  }
 
-    for (i = 0; i != (int)prog.prog.size(); i++) {
-      n = prog.prog[i];
-      n.printAST();
+  // ASTの種類をチェック
+  void checkKind(std::string kind) {
+    if (kind == "VarDecl") {
+      VarDeclArray[0].printAST();
+      VarDeclArray.erase(VarDeclArray.begin());
+    } else {
+      llvm::outs() << "Nothing kind";
     }
   }
   
