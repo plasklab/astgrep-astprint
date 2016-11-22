@@ -26,27 +26,58 @@ using namespace llvm::opt;
 class DataType {
 public:
   std::string kind;
-
   void printType();
+  virtual ~DataType() {};
 };
 
 void DataType::printType() {
-  llvm::outs() << "Type";
+  llvm::outs() << "No Type";
+}
+
+class VoidType : public DataType {
+public:
+  VoidType();
+};
+
+VoidType::VoidType() {
+  kind = "Void";
+}
+
+class BoolType : public DataType {
+public:
+  BoolType();
+};
+
+BoolType::BoolType() {
+  kind = "Bool";
 }
 
 class SignedType : public DataType {
+public:
+  bool constBool;
+  bool volatileBool;
 };
 
 class UnsignedType : public DataType {
+public:
+  bool constBool;
+  bool volatileBool;
 };
 
 class IntType : public SignedType {
 public:
   IntType();
+  virtual void printType();
 };
 
 IntType::IntType() {
   kind = "IntType";
+  constBool = false;
+  volatileBool = false;
+}
+
+void IntType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"}";
 }
 
 class UnsignedIntType : public UnsignedType {
@@ -56,6 +87,8 @@ public:
 
 UnsignedIntType::UnsignedIntType() {
   kind = "UnsignedIntType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class FloatType : public SignedType {
@@ -65,6 +98,8 @@ public:
 
 FloatType::FloatType() {
   kind = "FloatType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class UnsignedFloatType : public UnsignedType {
@@ -74,6 +109,8 @@ public:
 
 UnsignedFloatType::UnsignedFloatType() {
   kind = "UnsignedFloatType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class LongType : public SignedType {
@@ -83,6 +120,8 @@ public:
 
 LongType::LongType() {
   kind = "LongType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class UnsignedLongType : public UnsignedType {
@@ -92,6 +131,30 @@ public:
 
 UnsignedLongType::UnsignedLongType() {
   kind = "UnsignedLongType";
+  constBool = false;
+  volatileBool = false;
+}
+
+class LongLongType : public SignedType {
+public:
+  LongLongType();
+};
+
+LongLongType::LongLongType() {
+  kind = "LongLongType";
+  constBool = false;
+  volatileBool = false;
+}
+
+class UnsignedLongLongType : public UnsignedType {
+public:
+  UnsignedLongLongType();
+};
+
+UnsignedLongLongType::UnsignedLongLongType() {
+  kind = "UnsignedLongLongType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class DoubleType : public SignedType {
@@ -101,6 +164,8 @@ public:
 
 DoubleType::DoubleType() {
   kind = "DoubleType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class UnsignedDoubleType : public UnsignedType {
@@ -110,6 +175,19 @@ public:
 
 UnsignedDoubleType::UnsignedDoubleType() {
   kind = "UnsingedDoubleType";
+  constBool = false;
+  volatileBool = false;
+}
+
+class LongDoubleType : public SignedType {
+public:
+  LongDoubleType();
+};
+
+LongDoubleType::LongDoubleType() {
+  kind = "LongDoubleType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class ShortType : public SignedType {
@@ -119,6 +197,8 @@ public:
 
 ShortType::ShortType() {
   kind = "ShortType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class UnsignedShortType : public UnsignedType {
@@ -128,6 +208,8 @@ public:
 
 UnsignedShortType::UnsignedShortType() {
   kind = "UnsingedShortType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class CharType : public SignedType {
@@ -137,6 +219,8 @@ public:
 
 CharType::CharType() {
   kind = "CharType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class UnsignedCharType : public UnsignedType {
@@ -146,6 +230,8 @@ public:
 
 UnsignedCharType::UnsignedCharType() {
   kind = "UnsignedChartType";
+  constBool = false;
+  volatileBool = false;
 }
 
 class PointeeType : public DataType {
@@ -160,7 +246,8 @@ PointeeType::PointeeType() {
 
 class FuncType : public DataType {
 public:
-  DataType retType;
+  std::vector<DataType*> parmType;
+  DataType *retType;
   FuncType();
 };
 
@@ -171,7 +258,7 @@ FuncType::FuncType() {
 class ArrayDataType : public DataType {
 public:
   int arraySize;
-  DataType type;
+  DataType *type;
   ArrayDataType();
 };
 
@@ -200,8 +287,9 @@ UnionType::UnionType() {
 }
 
 class RenameType : public DataType {
+public:
   std::string typeName;
-  DataType typedefType;
+  DataType *typedefType;
   RenameType();
 };
 
@@ -218,8 +306,13 @@ public:
   std::string endFile;
   int endLine;
   int endColumn;
-  
+  void PrintLocation();
 };
+
+void Node::PrintLocation() {
+  llvm::outs() << " :loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
+  	   << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]";
+}
 
 class Expression : public Node {
 public:
@@ -381,7 +474,9 @@ FieldDeclation::FieldDeclation() : scope("member") {
 
 class ObjectDeclation : public Declation {
 public:
-  DataType type;
+  bool autoBool;
+  bool staticBool;
+  DataType *type;
   std::string displayType;
 };
 
@@ -397,6 +492,8 @@ public:
 
 ParameterDeclation::ParameterDeclation() {
   kind = "ParmDecl";
+  autoBool = false;
+  staticBool = false;
 }
 
 
@@ -409,21 +506,26 @@ public:
 
 VariableDeclation::VariableDeclation() {
   kind = "VarDecl";
+  autoBool = false;
+  staticBool = false;
 }
 
 void VariableDeclation::printAST() {
-  /*
-  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :scope \""
-	 << scope << "\" :display-type \"" << displayType << "\" :type ";
-  type.printType();
-  if (!init) {
-  init.printAST();
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :scope \"" << scope << "\"";
+  if (autoBool == true) {
+    llvm::outs() << ":auto \"true\"";
   }
-  llvm::outs() << ":loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
-	   << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]}";
-  */
-  llvm::outs() << name << "\n";
-  llvm::outs() << "{:kind \"" << kind << "\"}";
+  if (staticBool == true) {
+    llvm::outs() << ":static \"true\"";
+  }
+  llvm::outs() << " :display-type \"" << displayType << "\" :type ";
+  type->printType();
+  llvm::outs() << "\ntype" << type << "\n";
+  PrintLocation();
+  llvm::outs() << "}\n";
+  //if (!init) {
+  //  init.printAST();
+  //}
 }
 
 class FunctionDeclation : public Declation {
@@ -431,10 +533,17 @@ public:
   std::vector<ParameterDeclation> parm;
   std::vector<Node> body;
   FunctionDeclation();
+  void printAST();
 };
 
 FunctionDeclation::FunctionDeclation() {
   kind = "FuncDecl";
+}
+
+void FunctionDeclation::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
+  PrintLocation();
+  llvm::outs() << "}\n";
 }
 
 class TypeDeclation : public Declation {
@@ -585,6 +694,7 @@ class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
 private:
   std::vector<std::string> order;
   std::vector<VariableDeclation> VarDeclArray;
+  std::vector<FunctionDeclation> FuncDeclArray;
 
 public:
   explicit MyAstVisitor(ASTContext *Context, llvm::StringRef InFile) : Context(Context), source_file(InFile) {}
@@ -767,6 +877,7 @@ public:
   
   // FunctionDecl
   bool VisitFunctionDecl(FunctionDecl *Decl) {
+    FunctionDeclation FD;
     if (dyn_cast<CXXMethodDecl>(Decl)) {
       CXXMethodDecl *method = dyn_cast<CXXMethodDecl>(Decl);
       last_func = method->getQualifiedNameAsString();
@@ -815,6 +926,19 @@ public:
       TraverseStmt(Decl->getBody());
       llvm::outs() << "]}";
     }
+
+    // 修正版
+    order.push_back(FD.kind);
+    FD.name = Decl->getQualifiedNameAsString();
+    Node t = PrintSourceRange(Decl->getSourceRange());
+    FD.beginFile = t.beginFile;
+    FD.beginLine = t.beginLine;
+    FD.beginColumn = t.beginColumn;
+    FD.endFile = t.endFile;
+    FD.endLine = t.endLine;
+    FD.endColumn = t.endColumn;
+    FuncDeclArray.push_back(FD);
+
     return false;
   }
 
@@ -883,7 +1007,7 @@ public:
   // VarDecl
   bool VisitVarDecl(VarDecl *Decl) {
     VariableDeclation VD;
-    //VarDeclArray.push_back(new VariableDeclation());
+    // 今までの出力
     if (Decl->getKind() == 50) {
       return true;
     }
@@ -908,13 +1032,20 @@ public:
     }
     llvm::outs() << "}";
 
+    // 修正版
     order.push_back(VD.kind);
     VD.name = Decl -> getNameAsString();
     VD.scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
-    //VD.printAST();
-    //VarDeclArray.push_back(VD);
-    //VarDeclArray[VarDeclArray.end()].name = Decl -> getNameAsString();
-    //VarDeclArray[VarDeclArray.end()].scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
+    //VD.autoBool = PrintAutoTypeInfo(vartype);
+    VD.type = PrintTypeInfo(vartype);
+    VD.displayType = PrintDisplayType(vartype);
+    Node t = PrintSourceRange(Decl->getSourceRange());
+    VD.beginFile = t.beginFile;
+    VD.beginLine = t.beginLine;
+    VD.beginColumn = t.beginColumn;
+    VD.endFile = t.endFile;
+    VD.endLine = t.endLine;
+    VD.endColumn = t.endColumn;
     VarDeclArray.push_back(VD);
 
     return false;
@@ -992,32 +1123,40 @@ public:
   }
   
   // typeを文字列として出力
-  void PrintDisplayType(QualType typeInfo) {
+  //void PrintDisplayType(QualType typeInfo) {
+  std::string PrintDisplayType(QualType typeInfo) {
     if (labelflag != 0 || castflag != 0) {
       os << " :DisplayType " << "\"" << typeInfo.getAsString() << "\"";
     } else {
       llvm::outs() << " :DisplayType " << "\"" << typeInfo.getAsString() << "\"";
     }
+
+    return typeInfo.getAsString();
   }
  
   
   void PrintAutoTypeInfo(QualType typeInfo) {
+  //bool PrintAutoTypeInfo(QualType typeInfo) {
     assert(labelflag == 0);
     if (castflag != 0) {
-      cast << " :Auto \"true\"";
+      //cast << " :Auto \"true\"";
       PrintQualifier(typeInfo);
       PrintTypeInfo(dyn_cast<AutoType>(typeInfo)->getDeducedType());
-      castlabel += cast.str();
-      cast.str("");
-      cast.clear();
+      //castlabel += cast.str();
+      //cast.str("");
+      //cast.clear();
+     // return true;
     } else {
-      llvm::outs() << " :Auto \"true\"";
+      //llvm::outs() << " :Auto \"true\"";
       PrintQualifier(typeInfo);
       PrintTypeInfo(dyn_cast<AutoType>(typeInfo)->getDeducedType());
+     // return true;
     }
   }
 
-  void PrintTypedefTypeInfo(QualType typeInfo) {
+  //void PrintTypedefTypeInfo(QualType typeInfo) {
+  RenameType *PrintTypedefTypeInfo(QualType typeInfo) {
+    RenameType *TDF = new RenameType();
     TypedefNameDecl *TDtype = dyn_cast<TypedefType>(typeInfo)->getDecl();
     assert(labelflag == 0);
     if (castflag != 0) {
@@ -1038,72 +1177,133 @@ public:
       PrintQualifier(typeInfo);
       llvm::outs() << "}";
     }
+
+    TDF->typeName = (std::string)TDtype->getName();
+    TDF->typedefType = PrintTypeInfo(TDtype->getUnderlyingType());
+
+    return TDF;
   }
 
-  void PrintBuiltinTypeInfo(QualType typeInfo) {
+  //void PrintBuiltinTypeInfo(QualType typeInfo) {
+  DataType *PrintBuiltinTypeInfo(QualType typeInfo) {
     std::string Typename;
+    DataType *t;
     switch (dyn_cast<BuiltinType>(typeInfo)->getKind()) {
-    case BuiltinType::Void:
-      Typename = "Void";
-      break;
-    case BuiltinType::Bool:
-      Typename = "Bool";
-      break;
-    case BuiltinType::UChar:
-      Typename = "UnsignedChar";
-      break;
-    case BuiltinType::UShort:
-      Typename = "UnsignedShort";
-      break;
-    case BuiltinType::UInt:
-      Typename = "UnsignedInt";
-      break;
-    case BuiltinType::ULong:
-      Typename = "UnsignedLong";
-      break;
-    case BuiltinType::ULongLong:
-      Typename = "UnsigndLongLong";
-      break;
-    case BuiltinType::Char_S:
-      Typename = "Char";
-      break;
-    case BuiltinType::SChar:
-      Typename = "SignedChar";
-      break;
-    case BuiltinType::Short:
-      Typename = "Short";
-      break;
-    case BuiltinType::Int:
-      Typename = "Int";
-      break;
-    case BuiltinType::Long:
-      Typename = "Long";
-      break;
-    case BuiltinType::LongLong:
-      Typename = "LongLong";
-      break;
-    case BuiltinType::Float:
-      Typename = "Float";
-      break;
-    case BuiltinType::Double:
-      Typename = "Double";
-      break;
-    case BuiltinType::LongDouble:
-      Typename = "LongDouble";
-      break;
-      //以下c++に関するもの
-    case BuiltinType::WChar_S:
-    case BuiltinType::WChar_U:
-      Typename = "WChar_t";
-      break;
-    case BuiltinType::Dependent:
-      Typename = "Dependent";
-      break;
-    default:
-      Typename = "UnKnownError";
-      llvm::outs() << "\n \""<< typeInfo.getAsString() << "\"は, 初出です."
-		   << " astprint.cppのPrintTypeInfoにcaseを追加して下さい.";
-      break;
+      case BuiltinType::Void:
+      {
+	Typename = "Void";
+	t = new VoidType();
+        return t;
+      }
+      case BuiltinType::Bool:
+      {
+	Typename = "Bool";
+	t = new BoolType();
+        return t;
+      }
+      case BuiltinType::UChar:
+      {
+	Typename = "UnsignedChar";
+	t = new UnsignedCharType();
+        return t;
+      }
+      case BuiltinType::UShort:
+      {
+	Typename = "UnsignedShort";
+	t = new UnsignedShortType();
+        return t;
+      }
+      case BuiltinType::UInt:
+      {
+	Typename = "UnsignedInt";
+	t = new UnsignedIntType();
+	return t;
+      }
+      case BuiltinType::ULong:
+      {
+	Typename = "UnsignedLong";
+	t = new UnsignedLongType();
+	return t;
+      }
+      case BuiltinType::ULongLong:
+      {
+	Typename = "UnsigndLongLong";
+	t = new UnsignedLongLongType();
+	return t;
+      }
+      case BuiltinType::Char_S:
+      {
+	Typename = "Char";
+	t = new CharType();
+	return t;
+      }
+      case BuiltinType::SChar:
+      {
+	Typename = "SignedChar";
+	t = new CharType();
+	return t;
+      }
+      case BuiltinType::Short:
+      {
+	Typename = "Short";
+	t = new ShortType();
+	return t;
+      }
+      case BuiltinType::Int:
+      {
+	Typename = "Int";
+	t = new IntType();
+	return t;
+      }
+      case BuiltinType::Long:
+      {
+	Typename = "Long";
+	t = new LongType();
+	return t;
+      }
+      case BuiltinType::LongLong:
+      {
+	Typename = "LongLong";
+	t = new LongLongType();
+	return t;
+      }
+      case BuiltinType::Float:
+      {
+	Typename = "Float";
+	t = new FloatType();
+	return t;
+      }
+      case BuiltinType::Double:
+      {
+	Typename = "Double";
+	t = new DoubleType();
+	return t;
+      }
+      case BuiltinType::LongDouble:
+      {
+	Typename = "LongDouble";
+	t = new LongDoubleType();
+	return t;
+      }
+	//以下c++に関するもの
+      case BuiltinType::WChar_S:
+      case BuiltinType::WChar_U:
+      {
+	Typename = "WChar_t";
+	break;
+      }
+      case BuiltinType::Dependent:
+      {
+	Typename = "Dependent";
+	break;
+      }
+      default:
+      {
+	Typename = "UnKnownError";
+	llvm::outs() << "\n \""<< typeInfo.getAsString() << "\"は, 初出です."
+		     << " astprint.cppのPrintTypeInfoにcaseを追加して下さい.";
+	break;
+      }
     }
     assert(labelflag == 0);
     if (castflag != 0) {
@@ -1118,10 +1318,14 @@ public:
       PrintQualifier(typeInfo);
       llvm::outs() << "}";
     }
+
+    return t;
   }
 
-  void PrintFunctionTypeInfo(QualType typeInfo) {
+  //void PrintFunctionTypeInfo(QualType typeInfo) {
+  FuncType *PrintFunctionTypeInfo(QualType typeInfo) {
     assert(labelflag == 0);
+    FuncType *t = new FuncType();
     if (castflag != 0) {
       cast << "{:kind \"Func-type\""
 	   << " :ParmsType [";
@@ -1133,7 +1337,7 @@ public:
 	    if (i != 0) {
 	      cast << " ";
 	    }
-	    PrintTypeInfo(dyn_cast<FunctionProtoType>(typeInfo)->getArgType(i));
+	    t->parmType.push_back(PrintTypeInfo(dyn_cast<FunctionProtoType>(typeInfo)->getArgType(i)));
 	    i++;
 	  }
 	}
@@ -1142,7 +1346,7 @@ public:
       if (dyn_cast<FunctionType>(typeInfo)) {
 	cast << " :RetType ";
 	QualType rettype = dyn_cast<FunctionType>(typeInfo)->getResultType();
-	PrintTypeInfo(rettype);
+	t->retType = PrintTypeInfo(rettype);
       } 
       cast << "}";
       castlabel += cast.str();
@@ -1159,7 +1363,7 @@ public:
 	    if (i != 0) {
 	      llvm::outs() << " ";
 	    }
-	    PrintTypeInfo(dyn_cast<FunctionProtoType>(typeInfo)->getArgType(i));
+	    t->parmType.push_back(PrintTypeInfo(dyn_cast<FunctionProtoType>(typeInfo)->getArgType(i)));
 	    i++;
 	  }
 	}
@@ -1168,14 +1372,18 @@ public:
       if (dyn_cast<FunctionType>(typeInfo)) {
 	llvm::outs() << " :RetType ";
 	QualType rettype = dyn_cast<FunctionType>(typeInfo)->getResultType();
-	PrintTypeInfo(rettype);
+	t->retType = PrintTypeInfo(rettype);
       } 
       llvm::outs() << "}";
     }
+
+    return t;
   }
 
-  void PrintArrayTypeInfo(QualType typeInfo) {
+  //void PrintArrayTypeInfo(QualType typeInfo) {
+  ArrayDataType *PrintArrayTypeInfo(QualType typeInfo) {
     QualType elmtype;
+    ArrayDataType *t = new ArrayDataType();
     if (dyn_cast<ArrayType>(typeInfo)) {
       elmtype = dyn_cast<ArrayType>(typeInfo)->getElementType();
       assert(labelflag == 0);
@@ -1184,6 +1392,8 @@ public:
 	if (dyn_cast<ConstantArrayType>(typeInfo)) {
 	  cast << " :Arraysize \"" 
 	       << dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true) << "\"";
+          //std::string index = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
+          //t.arraySize = atoi(index);
 	}
 	if (dyn_cast<VariableArrayType>(typeInfo)) {
 	  Expr *vaexpr = dyn_cast<VariableArrayType>(typeInfo)->getSizeExpr();
@@ -1193,7 +1403,7 @@ public:
 	}
 	PrintQualifier(typeInfo);
 	cast << " :type [";
-	PrintTypeInfo(elmtype);
+	t->type = PrintTypeInfo(elmtype);
 	cast << "]}";
 	castlabel += cast.str();
 	cast.str("");
@@ -1203,6 +1413,8 @@ public:
 	if (dyn_cast<ConstantArrayType>(typeInfo)) {
 	  llvm::outs() << " :ArraySize \"" 
 		       << dyn_cast<ConstantArrayType>(typeInfo)->getSize() << "\"";
+          //std::string index  = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
+          //t.arraySize = std::stoi(index);
 	}
 	if (dyn_cast<VariableArrayType>(typeInfo)) {
 	  Expr *vaexpr = dyn_cast<VariableArrayType>(typeInfo)->getSizeExpr();
@@ -1212,16 +1424,20 @@ public:
 	}
 	PrintQualifier(typeInfo);
 	llvm::outs() << " :type [";
-	PrintTypeInfo(elmtype);
+	t->type = PrintTypeInfo(elmtype);
 	llvm::outs() << "]}";
       }
     } else if (dyn_cast<ParenType>(typeInfo)) {
       elmtype = dyn_cast<ParenType>(typeInfo)->getInnerType();
       PrintTypeInfo(elmtype);
     }
+
+    return t;
   }
 
-  void PrintPointerTypeInfo(QualType typeInfo) {
+  //void PrintPointerTypeInfo(QualType typeInfo) {
+  PointeeType *PrintPointerTypeInfo(QualType typeInfo) {
+    PointeeType *t = new PointeeType();
     if (dyn_cast<PointerType>(typeInfo)) {
       QualType elmtype = dyn_cast<PointerType>(typeInfo)->getPointeeType();
       assert(labelflag == 0);
@@ -1242,9 +1458,13 @@ public:
 	llvm::outs() << "}";
       }
     }
+
+    return t;
   }
 
-  void PrintStructureTypeInfo(QualType typeInfo) {
+  //void PrintStructureTypeInfo(QualType typeInfo) {
+  StructureType *PrintStructureTypeInfo(QualType typeInfo) {
+    StructureType *t = new StructureType();
     assert(labelflag == 0);
     if (castflag != 0) {
       if (dyn_cast<ElaboratedType>(typeInfo)) {
@@ -1301,9 +1521,13 @@ public:
 	llvm::outs() << "}";
       }
     }
+
+    return t;
   }
 
-  void PrintUnionTypeInfo(QualType typeInfo) {
+  //void PrintUnionTypeInfo(QualType typeInfo) {
+  UnionType *PrintUnionTypeInfo(QualType typeInfo) {
+    UnionType *t = new UnionType();
     if (castflag != 0) {
       if (dyn_cast<ElaboratedType>(typeInfo)) {
 	QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
@@ -1356,27 +1580,31 @@ public:
 	llvm::outs() << "}";
       }
     }
+    return t;
   }
 
   // :typeの情報を出力
-  void PrintTypeInfo(QualType typeInfo) {
+  //void PrintTypeInfo(QualType typeInfo) {
+  DataType *PrintTypeInfo(QualType typeInfo) {
     //llvm::outs() << "(";
-    if (dyn_cast<AutoType>(typeInfo))
-      PrintAutoTypeInfo(typeInfo);
-    else if (dyn_cast<TypedefType>(typeInfo))
-      PrintTypedefTypeInfo(typeInfo);
+    DataType *t;
+    //if (dyn_cast<AutoType>(typeInfo))
+    //  t = PrintAutoTypeInfo(typeInfo);
+    //else if (dyn_cast<TypedefType>(typeInfo))
+    if (dyn_cast<TypedefType>(typeInfo))
+      return PrintTypedefTypeInfo(typeInfo);
     else if (dyn_cast<BuiltinType>(typeInfo))
-      PrintBuiltinTypeInfo(typeInfo);
+      return PrintBuiltinTypeInfo(typeInfo);
     else if (typeInfo->isFunctionType())
-      PrintFunctionTypeInfo(typeInfo);
+      return PrintFunctionTypeInfo(typeInfo);
     else if (typeInfo->isArrayType()) 
-      PrintArrayTypeInfo(typeInfo);
+      return PrintArrayTypeInfo(typeInfo);
     else if (typeInfo->isPointerType())
-      PrintPointerTypeInfo(typeInfo);
+      return PrintPointerTypeInfo(typeInfo);
     else if (typeInfo->isStructureType())
-      PrintStructureTypeInfo(typeInfo);
+      return PrintStructureTypeInfo(typeInfo);
     else if (typeInfo->isUnionType()) 
-      PrintUnionTypeInfo(typeInfo);
+      return PrintUnionTypeInfo(typeInfo);
     else {
       assert(labelflag == 0);
       if (castflag != 0) {
@@ -1390,6 +1618,8 @@ public:
 		     << " :typeString " << "\"" << typeInfo.getAsString() << "\"}";
       }
     }
+
+    return t;
     //llvm::outs() << "\"" << typeInfo.getAsString() << "\")";
     //llvm::outs()  << " " << typeInfo->getTypeClassName();
   }
@@ -2536,7 +2766,9 @@ public:
 
   //// 出力関係
   // 行数 
-  void PrintSourceRange(SourceRange range) {
+  //void PrintSourceRange(SourceRange range) {
+  Node PrintSourceRange(SourceRange range) {
+    Node t;
     FullSourceLoc FullLocationBegin = Context->getFullLoc(range.getBegin());
     FullSourceLoc FullLocationEnd = Context->getFullLoc(range.getEnd());
     if (labelflag != 0) {
@@ -2575,6 +2807,15 @@ public:
 		   << " " << Context->getFullLoc(range.getEnd()).getSpellingColumnNumber() << "]";	
 #endif
     }
+
+    t.beginFile = Context->getFullLoc(range.getBegin()).getManager().getFilename(FullLocationBegin);
+    t.beginLine = Context->getFullLoc(range.getBegin()).getSpellingLineNumber();
+    t.beginColumn = Context->getFullLoc(range.getBegin()).getSpellingColumnNumber();
+    t.endFile = Context->getFullLoc(range.getEnd()).getManager().getFilename(FullLocationEnd);
+    t.endLine = Context->getFullLoc(range.getEnd()).getSpellingLineNumber();
+    t.endColumn = Context->getFullLoc(range.getEnd()).getSpellingColumnNumber();
+
+    return t;
   }
 
   // ラベルの有無
@@ -2609,6 +2850,9 @@ public:
     if (kind == "VarDecl") {
       VarDeclArray[0].printAST();
       VarDeclArray.erase(VarDeclArray.begin());
+    } else if (kind == "FuncDecl") {
+      FuncDeclArray[0].printAST();
+      FuncDeclArray.erase(FuncDeclArray.begin());
     } else {
       llvm::outs() << "Nothing kind";
     }
