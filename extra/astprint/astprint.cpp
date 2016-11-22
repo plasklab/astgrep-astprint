@@ -26,7 +26,7 @@ using namespace llvm::opt;
 class DataType {
 public:
   std::string kind;
-  void printType();
+  virtual void printType();
   virtual ~DataType() {};
 };
 
@@ -37,19 +37,29 @@ void DataType::printType() {
 class VoidType : public DataType {
 public:
   VoidType();
+  void printType();
 };
 
 VoidType::VoidType() {
   kind = "Void";
 }
 
+void VoidType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"}";
+}
+
 class BoolType : public DataType {
 public:
   BoolType();
+  void printType();
 };
 
 BoolType::BoolType() {
   kind = "Bool";
+}
+
+void BoolType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"}";
 }
 
 class SignedType : public DataType {
@@ -67,7 +77,7 @@ public:
 class IntType : public SignedType {
 public:
   IntType();
-  virtual void printType();
+  void printType();
 };
 
 IntType::IntType() {
@@ -77,12 +87,18 @@ IntType::IntType() {
 }
 
 void IntType::printType() {
-  llvm::outs() << "{:kind \"" << kind << "\"}";
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
 }
 
 class UnsignedIntType : public UnsignedType {
 public:
   UnsignedIntType();
+  void printType();
 };
 
 UnsignedIntType::UnsignedIntType() {
@@ -91,9 +107,19 @@ UnsignedIntType::UnsignedIntType() {
   volatileBool = false;
 }
 
+void UnsignedIntType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class FloatType : public SignedType {
 public:
   FloatType();
+  void printType();
 };
 
 FloatType::FloatType() {
@@ -102,9 +128,19 @@ FloatType::FloatType() {
   volatileBool = false;
 }
 
+void FloatType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class UnsignedFloatType : public UnsignedType {
 public:
   UnsignedFloatType();
+  void printType();
 };
 
 UnsignedFloatType::UnsignedFloatType() {
@@ -113,9 +149,19 @@ UnsignedFloatType::UnsignedFloatType() {
   volatileBool = false;
 }
 
+void UnsignedFloatType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class LongType : public SignedType {
 public:
   LongType();
+  void printType();
 };
 
 LongType::LongType() {
@@ -124,9 +170,19 @@ LongType::LongType() {
   volatileBool = false;
 }
 
+void LongType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class UnsignedLongType : public UnsignedType {
 public:
   UnsignedLongType();
+  void printType();
 };
 
 UnsignedLongType::UnsignedLongType() {
@@ -135,9 +191,19 @@ UnsignedLongType::UnsignedLongType() {
   volatileBool = false;
 }
 
+void UnsignedLongType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class LongLongType : public SignedType {
 public:
   LongLongType();
+  void printType();
 };
 
 LongLongType::LongLongType() {
@@ -146,9 +212,19 @@ LongLongType::LongLongType() {
   volatileBool = false;
 }
 
+void LongLongType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class UnsignedLongLongType : public UnsignedType {
 public:
   UnsignedLongLongType();
+  void printType();
 };
 
 UnsignedLongLongType::UnsignedLongLongType() {
@@ -157,9 +233,19 @@ UnsignedLongLongType::UnsignedLongLongType() {
   volatileBool = false;
 }
 
+void UnsignedLongLongType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class DoubleType : public SignedType {
 public:
   DoubleType();
+  void printType();
 };
 
 DoubleType::DoubleType() {
@@ -168,9 +254,19 @@ DoubleType::DoubleType() {
   volatileBool = false;
 }
 
+void DoubleType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class UnsignedDoubleType : public UnsignedType {
 public:
   UnsignedDoubleType();
+  void printType();
 };
 
 UnsignedDoubleType::UnsignedDoubleType() {
@@ -179,9 +275,19 @@ UnsignedDoubleType::UnsignedDoubleType() {
   volatileBool = false;
 }
 
+void UnsignedDoubleType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class LongDoubleType : public SignedType {
 public:
   LongDoubleType();
+  void printType();
 };
 
 LongDoubleType::LongDoubleType() {
@@ -190,9 +296,19 @@ LongDoubleType::LongDoubleType() {
   volatileBool = false;
 }
 
+void LongDoubleType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class ShortType : public SignedType {
 public:
   ShortType();
+  void printType();
 };
 
 ShortType::ShortType() {
@@ -201,9 +317,19 @@ ShortType::ShortType() {
   volatileBool = false;
 }
 
+void ShortType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class UnsignedShortType : public UnsignedType {
 public:
   UnsignedShortType();
+  void printType();
 };
 
 UnsignedShortType::UnsignedShortType() {
@@ -212,9 +338,19 @@ UnsignedShortType::UnsignedShortType() {
   volatileBool = false;
 }
 
+void UnsignedShortType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class CharType : public SignedType {
 public:
   CharType();
+  void printType();
 };
 
 CharType::CharType() {
@@ -223,9 +359,19 @@ CharType::CharType() {
   volatileBool = false;
 }
 
+void CharType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class UnsignedCharType : public UnsignedType {
 public:
   UnsignedCharType();
+  void printType();
 };
 
 UnsignedCharType::UnsignedCharType() {
@@ -234,14 +380,30 @@ UnsignedCharType::UnsignedCharType() {
   volatileBool = false;
 }
 
+void UnsignedCharType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (constBool == true)
+    llvm::outs() << ":const \"true\"";
+  if (volatileBool == true)
+    llvm::outs() << ":volatileBool \"true\"";
+  llvm::outs() << "}";
+}
+
 class PointeeType : public DataType {
 public:
-  DataType pointee;
+  DataType *pointee;
   PointeeType();
+  void printType();
 };
 
 PointeeType::PointeeType() {
   kind = "PointerType";
+}
+
+void PointeeType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\" :Pointee ";
+  pointee->printType();
+  llvm::outs() << "}";
 }
 
 class FuncType : public DataType {
@@ -249,10 +411,28 @@ public:
   std::vector<DataType*> parmType;
   DataType *retType;
   FuncType();
+  void printType();
 };
 
 FuncType::FuncType() {
   kind = "FuncType";
+}
+
+void FuncType::printType() {
+  int i;
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (parmType.size() != 0 ) {
+    llvm::outs() << " :parms-type [";
+    for (i = 0; i < (int)parmType.size() - 1; i++) {
+      parmType[i]->printType();
+      llvm::outs() << " ";
+    }
+    parmType[(int)parmType.size() - 1]->printType();
+    llvm::outs() << "]";
+  }
+  llvm::outs() << " :ret-type ";
+  retType->printType();
+  llvm::outs() << "}";
 }
 
 class ArrayDataType : public DataType {
@@ -260,30 +440,47 @@ public:
   int arraySize;
   DataType *type;
   ArrayDataType();
+  void printType();
 };
 
 ArrayDataType::ArrayDataType() {
   kind = "ArrayType";
 }
 
+void ArrayDataType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\" :array-size " << arraySize << " :type ";
+  type->printType();
+  llvm::outs() << "}";
+}
+
 class StructureType : public DataType {
 public:
   std::string name;
   StructureType();
+  void printType();
 };
 
 StructureType::StructureType() {
   kind = "StructureType";
 }
 
+void StructureType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"}";
+}
+
 class UnionType : public DataType {
 public:
   std::string name;
   UnionType();
+  void printType();
 };
 
 UnionType::UnionType() {
   kind = "UnionType";
+}
+
+void UnionType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"}";
 }
 
 class RenameType : public DataType {
@@ -291,10 +488,17 @@ public:
   std::string typeName;
   DataType *typedefType;
   RenameType();
+  void printType();
 };
 
 RenameType::RenameType() {
   kind = "TypedefType";
+}
+
+void RenameType::printType() {
+  llvm::outs() << "{:kind \"" << kind << "\" :type-name \"" << typeName << "\" :typedef-type ";
+  typedefType->printType();
+  llvm::outs() << "}";
 }
 
 class Node {
@@ -1458,6 +1662,8 @@ public:
 	llvm::outs() << "}";
       }
     }
+    QualType elmtype = dyn_cast<PointerType>(typeInfo)->getPointeeType();
+    t->pointee = PrintTypeInfo(elmtype);
 
     return t;
   }
