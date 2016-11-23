@@ -511,11 +511,17 @@ public:
   int endLine;
   int endColumn;
   void PrintLocation();
+  virtual void printAST();
+  virtual ~Node() {};
 };
 
 void Node::PrintLocation() {
   llvm::outs() << " :loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
   	   << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]";
+}
+
+void Node::printAST() {
+  llvm::outs() << "No Kind";
 }
 
 class Expression : public Node {
@@ -703,7 +709,7 @@ ParameterDeclation::ParameterDeclation() {
 
 class VariableDeclation : public DeclationOfVariables {
 public:
-  Expression init;
+  Expression *init;
   VariableDeclation();
   void printAST();
 };
@@ -724,11 +730,10 @@ void VariableDeclation::printAST() {
   }
   llvm::outs() << " :display-type \"" << displayType << "\" :type ";
   type->printType();
-  llvm::outs() << "\ntype" << type << "\n";
   PrintLocation();
   llvm::outs() << "}\n";
   //if (!init) {
-  //  init.printAST();
+  //  init->printAST();
   //}
 }
 
@@ -897,8 +902,10 @@ ReturnStatement::ReturnStatement() {
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
 private:
   std::vector<std::string> order;
-  std::vector<VariableDeclation> VarDeclArray;
-  std::vector<FunctionDeclation> FuncDeclArray;
+  std::vector<Node *> prog;
+  std::vector<Declation *> DpArray;
+  std::vector<Expression *> EpArray;
+  std::vector<Statement *> SpArray;
 
 public:
   explicit MyAstVisitor(ASTContext *Context, llvm::StringRef InFile) : Context(Context), source_file(InFile) {}
@@ -1081,7 +1088,8 @@ public:
   
   // FunctionDecl
   bool VisitFunctionDecl(FunctionDecl *Decl) {
-    FunctionDeclation FD;
+    Node *np;
+    FunctionDeclation *FD = new FunctionDeclation();
     if (dyn_cast<CXXMethodDecl>(Decl)) {
       CXXMethodDecl *method = dyn_cast<CXXMethodDecl>(Decl);
       last_func = method->getQualifiedNameAsString();
@@ -1132,16 +1140,18 @@ public:
     }
 
     // 修正版
-    order.push_back(FD.kind);
-    FD.name = Decl->getQualifiedNameAsString();
+    order.push_back(FD->kind);
+    FD->name = Decl->getQualifiedNameAsString();
     Node t = PrintSourceRange(Decl->getSourceRange());
-    FD.beginFile = t.beginFile;
-    FD.beginLine = t.beginLine;
-    FD.beginColumn = t.beginColumn;
-    FD.endFile = t.endFile;
-    FD.endLine = t.endLine;
-    FD.endColumn = t.endColumn;
-    FuncDeclArray.push_back(FD);
+    FD->beginFile = t.beginFile;
+    FD->beginLine = t.beginLine;
+    FD->beginColumn = t.beginColumn;
+    FD->endFile = t.endFile;
+    FD->endLine = t.endLine;
+    FD->endColumn = t.endColumn;
+    //FuncDeclArray.push_back(FD);
+    np = FD;
+    prog.push_back(np);
 
     return false;
   }
@@ -1210,7 +1220,9 @@ public:
 
   // VarDecl
   bool VisitVarDecl(VarDecl *Decl) {
-    VariableDeclation VD;
+    //VariableDeclation VD;
+    Node *np;
+    VariableDeclation *VD = new VariableDeclation();
     // 今までの出力
     if (Decl->getKind() == 50) {
       return true;
@@ -1237,20 +1249,27 @@ public:
     llvm::outs() << "}";
 
     // 修正版
-    order.push_back(VD.kind);
-    VD.name = Decl -> getNameAsString();
-    VD.scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
+    order.push_back(VD->kind);
+    VD->name = Decl -> getNameAsString();
+    VD->scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
     //VD.autoBool = PrintAutoTypeInfo(vartype);
-    VD.type = PrintTypeInfo(vartype);
-    VD.displayType = PrintDisplayType(vartype);
+    VD->type = PrintTypeInfo(vartype);
+    VD->displayType = PrintDisplayType(vartype);
+    if (Decl->hasInit()) {
+      //TraverseStmt(Decl->getInit());
+      //VD->init = EpArray[EpArray.begin()];
+      //EpArray.pop_back(EpArray.begin());
+    }
     Node t = PrintSourceRange(Decl->getSourceRange());
-    VD.beginFile = t.beginFile;
-    VD.beginLine = t.beginLine;
-    VD.beginColumn = t.beginColumn;
-    VD.endFile = t.endFile;
-    VD.endLine = t.endLine;
-    VD.endColumn = t.endColumn;
-    VarDeclArray.push_back(VD);
+    VD->beginFile = t.beginFile;
+    VD->beginLine = t.beginLine;
+    VD->beginColumn = t.beginColumn;
+    VD->endFile = t.endFile;
+    VD->endLine = t.endLine;
+    VD->endColumn = t.endColumn;
+    //VarDeclArray.push_back(VD);
+    np = VD;
+    prog.push_back(np);
 
     return false;
   }
@@ -3046,25 +3065,11 @@ public:
   // ASTの出力
   void printAST() {
     int i;
-    for (i = 0; i != (int)order.size(); i++) {
-      checkKind(order[i]);
+    for (i = 0; i != (int)prog.size(); i++) {
+      prog[i]->printAST();
     }
   }
 
-  // ASTの種類をチェック
-  void checkKind(std::string kind) {
-    if (kind == "VarDecl") {
-      VarDeclArray[0].printAST();
-      VarDeclArray.erase(VarDeclArray.begin());
-    } else if (kind == "FuncDecl") {
-      FuncDeclArray[0].printAST();
-      FuncDeclArray.erase(FuncDeclArray.begin());
-    } else {
-      llvm::outs() << "Nothing kind";
-    }
-  }
-  
-  
 private:
   ASTContext *Context;
   std::string last_func;
