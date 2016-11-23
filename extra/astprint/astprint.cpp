@@ -605,39 +605,61 @@ ConditionalOp::ConditionalOp() {
 
 class Literal : public Expression {
 public:
+  DataType *type;
 };
 
 class IntLiteral : public Literal {
 public:
   int value;
   IntLiteral();
-  
+  void printAST();
 };
 
 IntLiteral::IntLiteral() {
   kind = "IntegerLiteral";
 }
 
+void IntLiteral::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << "\" :type ";
+  type->printType();
+  PrintLocation();
+  llvm::outs() << "}";
+}
+
 class CharLiteral : public Literal {
 public:
   char value;
   CharLiteral();
-  
+  void printAST();
 };
 
 CharLiteral::CharLiteral() {
   kind = "CharacterLiteral";
 }
 
+void CharLiteral::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << "\" :type ";
+  type->printType();
+  PrintLocation();
+  llvm::outs() << "}";
+}
+
 class FloatLiteral : public Literal {
 public:
   double value;
   FloatLiteral();
-  
+  void printAST();
 };
 
 FloatLiteral::FloatLiteral() {
   kind = "FloatingLiteral";
+}
+
+void FloatLiteral::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << "\" :type ";
+  type->printType();
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class ArrayReference : public Reference {
