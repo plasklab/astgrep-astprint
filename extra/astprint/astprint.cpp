@@ -720,6 +720,7 @@ public:
 class ParameterDeclation : public DeclationOfVariables {
 public:
   ParameterDeclation();
+  void printAST();
 };
 
 ParameterDeclation::ParameterDeclation() {
@@ -728,6 +729,12 @@ ParameterDeclation::ParameterDeclation() {
   staticBool = false;
 }
 
+void ParameterDeclation::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :type ";
+  type->printType();
+  PrintLocation();
+  llvm::outs() << "}";
+}
 
 class VariableDeclation : public DeclationOfVariables {
 public:
@@ -755,14 +762,14 @@ void VariableDeclation::printAST() {
   PrintLocation();
   llvm::outs() << "}\n";
   //if (!init) {
-  //  init->printAST();
+    //init->printAST();
   //}
 }
 
 class FunctionDeclation : public Declation {
 public:
-  std::vector<ParameterDeclation> parm;
-  std::vector<Node> body;
+  std::vector<ParameterDeclation *> parm;
+  std::vector<Node *> body;
   FunctionDeclation();
   void printAST();
 };
@@ -772,7 +779,19 @@ FunctionDeclation::FunctionDeclation() {
 }
 
 void FunctionDeclation::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"\n :Parm [";
+  if (parm.size() != 0) {
+    for (int i = 0; i < (int)parm.size(); i++) {
+      parm[i]->printAST();
+    }
+  }
+  llvm::outs() << "]\n :body [";
+  if (body.size() != 0) {
+    for (int i = 0; i < (int)body.size(); i++) {
+      body[i]->printAST();
+    }
+  }
+  llvm::outs() << "]";
   PrintLocation();
   llvm::outs() << "}\n";
 }
@@ -926,6 +945,7 @@ private:
   std::vector<std::string> order;
   std::vector<Node *> prog;
   std::vector<Declation *> DpArray;
+  std::vector<ParameterDeclation *> PpArray;
   std::vector<Expression *> EpArray;
   std::vector<Statement *> SpArray;
 
@@ -1164,6 +1184,14 @@ public:
     // 修正版
     order.push_back(FD->kind);
     FD->name = Decl->getQualifiedNameAsString();
+    if (Decl->param_size()) {
+      for (int i = 0; i < (int)Decl->param_size(); i++) {
+        TraverseDecl(Decl->getParamDecl(i));
+        FD->parm[i] = PpArray[0];
+        DpArray.erase(DpArray.begin());
+      }
+    }
+    //TraverseStmt(Decl->getBody());
     Node t = PrintSourceRange(Decl->getSourceRange());
     FD->beginFile = t.beginFile;
     FD->beginLine = t.beginLine;
@@ -1180,6 +1208,7 @@ public:
 
   // ParmVarDecl
   bool VisitParmVarDecl(ParmVarDecl *Decl) {
+    ParameterDeclation *PD = new ParameterDeclation();
     std::string varname = Decl->getNameAsString();
     QualType vartype = Decl->getType();
     llvm::outs() << "{:kind \"Parm\"" 
@@ -1190,6 +1219,19 @@ public:
     llvm::outs() << "]";
     PrintSourceRange(Decl->getSourceRange());
     llvm::outs() << "}";
+
+    // 修正版
+    PD->name = Decl->getNameAsString();
+    PD->type = PrintTypeInfo(vartype);
+    Node t = PrintSourceRange(Decl->getSourceRange());
+    PD->beginFile = t.beginFile;
+    PD->beginLine = t.beginLine;
+    PD->beginColumn = t.beginColumn;
+    PD->endFile = t.endFile;
+    PD->endLine = t.endLine;
+    PD->endColumn = t.endColumn;
+    PpArray.push_back(PD);
+
     return true;
   }
 
