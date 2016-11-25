@@ -606,11 +606,11 @@ ConditionalOp::ConditionalOp() {
 class Literal : public Expression {
 public:
   DataType *type;
+  std::string value;
 };
 
 class IntLiteral : public Literal {
 public:
-  int value;
   IntLiteral();
   void printAST();
 };
@@ -620,7 +620,7 @@ IntLiteral::IntLiteral() {
 }
 
 void IntLiteral::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << "\" :type ";
+  llvm::outs() << "{:kind \"" << kind << "\" :value \"" << value << "\" :type ";
   type->printType();
   PrintLocation();
   llvm::outs() << "}";
@@ -628,7 +628,6 @@ void IntLiteral::printAST() {
 
 class CharLiteral : public Literal {
 public:
-  char value;
   CharLiteral();
   void printAST();
 };
@@ -638,7 +637,7 @@ CharLiteral::CharLiteral() {
 }
 
 void CharLiteral::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << "\" :type ";
+  llvm::outs() << "{:kind \"" << kind << "\" :value \"" << value << "\" :type ";
   type->printType();
   PrintLocation();
   llvm::outs() << "}";
@@ -646,7 +645,6 @@ void CharLiteral::printAST() {
 
 class FloatLiteral : public Literal {
 public:
-  double value;
   FloatLiteral();
   void printAST();
 };
@@ -656,7 +654,7 @@ FloatLiteral::FloatLiteral() {
 }
 
 void FloatLiteral::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << "\" :type ";
+  llvm::outs() << "{:kind \"" << kind << "\" :value \"" << value << "\" :type ";
   type->printType();
   PrintLocation();
   llvm::outs() << "}";
@@ -760,10 +758,11 @@ void VariableDeclation::printAST() {
   llvm::outs() << " :display-type \"" << displayType << "\" :type ";
   type->printType();
   PrintLocation();
+  if (init != 0) {
+    llvm::outs() << " :init ";
+    init->printAST();
+  }
   llvm::outs() << "}\n";
-  //if (!init) {
-    //init->printAST();
-  //}
 }
 
 class FunctionDeclation : public Declation {
@@ -1191,7 +1190,15 @@ public:
         DpArray.erase(DpArray.begin());
       }
     }
-    //TraverseStmt(Decl->getBody());
+   /*
+    int i = prog.size();
+    TraverseStmt(Decl->getBody());
+    int j = prog.size();
+    for (; i < j; i++) {
+      FD->body.push_back(prog[i]);
+      prog.erase(prog.begin() + i - 1);
+    }
+*/
     Node t = PrintSourceRange(Decl->getSourceRange());
     FD->beginFile = t.beginFile;
     FD->beginLine = t.beginLine;
@@ -1284,10 +1291,8 @@ public:
 
   // VarDecl
   bool VisitVarDecl(VarDecl *Decl) {
-    //VariableDeclation VD;
     Node *np;
     VariableDeclation *VD = new VariableDeclation();
-    // 今までの出力
     if (Decl->getKind() == 50) {
       return true;
     }
@@ -1320,9 +1325,9 @@ public:
     VD->type = PrintTypeInfo(vartype);
     VD->displayType = PrintDisplayType(vartype);
     if (Decl->hasInit()) {
-      //TraverseStmt(Decl->getInit());
-      //VD->init = EpArray[EpArray.begin()];
-      //EpArray.pop_back(EpArray.begin());
+      TraverseStmt(Decl->getInit());
+      VD->init = EpArray[0];
+      EpArray.pop_back();
     }
     Node t = PrintSourceRange(Decl->getSourceRange());
     VD->beginFile = t.beginFile;
@@ -1331,7 +1336,6 @@ public:
     VD->endFile = t.endFile;
     VD->endLine = t.endLine;
     VD->endColumn = t.endColumn;
-    //VarDeclArray.push_back(VD);
     np = VD;
     prog.push_back(np);
 
@@ -2957,6 +2961,7 @@ public:
 
   // IntegerLiteral
   bool VisitIntegerLiteral(IntegerLiteral *Int) {
+    IntLiteral *IL = new IntLiteral();
     QualType vartype = Int->getType();
     if (labelflag != 0) {
       getLabelValue(Int);
@@ -2970,6 +2975,19 @@ public:
       PrintSourceRange(Int->getSourceRange());
       llvm::outs() << "}";
     }
+
+    IL->value = Int->getValue().toString(10, true);
+    IL->type = PrintTypeInfo(vartype);
+    Node t = PrintSourceRange(Int->getSourceRange());
+    IL->beginFile = t.beginFile;
+    IL->beginLine = t.beginLine;
+    IL->beginColumn = t.beginColumn;
+    IL->endFile = t.endFile;
+    IL->endLine = t.endLine;
+    IL->endColumn = t.endColumn;
+    Expression *ep = IL;
+    EpArray.push_back(ep);
+
     return true;
   }
 
