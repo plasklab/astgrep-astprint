@@ -3073,48 +3073,10 @@ public:
 
   //// 出力関係
   // 行数 
-  //void PrintSourceRange(SourceRange range) {
   Node PrintSourceRange(SourceRange range) {
     Node t;
     FullSourceLoc FullLocationBegin = Context->getFullLoc(range.getBegin());
     FullSourceLoc FullLocationEnd = Context->getFullLoc(range.getEnd());
-    if (labelflag != 0) {
-      os << " :line [" 
-	 << Context->getFullLoc(range.getBegin()).getSpellingLineNumber() 
-	 << " " 
-	 << Context->getFullLoc(range.getEnd()).getSpellingLineNumber() 
-	 << "]";
-      caselabel += os.str();
-      os.str("");
-      os.clear();
-    } else {
-#if 0
-      llvm::outs() << " :line [" 
-		   << Context->getFullLoc(range.getBegin()).getSpellingLineNumber() 
-		   << " " 
-		   << Context->getFullLoc(range.getEnd()).getSpellingLineNumber() 
-		   << "]";
-
-      llvm::outs() << " :column " 
-		   << Context->getFullLoc(range.getBegin()).getSpellingColumnNumber();
-      // U>_<U
-      llvm::outs() << " :Filename " 
-		   << "\"" << FullLocation.getManager().getFilename(FullLocation) << "\""
-		   << " :EndFile "
-		   << "\"" << Context->getFullLoc(range.getEnd()).getManager().getFilename(FullLocation) << "\"";
-#else
-      
-      llvm::outs() << " :loc-begin [" 
-		   << "\"" << Context->getFullLoc(range.getBegin()).getManager().getFilename(FullLocationBegin) << "\""
-		   << " " << Context->getFullLoc(range.getBegin()).getSpellingLineNumber()
-		   << " " << Context->getFullLoc(range.getBegin()).getSpellingColumnNumber() << "]"
-		   << " :loc-end [" 
-		   << "\"" << Context->getFullLoc(range.getEnd()).getManager().getFilename(FullLocationEnd) << "\""
-		   << " " << Context->getFullLoc(range.getEnd()).getSpellingLineNumber()
-		   << " " << Context->getFullLoc(range.getEnd()).getSpellingColumnNumber() << "]";	
-#endif
-    }
-
     t.beginFile = Context->getFullLoc(range.getBegin()).getManager().getFilename(FullLocationBegin);
     t.beginLine = Context->getFullLoc(range.getBegin()).getSpellingLineNumber();
     t.beginColumn = Context->getFullLoc(range.getBegin()).getSpellingColumnNumber();
@@ -3146,8 +3108,7 @@ public:
   
   // ASTの出力
   void printAST() {
-    int i;
-    for (i = 0; i != (int)prog.size(); i++) {
+    for (int i = 0; i != (int)prog.size(); i++) {
       prog[i]->printAST();
     }
   }
