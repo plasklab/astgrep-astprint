@@ -483,6 +483,7 @@ void UnionType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"}";
 }
 
+// typedefType
 class RenameType : public DataType {
 public:
   std::string typeName;
@@ -521,12 +522,12 @@ void Node::PrintLocation() {
 }
 
 void Node::printAST() {
-  llvm::outs() << "No Kind";
+  llvm::outs() << "{:No Kind}";
 }
 
 class Expression : public Node {
 public:
-  std::vector<DataType> type;
+  std::vector<DataType *> type;
 };
 
 class Reference : public Expression {
@@ -538,22 +539,43 @@ class DeclationReferenceExpression : public Reference {
 public:
   std::string scope;
   DeclationReferenceExpression();
-  
+  void printAST();
 };
 
 DeclationReferenceExpression::DeclationReferenceExpression() {
   kind = "DRE";
 }
 
+void DeclationReferenceExpression::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name 
+               << "\" :scope \"" << scope << "\" :type [";
+  for (int i = 0; i < (int)type.size(); i++) {
+    type[i]->printType();
+  }
+  llvm::outs() << "] ";
+  PrintLocation();
+  llvm::outs() << "}";
+}
+
 class MemberReference : public Reference {
 public:
   std::string scope;
   MemberReference();
-  
+  void printAST();  
 };
 
 MemberReference::MemberReference() : scope("member") {
   kind = "Field";
+}
+
+void MemberReference::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name 
+               << "\" :scope \"" << scope << "\" :type [";
+  for (int i = 0; i < (int)type.size(); i++) {
+    type[i]->printType();
+  }
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class StructReference : public Reference {
@@ -759,7 +781,7 @@ void VariableDeclation::printAST() {
   type->printType();
   PrintLocation();
   if (init != 0) {
-    llvm::outs() << " :init ";
+    llvm::outs() << "\n :init ";
     init->printAST();
   }
   llvm::outs() << "}\n";
@@ -767,6 +789,7 @@ void VariableDeclation::printAST() {
 
 class FunctionDeclation : public Declation {
 public:
+  DataType *type;
   std::vector<ParameterDeclation *> parm;
   std::vector<Node *> body;
   FunctionDeclation();
@@ -778,7 +801,9 @@ FunctionDeclation::FunctionDeclation() {
 }
 
 void FunctionDeclation::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"\n :Parm [";
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :type ";
+  type->printType();
+  llvm::outs() << "\n :Parm [";
   if (parm.size() != 0) {
     for (int i = 0; i < (int)parm.size(); i++) {
       parm[i]->printAST();
@@ -1183,6 +1208,7 @@ public:
     // 修正版
     order.push_back(FD->kind);
     FD->name = Decl->getQualifiedNameAsString();
+    FD->type = PrintTypeInfo(Decl->getType());
     if (Decl->param_size()) {
       for (int i = 0; i < (int)Decl->param_size(); i++) {
         TraverseDecl(Decl->getParamDecl(i));
@@ -3140,7 +3166,7 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    llvm::outs() << "-----------------------------------------------";
+    llvm::outs() << "\n----------------------------------------------------------------------\n";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
