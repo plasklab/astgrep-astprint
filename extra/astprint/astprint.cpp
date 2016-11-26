@@ -688,7 +688,12 @@ class Literal : public Expression {
 public:
   DataType *type;
   std::string value;
+  virtual void printAST();
 };
+
+void Literal::printAST() {
+  llvm::outs() << "No Literal";
+}
 
 class IntLiteral : public Literal {
 public:
@@ -737,20 +742,33 @@ FloatLiteral::FloatLiteral() {
 void FloatLiteral::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :value \"" << value << "\" :type ";
   type->printType();
+  llvm::outs() << " ";
   PrintLocation();
   llvm::outs() << "}";
 }
 
 class ArrayReference : public Reference {
 public:
-  DeclationReferenceExpression array;
-  Literal index;
+  DeclationReferenceExpression *array;
+  Literal *index;
   ArrayReference();
-  
+  void printAST();
 };
 
 ArrayReference::ArrayReference() {
   kind = "ArrayRef";
+}
+
+void ArrayReference::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :type ";
+  type[0]->printType();
+  llvm::outs() << " :array ";
+  array->printAST();
+  llvm::outs() << " :index ";
+  index->printAST();
+  llvm::outs() << " ";
+  PrintLocation();
+  llvm::outs() <<"}";
 }
 
 class FunctionCall : public Expression {
@@ -758,7 +776,7 @@ public:
   DeclationReferenceExpression func;
   std::vector<DeclationReferenceExpression> parm;
   FunctionCall();
-  
+  void printAST();
 };
 
 FunctionCall::FunctionCall() {
