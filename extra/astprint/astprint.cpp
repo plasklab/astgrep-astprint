@@ -528,7 +528,12 @@ void Node::printAST() {
 class Expression : public Node {
 public:
   std::vector<DataType *> type;
+  virtual void printAST();
 };
+
+void Expression::printAST() {
+  llvm::outs() << "No Expression";
+}
 
 class Reference : public Expression {
 public:
@@ -595,6 +600,7 @@ void StructReference::printAST() {
   structs->printAST();
   llvm::outs() << " :struct-member ";
   structMember->printAST();
+  PrintLocation();
   llvm::outs() << "}";
 }
 
@@ -604,14 +610,23 @@ class Operator : public Expression {
 class BinOp : public Operator {
 public:
   std::string op;
-  std::vector<Expression> left;
-  std::vector<Expression> right;
+  Expression *left;
+  Expression *right;
   BinOp();
-  
+  void printAST();
 };
 
 BinOp::BinOp() {
   kind = "BinOp";
+}
+
+void BinOp::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :left ";
+  left->printAST();
+  llvm::outs() << " :right ";
+  right->printAST();
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class UnOp : public Operator {
