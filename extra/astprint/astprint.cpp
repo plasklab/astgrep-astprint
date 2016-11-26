@@ -580,9 +580,23 @@ void MemberReference::printAST() {
 
 class StructReference : public Reference {
 public:
-  std::vector<DeclationReferenceExpression> structs;
-  MemberReference structMember;
+  DeclationReferenceExpression *structs;
+  MemberReference *structMember;
+  StructReference();
+  void printAST();
 };
+
+StructReference::StructReference() {
+  kind = "Struct";
+}
+
+void StructReference::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :struct ";
+  structs->printAST();
+  llvm::outs() << " :struct-member ";
+  structMember->printAST();
+  llvm::outs() << "}";
+}
 
 class Operator : public Expression {
 };
