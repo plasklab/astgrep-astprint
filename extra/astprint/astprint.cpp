@@ -773,14 +773,28 @@ void ArrayReference::printAST() {
 
 class FunctionCall : public Expression {
 public:
-  DeclationReferenceExpression func;
-  std::vector<DeclationReferenceExpression> parm;
+  DeclationReferenceExpression *func;
+  std::vector<DeclationReferenceExpression *> parm;
   FunctionCall();
   void printAST();
 };
 
 FunctionCall::FunctionCall() {
   kind = "FuncCall";
+}
+
+void FunctionCall::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :type ";
+  type[0]->printType();
+  llvm::outs() << "\n :func ";
+  func->printAST();
+  llvm::outs() << "\n :parm [";
+  for (int i = 0; i < (int)parm.size(); i++) {
+    parm[i]->printAST();
+  }
+  llvm::outs() << "] ";
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class Declation : public Node {
