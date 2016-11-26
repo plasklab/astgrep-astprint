@@ -805,14 +805,22 @@ public:
 class FieldDeclation : public Declation {
 public:
   std::string scope;
-  DataType type;
-
+  DataType *type;
   FieldDeclation();
-  
+  void printAST();
 };
 
 FieldDeclation::FieldDeclation() : scope("member") {
   kind = "FieldDecl";
+}
+
+void FieldDeclation::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :name \" " << name 
+               << "\" :scope " << scope << " type";
+  type->printType();
+  llvm::outs() << " ";
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class ObjectDeclation : public Declation {
