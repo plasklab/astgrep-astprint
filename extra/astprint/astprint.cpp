@@ -659,14 +659,29 @@ void UnOp::printAST() {
 
 class ConditionalOp : public Operator {
 public:
-  BinOp condition;
-  std::vector<Operator> then;
-  std::vector<Operator> denial;
+  BinOp *condition;
+  Operator *then;
+  Operator *denial;
   ConditionalOp();
+  void printAST();
 };
 
 ConditionalOp::ConditionalOp() {
   kind = "ConditionalOp";
+}
+
+void ConditionalOp::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :type ";
+  for (int i = 0; i < (int)type.size(); i++) {
+    type[i]->printType();
+  }
+  llvm::outs() << " :condition ";
+  condition->printAST();
+  llvm::outs() << " :then ";
+  then->printAST();
+  llvm::outs() << " :else ";
+  denial->printAST();
+  llvm::outs() << "}";
 }
 
 class Literal : public Expression {
