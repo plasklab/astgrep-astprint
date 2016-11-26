@@ -621,7 +621,11 @@ BinOp::BinOp() {
 }
 
 void BinOp::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :left ";
+  llvm::outs() << "{:kind \"" << kind << "\" :op \"" << op << "\" :type [";
+  for (int i = 0; i < (int)type.size(); i++) {
+    type[i]->printType();
+  }
+  llvm::outs() << "] :left ";
   left->printAST();
   llvm::outs() << " :right ";
   right->printAST();
@@ -632,13 +636,25 @@ void BinOp::printAST() {
 class UnOp : public Operator {
 public:
   std::string op;
-  std::vector<Expression> operand;
+  Expression *operand;
   UnOp();
-  
+  void printAST();
 };
 
 UnOp::UnOp() {
   kind = "UnOp";
+}
+
+void UnOp::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :op \"" << op << "\" :type [";
+  for (int i = 0; i < (int)type.size(); i++) {
+    type[i]->printType();
+  }
+  llvm::outs() << "] :operand ";
+  operand->printAST();
+  llvm::outs() << " ";
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class ConditionalOp : public Operator {
@@ -647,7 +663,6 @@ public:
   std::vector<Operator> then;
   std::vector<Operator> denial;
   ConditionalOp();
-  
 };
 
 ConditionalOp::ConditionalOp() {
