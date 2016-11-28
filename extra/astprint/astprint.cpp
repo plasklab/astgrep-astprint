@@ -921,16 +921,27 @@ void FunctionDeclation::printAST() {
 
 class TypeDeclation : public Declation {
 public:
-  std::vector<FieldDeclation> member;
+  std::vector<FieldDeclation *> member;
 };
 
 class StructDeclation : public TypeDeclation {
 public:
   StructDeclation();
+  void printAST();
 };
 
 StructDeclation::StructDeclation() {
   kind = "StructDecl";
+}
+
+void StructDeclation::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\"\n :member [";
+  for (int i = 0; i < (int)member.size(); i++) {
+    member[i]->printAST();
+  }
+  llvm::outs() << "]";
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class UnionDeclation : public TypeDeclation {
