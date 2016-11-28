@@ -1208,7 +1208,6 @@ void ReturnStatement::printAST() {
 
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
 private:
-  std::vector<std::string> order;
   std::vector<Node *> prog;
   std::vector<Declation *> DpArray;
   std::vector<ParameterDeclation *> PpArray;
@@ -1398,7 +1397,7 @@ public:
   bool VisitFunctionDecl(FunctionDecl *Decl) {
     Node *np;
     FunctionDeclation *FD = new FunctionDeclation();
-    if (dyn_cast<CXXMethodDecl>(Decl)) {
+    /*if (dyn_cast<CXXMethodDecl>(Decl)) {
       CXXMethodDecl *method = dyn_cast<CXXMethodDecl>(Decl);
       last_func = method->getQualifiedNameAsString();
       QualType functype = method->getResultType();
@@ -1446,9 +1445,8 @@ public:
       TraverseStmt(Decl->getBody());
       llvm::outs() << "]}";
     }
-
+*/
     // 修正版
-    order.push_back(FD->kind);
     FD->name = Decl->getQualifiedNameAsString();
     FD->type = PrintTypeInfo(Decl->getType());
     if (Decl->param_size()) {
@@ -1458,15 +1456,15 @@ public:
         DpArray.erase(DpArray.begin());
       }
     }
-   /*
     int i = prog.size();
     TraverseStmt(Decl->getBody());
     int j = prog.size();
-    for (; i < j; i++) {
-      FD->body.push_back(prog[i]);
-      prog.erase(prog.begin() + i - 1);
+    if (i < j) {
+      for (int k = i; k < j; k++) {
+        FD->body.push_back(prog[i]);
+        prog.erase(prog.begin() + i);
+      }
     }
-*/
     Node t = PrintSourceRange(Decl->getSourceRange());
     FD->beginFile = t.beginFile;
     FD->beginLine = t.beginLine;
@@ -1474,7 +1472,6 @@ public:
     FD->endFile = t.endFile;
     FD->endLine = t.endLine;
     FD->endColumn = t.endColumn;
-    //FuncDeclArray.push_back(FD);
     np = FD;
     prog.push_back(np);
 
@@ -1586,7 +1583,6 @@ public:
     llvm::outs() << "}";
 
     // 修正版
-    order.push_back(VD->kind);
     VD->name = Decl -> getNameAsString();
     VD->scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
     //VD.autoBool = PrintAutoTypeInfo(vartype);
