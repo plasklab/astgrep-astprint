@@ -947,10 +947,21 @@ void StructDeclation::printAST() {
 class UnionDeclation : public TypeDeclation {
 public:
   UnionDeclation();
+  void printAST();
 };
 
 UnionDeclation::UnionDeclation() {
   kind = "UnionDecl";
+}
+
+void UnionDeclation::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\"\n :member [";
+  for (int i = 0; i < (int)member.size(); i++) {
+    member[i]->printAST();
+  }
+  llvm::outs() << "]";
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class Statement : public Node {
@@ -958,17 +969,30 @@ class Statement : public Node {
 
 class RepetitionStatement : public Statement {
 public:
-  Expression condition;
-  std::vector<Expression> body;
+  Expression *condition;
+  std::vector<Expression *> body;
 };
 
 class WhileStatement : public RepetitionStatement {
 public:
   WhileStatement();
+  void printAST();
 };
 
 WhileStatement::WhileStatement() {
   kind = "While";
+}
+
+void WhileStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :condition ";
+  condition->printAST();
+  llvm::outs() << " :body [";
+  for (int i = 0; i < (int)body.size(); i++) {
+    body[i]->printAST();
+  }
+  llvm::outs() << "]";
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class DoStatement : public RepetitionStatement {
