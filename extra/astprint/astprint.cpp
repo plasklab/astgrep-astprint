@@ -998,12 +998,24 @@ void WhileStatement::printAST() {
 class DoStatement : public RepetitionStatement {
 public:
   DoStatement();
+  void printAST();
 };
 
 DoStatement::DoStatement() {
   kind = "Do";
 }
 
+void DoStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :condition ";
+  condition->printAST();
+  llvm::outs() << " :body [";
+  for (int i = 0; i < (int)body.size(); i++) {
+    body[i]->printAST();
+  }
+  llvm::outs() << "]";
+  PrintLocation();
+  llvm::outs() << "}";
+}
 class ForStatement : public RepetitionStatement {
 public:
   std::vector<Operator> init;
