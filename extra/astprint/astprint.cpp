@@ -1016,15 +1016,31 @@ void DoStatement::printAST() {
   PrintLocation();
   llvm::outs() << "}";
 }
+
 class ForStatement : public RepetitionStatement {
 public:
-  std::vector<Operator> init;
-  std::vector<Operator> update;
+  Expression *init;
+  Expression *update;
   ForStatement();
+  void printAST();
 };
 
 ForStatement::ForStatement() {
   kind = "For";
+}
+
+void ForStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :init ";
+  init->printAST();
+  llvm::outs() << " :update ";
+  update->printAST();
+  llvm::outs() << " :body [";
+  for (int i = 0; i < (int)body.size(); i++) {
+    body[i]->printAST();
+  }
+  llvm::outs() << "] ";
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class BranchStatement : public Statement {
