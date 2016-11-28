@@ -1158,29 +1158,52 @@ void GotoStatement::printAST() {
 class ContinueStatement : public Statement {
 public:
   ContinueStatement();
+  void printAST();
 };
 
 ContinueStatement::ContinueStatement() {
   kind = "Continue";
 }
 
+void ContinueStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" ";
+  PrintLocation();
+  llvm::outs() << "}";
+}
+
 class BreakStatement : public Statement {
 public:
   BreakStatement();
+  void printAST();
 };
 
 BreakStatement::BreakStatement() {
   kind = "Break";
 }
 
+void BreakStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" ";
+  PrintLocation();
+  llvm::outs() << "}";
+}
+
 class ReturnStatement : public Statement {
 public:
-  Expression value;
+  Expression *value;
   ReturnStatement();
+  void printAST();
 };
 
 ReturnStatement::ReturnStatement() {
   kind = "Ret";
+}
+
+void ReturnStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :value ";
+  value->printAST();
+  llvm::outs() << " ";
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
