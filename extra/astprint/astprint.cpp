@@ -1120,22 +1120,39 @@ void LabelStatement::printAST() {
 
 class CaseStatement : public Statement {
 public:
-  Literal value;
+  Literal *value;
   CaseStatement();
+  void printAST();
 };
 
 CaseStatement::CaseStatement() {
   kind = "Case";
 }
 
+void CaseStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :value ";
+  value->printAST();
+  llvm::outs() << " ";
+  PrintLocation();
+  llvm::outs() << "}";
+}
+
+
 class GotoStatement : public Statement {
 public:
   std::string jump;
   GotoStatement();
+  void printAST();
 };
 
 GotoStatement::GotoStatement() {
   kind = "Goto";
+}
+
+void GotoStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :goto \"" << jump << "\" ";
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class ContinueStatement : public Statement {
