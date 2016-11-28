@@ -1103,11 +1103,19 @@ void SwitchStatement::printAST() {
 }
 class LabelStatement : public Statement {
 public:
+  std::string name;
   LabelStatement();
+  void printAST();
 };
 
 LabelStatement::LabelStatement() {
   kind = "Label";
+}
+
+void LabelStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" ";
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class CaseStatement : public Statement {
