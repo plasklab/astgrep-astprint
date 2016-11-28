@@ -1081,14 +1081,26 @@ void IfStatement::printAST() {
 
 class SwitchStatement : public BranchStatement {
 public:
-  std::vector<Expression> body;
+  std::vector<Expression *> body;
   SwitchStatement();
+  void printAST();
 };
 
 SwitchStatement::SwitchStatement() {
   kind = "switch";
 }
 
+void SwitchStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :dondition ";
+  condition->printAST();
+  llvm::outs() << " :body [";
+  for (int i = 0; i < (int)body.size(); i ++) {
+    body[i]->printAST();
+  }
+  llvm::outs() << "] ";
+  PrintLocation();
+  llvm::outs() << "}";
+}
 class LabelStatement : public Statement {
 public:
   LabelStatement();
