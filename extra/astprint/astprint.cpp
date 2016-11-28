@@ -1045,18 +1045,38 @@ void ForStatement::printAST() {
 
 class BranchStatement : public Statement {
 public:
-  Expression condition;
+  Expression *condition;
 };
 
 class IfStatement : public BranchStatement {
 public:
-  std::vector<Expression> then;
-  std::vector<Expression> denial;
+  std::vector<Expression *> then;
+  std::vector<Expression *> denial;
   IfStatement();
+  void printAST();
 };
 
 IfStatement::IfStatement() {
   kind = "If";
+}
+
+void IfStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :condition ";
+  condition->printAST();
+  llvm::outs() << " :then [";
+  for (int i = 0; i < (int)then.size(); i++) {
+    then[i]->printAST();
+  }
+  llvm::outs() << "]";
+  if (denial.size() != 0) {
+    llvm::outs() << " :else [";
+    for (int i = 0; i < (int)denial.size(); i++) {
+      denial[i]->printAST();
+    }
+    llvm::outs() << "] ";
+  }
+  PrintLocation();
+  llvm::outs() << "}";
 }
 
 class SwitchStatement : public BranchStatement {
