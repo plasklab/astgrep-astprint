@@ -1618,9 +1618,7 @@ public:
     VD->displayType = PrintDisplayType(vartype);
     if (Decl->hasInit()) {
       int i = prog.size();
-      llvm::outs() << i << "aaaaaaaaaaaaaaaaaaaaa";
       TraverseStmt(Decl->getInit());
-      llvm::outs() << prog.size() << "bbbbbbbbbbbbbbbbbbbbbbb";
       //VD->init = EpArray[0];
       if (i < (int)prog.size()) {
         VD->init = prog[i];
@@ -2925,7 +2923,6 @@ public:
     std::string scope = "";
 
     // 修正版
-    Node *np;
     DeclationReferenceExpression *DRE = new DeclationReferenceExpression();
     if (vardecl) {
       /*
@@ -3056,7 +3053,7 @@ public:
     DRE->endFile = t.endFile;
     DRE->endLine = t.endLine;
     DRE->endColumn = t.endColumn;
-    np = DRE;
+    Node *np = DRE;
     prog.push_back(np);
     return true;
   }
@@ -3285,7 +3282,6 @@ public:
   // IntegerLiteral
   bool VisitIntegerLiteral(IntegerLiteral *Int) {
     IntLiteral *IL = new IntLiteral();
-    llvm::outs() << "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv";
     QualType vartype = Int->getType();
     /*
     if (labelflag != 0) {
