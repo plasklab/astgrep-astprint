@@ -893,7 +893,7 @@ void VariableDeclation::printAST() {
   PrintLocation();
   if (init != 0) {
     llvm::outs() << "\n :init ";
-    //init->printAST();
+    init->printAST();
   }
   llvm::outs() << "}\n";
 }
@@ -1602,11 +1602,12 @@ public:
     checkCast();
     llvm::outs() << "]";
     PrintSourceRange(Decl->getSourceRange());
+    /*
     if (Decl->hasInit()) {
       llvm::outs() << "\n :init ";
       linefeedflag = 0;
       TraverseStmt(Decl->getInit());
-    }
+    }*/
     llvm::outs() << "}";
 
     // 修正版
@@ -3284,6 +3285,7 @@ public:
   // IntegerLiteral
   bool VisitIntegerLiteral(IntegerLiteral *Int) {
     IntLiteral *IL = new IntLiteral();
+    llvm::outs() << "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv";
     QualType vartype = Int->getType();
     /*
     if (labelflag != 0) {
