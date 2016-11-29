@@ -586,7 +586,8 @@ void MemberReference::printAST() {
 class StructReference : public Reference {
 public:
   DeclationReferenceExpression *structs;
-  MemberReference *structMember;
+  //MemberReference *structMember;
+  Node *structMember;
   StructReference();
   void printAST();
 };
@@ -610,8 +611,10 @@ class Operator : public Expression {
 class BinOp : public Operator {
 public:
   std::string op;
-  Expression *left;
-  Expression *right;
+  //Expression *left;
+  //Expression *right;
+  Node *left;
+  Node *right;
   BinOp();
   void printAST();
 };
@@ -636,7 +639,8 @@ void BinOp::printAST() {
 class UnOp : public Operator {
 public:
   std::string op;
-  Expression *operand;
+  //Expression *operand;
+  Node *operand;
   UnOp();
   void printAST();
 };
@@ -659,9 +663,12 @@ void UnOp::printAST() {
 
 class ConditionalOp : public Operator {
 public:
-  BinOp *condition;
-  Operator *then;
-  Operator *denial;
+  //BinOp *condition;
+  //Operator *then;
+  //Operator *denial;
+  Node *condition;
+  Node *then;
+  Node *denial;
   ConditionalOp();
   void printAST();
 };
@@ -749,8 +756,10 @@ void FloatLiteral::printAST() {
 
 class ArrayReference : public Reference {
 public:
-  DeclationReferenceExpression *array;
-  Literal *index;
+  //DeclationReferenceExpression *array;
+  Node *array;
+  //Literal *index;
+  Node *index;
   ArrayReference();
   void printAST();
 };
@@ -773,8 +782,10 @@ void ArrayReference::printAST() {
 
 class FunctionCall : public Expression {
 public:
-  DeclationReferenceExpression *func;
-  std::vector<DeclationReferenceExpression *> parm;
+  //DeclationReferenceExpression *func;
+  Node *func;
+  //std::vector<DeclationReferenceExpression *> parm;
+  std::vector<Node *> parm;
   FunctionCall();
   void printAST();
 };
@@ -857,7 +868,8 @@ void ParameterDeclation::printAST() {
 
 class VariableDeclation : public DeclationOfVariables {
 public:
-  Expression *init;
+  //Expression *init;
+  Node *init;
   VariableDeclation();
   void printAST();
 };
@@ -881,7 +893,7 @@ void VariableDeclation::printAST() {
   PrintLocation();
   if (init != 0) {
     llvm::outs() << "\n :init ";
-    init->printAST();
+    //init->printAST();
   }
   llvm::outs() << "}\n";
 }
@@ -889,7 +901,8 @@ void VariableDeclation::printAST() {
 class FunctionDeclation : public Declation {
 public:
   DataType *type;
-  std::vector<ParameterDeclation *> parm;
+  //std::vector<ParameterDeclation *> parm;
+  std::vector<Node *> parm;
   std::vector<Node *> body;
   FunctionDeclation();
   void printAST();
@@ -921,7 +934,8 @@ void FunctionDeclation::printAST() {
 
 class TypeDeclation : public Declation {
 public:
-  std::vector<FieldDeclation *> member;
+  //std::vector<FieldDeclation *> member;
+  std::vector<Node *> member;
 };
 
 class StructDeclation : public TypeDeclation {
@@ -969,8 +983,10 @@ class Statement : public Node {
 
 class RepetitionStatement : public Statement {
 public:
-  Expression *condition;
-  std::vector<Expression *> body;
+  //Expression *condition;
+  //std::vector<Expression *> body;
+  Node *condition;
+  std::vector<Node *> body;
 };
 
 class WhileStatement : public RepetitionStatement {
@@ -1019,8 +1035,10 @@ void DoStatement::printAST() {
 
 class ForStatement : public RepetitionStatement {
 public:
-  Expression *init;
-  Expression *update;
+  //Expression *init;
+  //Expression *update;
+  Node *init;
+  Node *update;
   ForStatement();
   void printAST();
 };
@@ -1045,13 +1063,16 @@ void ForStatement::printAST() {
 
 class BranchStatement : public Statement {
 public:
-  Expression *condition;
+  //Expression *condition;
+  Node *condition;
 };
 
 class IfStatement : public BranchStatement {
 public:
-  std::vector<Expression *> then;
-  std::vector<Expression *> denial;
+  //std::vector<Expression *> then;
+  //std::vector<Expression *> denial;
+  std::vector<Node *> then;
+  std::vector<Node *> denial;
   IfStatement();
   void printAST();
 };
@@ -1081,7 +1102,8 @@ void IfStatement::printAST() {
 
 class SwitchStatement : public BranchStatement {
 public:
-  std::vector<Expression *> body;
+  //std::vector<Expression *> body;
+  std::vector<Node *> body;
   SwitchStatement();
   void printAST();
 };
@@ -1120,7 +1142,8 @@ void LabelStatement::printAST() {
 
 class CaseStatement : public Statement {
 public:
-  Literal *value;
+  //Literal *value;
+  Node *value;
   CaseStatement();
   void printAST();
 };
@@ -1189,7 +1212,8 @@ void BreakStatement::printAST() {
 
 class ReturnStatement : public Statement {
 public:
-  Expression *value;
+  //Expression *value;
+  Node *value;
   ReturnStatement();
   void printAST();
 };
@@ -1209,10 +1233,10 @@ void ReturnStatement::printAST() {
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
 private:
   std::vector<Node *> prog;
-  std::vector<Declation *> DpArray;
-  std::vector<ParameterDeclation *> PpArray;
-  std::vector<Expression *> EpArray;
-  std::vector<Statement *> SpArray;
+  //std::vector<Declation *> DpArray;
+  //std::vector<ParameterDeclation *> PpArray;
+  //std::vector<Expression *> EpArray;
+  //std::vector<Statement *> SpArray;
 
 public:
   explicit MyAstVisitor(ASTContext *Context, llvm::StringRef InFile) : Context(Context), source_file(InFile) {}
@@ -1451,9 +1475,11 @@ public:
     FD->type = PrintTypeInfo(Decl->getType());
     if (Decl->param_size()) {
       for (int i = 0; i < (int)Decl->param_size(); i++) {
+        int j = prog.size();
         TraverseDecl(Decl->getParamDecl(i));
-        FD->parm[i] = PpArray[0];
-        DpArray.erase(DpArray.begin());
+        //FD->parm[i] = PpArray[0];
+        FD->parm[i] = prog[j];
+        prog.erase(prog.begin() + j);
       }
     }
     int i = prog.size();
@@ -1502,7 +1528,8 @@ public:
     PD->endFile = t.endFile;
     PD->endLine = t.endLine;
     PD->endColumn = t.endColumn;
-    PpArray.push_back(PD);
+    Node *np = PD;
+    prog.push_back(np);
 
     return true;
   }
@@ -1556,14 +1583,14 @@ public:
 
   // VarDecl
   bool VisitVarDecl(VarDecl *Decl) {
-    Node *np;
     VariableDeclation *VD = new VariableDeclation();
+    QualType vartype = Decl->getType();
     if (Decl->getKind() == 50) {
       return true;
     }
     std::string kindname = "Var";
     std::string varname = Decl->getNameAsString();
-    QualType vartype = Decl->getType();
+    //QualType vartype = Decl->getType();
     std::string arrsize;
     llvm::outs() << "{" << ":kind "<< "\"" << kindname << "\""  
 		 << " :name " << "\"" << varname << "\"" 
@@ -1589,9 +1616,15 @@ public:
     VD->type = PrintTypeInfo(vartype);
     VD->displayType = PrintDisplayType(vartype);
     if (Decl->hasInit()) {
+      int i = prog.size();
+      llvm::outs() << i << "aaaaaaaaaaaaaaaaaaaaa";
       TraverseStmt(Decl->getInit());
-      VD->init = EpArray[0];
-      EpArray.pop_back();
+      llvm::outs() << prog.size() << "bbbbbbbbbbbbbbbbbbbbbbb";
+      //VD->init = EpArray[0];
+      if (i < (int)prog.size()) {
+        VD->init = prog[i];
+        prog.pop_back();
+      }
     }
     Node t = PrintSourceRange(Decl->getSourceRange());
     VD->beginFile = t.beginFile;
@@ -1600,7 +1633,7 @@ public:
     VD->endFile = t.endFile;
     VD->endLine = t.endLine;
     VD->endColumn = t.endColumn;
-    np = VD;
+    Node *np = VD;
     prog.push_back(np);
 
     return false;
@@ -2889,6 +2922,21 @@ public:
     VarDecl *vardecl = dyn_cast<VarDecl>(valuedecl);
     FunctionDecl *funcdecl = dyn_cast<FunctionDecl>(valuedecl);
     std::string scope = "";
+
+    // 修正版
+    Node *np;
+    DeclationReferenceExpression *DRE = new DeclationReferenceExpression();
+    if (vardecl) {
+      /*
+      QualType vartype = vardecl->getType();
+      DRE->name = Declref->getNameInfo().getAsString();
+      DRE->scope = (vardecl->isFileVarDecl() == 1 ? "global" : "local");
+      DRE->type[0] = PrintTypeInfo(vartype);
+      */
+    } else if (funcdecl) {
+
+    }
+    // 既存版
     if (labelflag != 0) {
       if (vardecl) {// 変数の場合
 	QualType vartype = vardecl->getType();
@@ -2999,6 +3047,16 @@ public:
 	llvm::outs() << "}";
       }
     }
+
+    Node t = PrintSourceRange(Declref->getSourceRange());
+    DRE->beginFile = t.beginFile;
+    DRE->beginLine = t.beginLine;
+    DRE->beginColumn = t.beginColumn;
+    DRE->endFile = t.endFile;
+    DRE->endLine = t.endLine;
+    DRE->endColumn = t.endColumn;
+    np = DRE;
+    prog.push_back(np);
     return true;
   }
 
@@ -3227,6 +3285,7 @@ public:
   bool VisitIntegerLiteral(IntegerLiteral *Int) {
     IntLiteral *IL = new IntLiteral();
     QualType vartype = Int->getType();
+    /*
     if (labelflag != 0) {
       getLabelValue(Int);
     } else {
@@ -3239,7 +3298,7 @@ public:
       PrintSourceRange(Int->getSourceRange());
       llvm::outs() << "}";
     }
-
+*/
     IL->value = Int->getValue().toString(10, true);
     IL->type = PrintTypeInfo(vartype);
     Node t = PrintSourceRange(Int->getSourceRange());
@@ -3249,15 +3308,19 @@ public:
     IL->endFile = t.endFile;
     IL->endLine = t.endLine;
     IL->endColumn = t.endColumn;
-    Expression *ep = IL;
-    EpArray.push_back(ep);
+    //Expression *ep = IL;
+    //EpArray.push_back(ep);
+    Node *np = IL;
+    prog.push_back(np);
 
     return true;
   }
 
   // FloatingLiteral
   bool VisitFloatingLiteral(FloatingLiteral *Float) {
+    FloatLiteral *FL = new FloatLiteral();
     QualType vartype = Float->getType();
+    /*
     llvm::outs() << "{:kind \"FloatingLiteral\""
 		 << " :value " << Float->getValueAsApproximateDouble();
     llvm::outs() << " :type [";
@@ -3266,6 +3329,20 @@ public:
     llvm::outs() << "]";
     PrintSourceRange(Float->getSourceRange());
     llvm::outs() << "}";
+    */
+    // 修正版
+    //FL->value = Float->getValueAsApproximateDouble().toString(10, true);
+    FL->type = PrintTypeInfo(vartype);
+    Node t = PrintSourceRange(Float->getSourceRange());
+    FL->beginFile = t.beginFile;
+    FL->beginLine = t.beginLine;
+    FL->beginColumn = t.beginColumn;
+    FL->endFile = t.endFile;
+    FL->endLine = t.endLine;
+    FL->endColumn = t.endColumn;
+    Node *np = FL;
+    prog.push_back(np);
+
     return true;
   }
 
@@ -3285,6 +3362,7 @@ public:
 
   // CharacterLiteral
   bool VisitCharacterLiteral(CharacterLiteral *Char) {
+    CharLiteral *CL = new CharLiteral();
     QualType vartype = Char->getType();
     if (labelflag != 0) {
       getLabelValue(Char);
@@ -3300,6 +3378,19 @@ public:
       PrintSourceRange(Char->getSourceRange());
       llvm::outs() << "}";
     }
+
+    CL->value = Char->getValue();
+    CL->type = PrintTypeInfo(vartype);
+    Node t = PrintSourceRange(Char->getSourceRange());
+    CL->beginFile = t.beginFile;
+    CL->beginLine = t.beginLine;
+    CL->beginColumn = t.beginColumn;
+    CL->endFile = t.endFile;
+    CL->endLine = t.endLine;
+    CL->endColumn = t.endColumn;
+    Node *np = CL;
+    prog.push_back(np);
+
     return true;
   }
 
