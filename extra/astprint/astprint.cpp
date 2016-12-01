@@ -609,8 +609,6 @@ class Operator : public Expression {
 class BinOp : public Operator {
 public:
   std::string op;
-  //Expression *left;
-  //Expression *right;
   Node *left;
   Node *right;
   BinOp();
@@ -626,18 +624,18 @@ void BinOp::printAST() {
   for (int i = 0; i < (int)type.size(); i++) {
     type[i]->printType();
   }
-  llvm::outs() << "] :left ";
-  left->printAST();
-  llvm::outs() << " :right ";
-  right->printAST();
+  llvm::outs() << "]";
   PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "\n :left ";
+  left->printAST();
+  llvm::outs() << "\n :right ";
+  right->printAST();
+  llvm::outs() << "}\n";
 }
 
 class UnOp : public Operator {
 public:
   std::string op;
-  //Expression *operand;
   Node *operand;
   UnOp();
   void printAST();
@@ -652,18 +650,15 @@ void UnOp::printAST() {
   for (int i = 0; i < (int)type.size(); i++) {
     type[i]->printType();
   }
-  llvm::outs() << "] :operand ";
-  operand->printAST();
-  llvm::outs() << " ";
+  llvm::outs() << "]";
   PrintLocation();
+  llvm::outs() << "\n :operand ";
+  operand->printAST();
   llvm::outs() << "}";
 }
 
 class ConditionalOp : public Operator {
 public:
-  //BinOp *condition;
-  //Operator *then;
-  //Operator *denial;
   Node *condition;
   Node *then;
   Node *denial;
@@ -876,7 +871,6 @@ void ParameterDeclation::printAST() {
 
 class VariableDeclation : public DeclationOfVariables {
 public:
-  //Expression *init;
   Node *init;
   VariableDeclation();
   void printAST();
@@ -909,7 +903,6 @@ void VariableDeclation::printAST() {
 class FunctionDeclation : public Declation {
 public:
   DataType *type;
-  //std::vector<ParameterDeclation *> parm;
   std::vector<Node *> parm;
   std::vector<Node *> body;
   FunctionDeclation();
@@ -941,7 +934,6 @@ void FunctionDeclation::printAST() {
 
 class TypeDeclation : public Declation {
 public:
-  //std::vector<FieldDeclation *> member;
   std::vector<Node *> member;
 };
 
@@ -962,7 +954,7 @@ void StructDeclation::printAST() {
   }
   llvm::outs() << "]";
   PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
 
 class UnionDeclation : public TypeDeclation {
@@ -982,7 +974,7 @@ void UnionDeclation::printAST() {
   }
   llvm::outs() << "]";
   PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
 
 class Statement : public Node {
@@ -990,8 +982,6 @@ class Statement : public Node {
 
 class RepetitionStatement : public Statement {
 public:
-  //Expression *condition;
-  //std::vector<Expression *> body;
   Node *condition;
   std::vector<Node *> body;
 };
@@ -1594,7 +1584,6 @@ public:
     }
     std::string kindname = "Var";
     std::string varname = Decl->getNameAsString();
-    //QualType vartype = Decl->getType();
     std::string arrsize;
     llvm::outs() << "{" << ":kind "<< "\"" << kindname << "\""  
 		 << " :name " << "\"" << varname << "\"" 
@@ -1617,17 +1606,13 @@ public:
     // 修正版
     VD->name = Decl -> getNameAsString();
     VD->scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
-    //VD.autoBool = PrintAutoTypeInfo(vartype);
     VD->type = PrintTypeInfo(vartype);
     VD->displayType = PrintDisplayType(vartype);
     if (Decl->hasInit()) {
       int i = prog.size();
       TraverseStmt(Decl->getInit());
-      //VD->init = EpArray[0];
-      if (i < (int)prog.size()) {
-        VD->init = prog[i];
-        prog.pop_back();
-      }
+      VD->init = prog[i];
+      prog.pop_back();
     }
     Node t = PrintSourceRange(Decl->getSourceRange());
     VD->beginFile = t.beginFile;
@@ -2919,7 +2904,7 @@ public:
   bool VisitCStyleCastExpr(CStyleCastExpr *cscast) {
     if (cscast->getCastKind() != 3) {
       QualType casttype = cscast->getType();
-      PrintTypeInfo(casttype); 
+      castType.push_back(PrintTypeInfo(casttype)); 
       ct.push(castlabel);
       castlabel = "";
       cast.str("");
@@ -2943,12 +2928,16 @@ public:
     // 修正版
     DeclationReferenceExpression *DRE = new DeclationReferenceExpression();
     if (vardecl) {
-      /*
       QualType vartype = vardecl->getType();
       DRE->name = Declref->getNameInfo().getAsString();
       DRE->scope = (vardecl->isFileVarDecl() == 1 ? "global" : "local");
-      DRE->type[0] = PrintTypeInfo(vartype);
-      */
+      DRE->type.push_back(PrintTypeInfo(vartype));
+      if (castType.size() != 0) {
+        for (int i = 0; i < (int)castType.size(); i++) {
+          DRE->type.push_back(castType[0]);
+          castType.erase(castType.begin());
+        }
+      }
     } else if (funcdecl) {
 
     }
@@ -3189,6 +3178,7 @@ public:
   // UnaryOperator
   bool VisitUnaryOperator(UnaryOperator *Unop) {
     UnaryOperator::Opcode opcode = Unop->getOpcode();
+    /*
     llvm::outs() << "{:kind \"Unop\""
 		 << " :op " << "\"" << Unop->getOpcodeStr(opcode) << "\"";
     checkLabel(); 
@@ -3201,11 +3191,40 @@ public:
     linefeedflag = 0;
     TraverseStmt(Unop->getSubExpr());
     llvm::outs() << "}";
+    */
+    // 修正版
+    UnOp *UO = new UnOp();
+    UO->op = Unop->getOpcodeStr(opcode);
+    UO->type.push_back(PrintTypeInfo(Unop->getType()));
+    if (castType.size() != 0) {
+      for (int i = 0; i < (int)castType.size(); i++) {
+        UO->type.push_back(castType[0]);
+        castType.erase(castType.begin());
+      }
+    }
+    int i = prog.size();
+    TraverseStmt(Unop->getSubExpr());
+    if (i < (int)prog.size()) {
+      UO->operand = prog[i];
+      prog.pop_back();
+    }
+
+    Node t = PrintSourceRange(Unop->getSourceRange());
+    UO->beginFile = t.beginFile;
+    UO->beginLine = t.beginLine;
+    UO->beginColumn = t.beginColumn; 
+    UO->endFile = t.endFile;
+    UO->endLine = t.endLine;
+    UO->endColumn = t.endColumn;
+    Node *np = UO;
+    prog.push_back(np);
+
     return false;
   }
 
   // BinaryOperator
   bool VisitBinaryOperator(BinaryOperator *Binop) {
+    /*
     llvm::outs() << "{:kind \"Binop\"" 
 		 << " :op " << "\"" << Binop->getOpcodeStr() << "\"";
     checkLabel(); 
@@ -3225,7 +3244,37 @@ public:
       TraverseStmt(Binop->getRHS());
     }
     llvm::outs() << "}";
-      
+    */
+    // 修正版
+    BinOp *BO = new BinOp();
+    BO->op = Binop->getOpcodeStr();
+    BO->type.push_back(PrintTypeInfo(Binop->getType()));
+    if (castType.size() != 0) {
+      for (int i = 0; i < (int)castType.size(); i++) {
+        BO->type.push_back(castType[0]);
+        castType.erase(castType.begin());
+      }
+    }
+    int i = prog.size();
+    TraverseStmt(Binop->getLHS());
+    BO->left = prog[i];
+    prog.pop_back();
+    i = prog.size();
+    TraverseStmt(Binop->getRHS());
+    BO->right = prog[i];
+    prog.pop_back();
+
+    Node t = PrintSourceRange(Binop->getSourceRange());
+    BO->beginFile = t.beginFile;
+    BO->beginLine = t.beginLine;
+    BO->beginColumn = t.beginColumn;
+    BO->endFile = t.endFile;
+    BO->endLine = t.endLine;
+    BO->endColumn = t.endColumn;
+
+    Node *np = BO;
+    prog.push_back(np);
+
     return false;
   }
   
