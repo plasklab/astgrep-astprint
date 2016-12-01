@@ -1209,7 +1209,6 @@ void BreakStatement::printAST() {
 
 class ReturnStatement : public Statement {
 public:
-  //Expression *value;
   Node *value;
   ReturnStatement();
   void printAST();
@@ -1220,10 +1219,10 @@ ReturnStatement::ReturnStatement() {
 }
 
 void ReturnStatement::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :value ";
-  value->printAST();
-  llvm::outs() << " ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
+  llvm::outs() << "\n :value ";
+  value->printAST();
   llvm::outs() << "}";
 }
 
@@ -2842,6 +2841,7 @@ public:
  
   // ReturnStmt
   bool VisitReturnStmt(ReturnStmt *Ret) {
+    /*
     llvm::outs() << "{:kind \"Ret\"";
     checkLabel(); 
     PrintSourceRange(Ret->getSourceRange());
@@ -2853,6 +2853,26 @@ public:
       
     }
     llvm::outs() << "}";
+    */
+    ReturnStatement *RS = new ReturnStatement();
+    if (Ret->getRetValue()) {
+      int i = prog.size();
+      TraverseStmt(Ret->getRetValue());
+      RS->value = prog[i];
+      prog.pop_back();
+    }
+
+    Node t = PrintSourceRange(Ret->getSourceRange());
+    RS->beginFile = t.beginFile;
+    RS->beginLine = t.beginLine;
+    RS->beginColumn = t.beginColumn;
+    RS->endFile = t.endFile;
+    RS->endLine = t.endLine;
+    RS->endColumn = t.endColumn;
+
+    Node *tp = RS;
+    prog.push_back(tp);
+
     return false;
   }
 
