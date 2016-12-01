@@ -2667,10 +2667,6 @@ public:
     if (cscast->getCastKind() != 3) {
       QualType casttype = cscast->getType();
       castType.push_back(PrintTypeInfo(casttype)); 
-      ct.push(castlabel);
-      castlabel = "";
-      cast.str("");
-      cast.clear();
     }
     castflag = 0;
     TraverseStmt(cscast->getSubExpr());
