@@ -1743,102 +1743,85 @@ public:
 
   //void PrintBuiltinTypeInfo(QualType typeInfo) {
   DataType *PrintBuiltinTypeInfo(QualType typeInfo) {
-    std::string Typename;
     DataType *t;
     switch (dyn_cast<BuiltinType>(typeInfo)->getKind()) {
       case BuiltinType::Void:
       {
-	Typename = "Void";
 	t = new VoidType();
         break;
       }
       case BuiltinType::Bool:
       {
-	Typename = "Bool";
 	t = new BoolType();
         break;
       }
       case BuiltinType::UChar:
       {
-	Typename = "UnsignedChar";
 	t = new UnsignedCharType();
         break;
       }
       case BuiltinType::UShort:
       {
-	Typename = "UnsignedShort";
 	t = new UnsignedShortType();
         break;
       }
       case BuiltinType::UInt:
       {
-	Typename = "UnsignedInt";
 	t = new UnsignedIntType();
         break;
       }
       case BuiltinType::ULong:
       {
-	Typename = "UnsignedLong";
 	t = new UnsignedLongType();
         break;
       }
       case BuiltinType::ULongLong:
       {
-	Typename = "UnsigndLongLong";
 	t = new UnsignedLongLongType();
         break;
       }
       case BuiltinType::Char_S:
       {
-	Typename = "Char";
 	t = new CharType();
         break;
       }
       case BuiltinType::SChar:
       {
-	Typename = "SignedChar";
 	t = new CharType();
         break;
       }
       case BuiltinType::Short:
       {
-	Typename = "Short";
 	t = new ShortType();
         break;
       }
       case BuiltinType::Int:
       {
-	Typename = "Int";
 	t = new IntType();
         break;
       }
       case BuiltinType::Long:
       {
-	Typename = "Long";
 	t = new LongType();
         break;
       }
       case BuiltinType::LongLong:
       {
-	Typename = "LongLong";
 	t = new LongLongType();
         break;
       }
       case BuiltinType::Float:
       {
-	Typename = "Float";
 	t = new FloatType();
         break;
       }
       case BuiltinType::Double:
       {
-	Typename = "Double";
 	t = new DoubleType();
         break;
       }
       case BuiltinType::LongDouble:
       {
-	Typename = "LongDouble";
 	t = new LongDoubleType();
         break;
       }
@@ -1846,36 +1829,22 @@ public:
       case BuiltinType::WChar_S:
       case BuiltinType::WChar_U:
       {
-	Typename = "WChar_t";
+	//Typename = "WChar_t";
 	break;
       }
       case BuiltinType::Dependent:
       {
-	Typename = "Dependent";
+	//Typename = "Dependent";
 	break;
       }
       default:
       {
-	Typename = "UnKnownError";
 	llvm::outs() << "\n \""<< typeInfo.getAsString() << "\"は, 初出です."
 		     << " astprint.cppのPrintTypeInfoにcaseを追加して下さい.";
 	break;
       }
     }
     assert(labelflag == 0);
-    if (castflag != 0) {
-      cast << "{:kind \"" << Typename << "-type\"";
-      PrintQualifier(typeInfo);
-      cast << "}";
-      castlabel += cast.str();
-      cast.str("");
-      cast.clear();
-    } else {
-      llvm::outs() << "{:kind \"" << Typename << "-type\"";
-      PrintQualifier(typeInfo);
-      llvm::outs() << "}";
-    }
-
     DataType *tp = PrintQualifier(typeInfo);
     t->constBool = tp->constBool;
     t->volatileBool = tp->volatileBool;
