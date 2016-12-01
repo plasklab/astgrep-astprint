@@ -1581,28 +1581,6 @@ public:
     if (Decl->getKind() == 50) {
       return true;
     }
-    std::string kindname = "Var";
-    std::string varname = Decl->getNameAsString();
-    std::string arrsize;
-    llvm::outs() << "{" << ":kind "<< "\"" << kindname << "\""  
-		 << " :name " << "\"" << varname << "\"" 
-		 << " :scope " << (Decl->isFileVarDecl() == 1? "\"global\"":"\"local\"");
-    checkSpecifier(Decl->getStorageClass());
-    PrintDisplayType(vartype);
-    llvm::outs() << " :type [";
-    PrintTypeInfo(vartype);
-    checkCast();
-    llvm::outs() << "]";
-    PrintSourceRange(Decl->getSourceRange());
-    /*
-    if (Decl->hasInit()) {
-      llvm::outs() << "\n :init ";
-      linefeedflag = 0;
-      TraverseStmt(Decl->getInit());
-    }*/
-    llvm::outs() << "}";
-
-    // 修正版
     VD->name = Decl -> getNameAsString();
     VD->scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
     VD->type = PrintTypeInfo(vartype);
