@@ -693,7 +693,7 @@ void ConditionalOp::printAST() {
 
 class Literal : public Expression {
 public:
-  DataType *type;
+  std::vector<DataType *> type;
   virtual void printAST();
 };
 
@@ -713,8 +713,12 @@ IntLiteral::IntLiteral() {
 }
 
 void IntLiteral::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << " :type ";
-  type->printType();
+  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << " :type [";
+  //for (int i = 0; i < (int)type.size(); i++) {
+  //  type[i]->printType();
+  //}
+  type[0]->printType();
+  llvm::outs() << "]";
   PrintLocation();
   llvm::outs() << "}";
 }
@@ -731,8 +735,12 @@ CharLiteral::CharLiteral() {
 }
 
 void CharLiteral::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :value \"" << value << "\" :type ";
-  type->printType();
+  llvm::outs() << "{:kind \"" << kind << "\" :value \"" << value << "\" :type [";
+  //for (int i = 0; i < (int)type.size(); i++) {
+  //  type[i]->printType();
+  //}
+  type[0]->printType();
+  llvm::outs() << "]";
   PrintLocation();
   llvm::outs() << "}";
 }
@@ -749,8 +757,11 @@ FloatLiteral::FloatLiteral() {
 }
 
 void FloatLiteral::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << " :type ";
-  type->printType();
+  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << " :type [";
+  //for (int i = 0; i < (int)type.size(); i++) {
+  //  type[i]->printType();
+  //}
+  type[0]->printType();
   llvm::outs() << " ";
   PrintLocation();
   llvm::outs() << "}";
@@ -1235,6 +1246,7 @@ void ReturnStatement::printAST() {
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
 private:
   std::vector<Node *> prog;
+  std::vector<DataType *> castType;
 
 public:
   explicit MyAstVisitor(ASTContext *Context, llvm::StringRef InFile) : Context(Context), source_file(InFile) {}
@@ -3296,7 +3308,7 @@ public:
     }
 */
     IL->value = Int->getValue().toString(10, true);
-    IL->type = PrintTypeInfo(vartype);
+    IL->type.push_back(PrintTypeInfo(vartype));
     Node t = PrintSourceRange(Int->getSourceRange());
     IL->beginFile = t.beginFile;
     IL->beginLine = t.beginLine;
@@ -3328,7 +3340,7 @@ public:
     */
     // 修正版
     FL->value = Float->getValueAsApproximateDouble();
-    FL->type = PrintTypeInfo(vartype);
+    FL->type.push_back(PrintTypeInfo(vartype));
     Node t = PrintSourceRange(Float->getSourceRange());
     FL->beginFile = t.beginFile;
     FL->beginLine = t.beginLine;
@@ -3377,7 +3389,7 @@ public:
     }
 */
     CL->value = Char->getValue();
-    CL->type = PrintTypeInfo(vartype);
+    CL->type.push_back(PrintTypeInfo(vartype));
     Node t = PrintSourceRange(Char->getSourceRange());
     CL->beginFile = t.beginFile;
     CL->beginLine = t.beginLine;
