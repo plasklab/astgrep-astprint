@@ -2917,21 +2917,6 @@ public:
   // UnaryOperator
   bool VisitUnaryOperator(UnaryOperator *Unop) {
     UnaryOperator::Opcode opcode = Unop->getOpcode();
-    /*
-    llvm::outs() << "{:kind \"Unop\""
-		 << " :op " << "\"" << Unop->getOpcodeStr(opcode) << "\"";
-    checkLabel(); 
-    llvm::outs() << " :type [";
-    PrintTypeInfo(Unop->getType());
-    checkCast();
-    llvm::outs() << "]";
-    PrintSourceRange(Unop->getSourceRange());
-    llvm::outs() << " :HS ";
-    linefeedflag = 0;
-    TraverseStmt(Unop->getSubExpr());
-    llvm::outs() << "}";
-    */
-    // 修正版
     UnOp *UO = new UnOp();
     UO->op = Unop->getOpcodeStr(opcode);
     UO->type.push_back(PrintTypeInfo(Unop->getType()));
@@ -2963,28 +2948,6 @@ public:
 
   // BinaryOperator
   bool VisitBinaryOperator(BinaryOperator *Binop) {
-    /*
-    llvm::outs() << "{:kind \"Binop\"" 
-		 << " :op " << "\"" << Binop->getOpcodeStr() << "\"";
-    checkLabel(); 
-    llvm::outs() << " :type [";
-    PrintTypeInfo(Binop->getType());
-    checkCast();
-    llvm::outs() << "]";
-    PrintSourceRange(Binop->getSourceRange());
-    llvm::outs() << "\n :LHS ";
-    linefeedflag = 0;
-    TraverseStmt(Binop->getLHS());
-    llvm::outs() << "\n :RHS ";
-    if (Binop->getRHS()->getStmtClass() == 68) {
-      llvm::outs() << "{:kind \"NULL\" :value \"Null\"}";
-    } else {
-      linefeedflag = 0;
-      TraverseStmt(Binop->getRHS());
-    }
-    llvm::outs() << "}";
-    */
-    // 修正版
     BinOp *BO = new BinOp();
     BO->op = Binop->getOpcodeStr();
     BO->type.push_back(PrintTypeInfo(Binop->getType()));
@@ -3275,7 +3238,7 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    llvm::outs() << "\n----------------------------------------------------------------------\n";
+    //llvm::outs() << "\n----------------------------------------------------------------------\n";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
