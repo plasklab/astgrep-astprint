@@ -714,10 +714,9 @@ IntLiteral::IntLiteral() {
 
 void IntLiteral::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :value " << value << " :type [";
-  //for (int i = 0; i < (int)type.size(); i++) {
-  //  type[i]->printType();
-  //}
-  type[0]->printType();
+  for (int i = 0; i < (int)type.size(); i++) {
+    type[i]->printType();
+  }
   llvm::outs() << "]";
   PrintLocation();
   llvm::outs() << "}";
@@ -736,10 +735,9 @@ CharLiteral::CharLiteral() {
 
 void CharLiteral::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :value \"" << value << "\" :type [";
-  //for (int i = 0; i < (int)type.size(); i++) {
-  //  type[i]->printType();
-  //}
-  type[0]->printType();
+  for (int i = 0; i < (int)type.size(); i++) {
+    type[i]->printType();
+  }
   llvm::outs() << "]";
   PrintLocation();
   llvm::outs() << "}";
@@ -758,11 +756,10 @@ FloatLiteral::FloatLiteral() {
 
 void FloatLiteral::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :value " << value << " :type [";
-  //for (int i = 0; i < (int)type.size(); i++) {
-  //  type[i]->printType();
-  //}
-  type[0]->printType();
-  llvm::outs() << " ";
+  for (int i = 0; i < (int)type.size(); i++) {
+    type[i]->printType();
+  }
+  llvm::outs() << "]";
   PrintLocation();
   llvm::outs() << "}";
 }
