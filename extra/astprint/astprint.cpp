@@ -87,9 +87,9 @@ IntType::IntType() {
 void IntType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -108,9 +108,9 @@ UnsignedIntType::UnsignedIntType() {
 void UnsignedIntType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -129,9 +129,9 @@ FloatType::FloatType() {
 void FloatType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -150,9 +150,9 @@ UnsignedFloatType::UnsignedFloatType() {
 void UnsignedFloatType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -171,9 +171,9 @@ LongType::LongType() {
 void LongType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -192,9 +192,9 @@ UnsignedLongType::UnsignedLongType() {
 void UnsignedLongType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -213,9 +213,9 @@ LongLongType::LongLongType() {
 void LongLongType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -234,9 +234,9 @@ UnsignedLongLongType::UnsignedLongLongType() {
 void UnsignedLongLongType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -255,9 +255,9 @@ DoubleType::DoubleType() {
 void DoubleType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -276,9 +276,9 @@ UnsignedDoubleType::UnsignedDoubleType() {
 void UnsignedDoubleType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -297,9 +297,9 @@ LongDoubleType::LongDoubleType() {
 void LongDoubleType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -318,9 +318,9 @@ ShortType::ShortType() {
 void ShortType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -339,9 +339,9 @@ UnsignedShortType::UnsignedShortType() {
 void UnsignedShortType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -360,9 +360,9 @@ CharType::CharType() {
 void CharType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -381,9 +381,9 @@ UnsignedCharType::UnsignedCharType() {
 void UnsignedCharType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   if (constBool == true)
-    llvm::outs() << ":const \"true\"";
+    llvm::outs() << " :const \"true\"";
   if (volatileBool == true)
-    llvm::outs() << ":volatileBool \"true\"";
+    llvm::outs() << " :volatileBool \"true\"";
   llvm::outs() << "}";
 }
 
@@ -1769,7 +1769,10 @@ public:
       llvm::outs() << "}";
     }
 
+    DataType *tp = PrintQualifier(typeInfo);
     TDF->typeName = (std::string)TDtype->getName();
+    TDF->constBool = tp->constBool;
+    TDF->volatileBool = tp->volatileBool;
     TDF->typedefType = PrintTypeInfo(TDtype->getUnderlyingType());
 
     return TDF;
@@ -1784,97 +1787,97 @@ public:
       {
 	Typename = "Void";
 	t = new VoidType();
-        return t;
+        break;
       }
       case BuiltinType::Bool:
       {
 	Typename = "Bool";
 	t = new BoolType();
-        return t;
+        break;
       }
       case BuiltinType::UChar:
       {
 	Typename = "UnsignedChar";
 	t = new UnsignedCharType();
-        return t;
+        break;
       }
       case BuiltinType::UShort:
       {
 	Typename = "UnsignedShort";
 	t = new UnsignedShortType();
-        return t;
+        break;
       }
       case BuiltinType::UInt:
       {
 	Typename = "UnsignedInt";
 	t = new UnsignedIntType();
-	return t;
+        break;
       }
       case BuiltinType::ULong:
       {
 	Typename = "UnsignedLong";
 	t = new UnsignedLongType();
-	return t;
+        break;
       }
       case BuiltinType::ULongLong:
       {
 	Typename = "UnsigndLongLong";
 	t = new UnsignedLongLongType();
-	return t;
+        break;
       }
       case BuiltinType::Char_S:
       {
 	Typename = "Char";
 	t = new CharType();
-	return t;
+        break;
       }
       case BuiltinType::SChar:
       {
 	Typename = "SignedChar";
 	t = new CharType();
-	return t;
+        break;
       }
       case BuiltinType::Short:
       {
 	Typename = "Short";
 	t = new ShortType();
-	return t;
+        break;
       }
       case BuiltinType::Int:
       {
 	Typename = "Int";
 	t = new IntType();
-	return t;
+        break;
       }
       case BuiltinType::Long:
       {
 	Typename = "Long";
 	t = new LongType();
-	return t;
+        break;
       }
       case BuiltinType::LongLong:
       {
 	Typename = "LongLong";
 	t = new LongLongType();
-	return t;
+        break;
       }
       case BuiltinType::Float:
       {
 	Typename = "Float";
 	t = new FloatType();
-	return t;
+        break;
       }
       case BuiltinType::Double:
       {
 	Typename = "Double";
 	t = new DoubleType();
-	return t;
+        break;
       }
       case BuiltinType::LongDouble:
       {
 	Typename = "LongDouble";
 	t = new LongDoubleType();
-	return t;
+        break;
       }
 	//以下c++に関するもの
       case BuiltinType::WChar_S:
@@ -1909,6 +1912,10 @@ public:
       PrintQualifier(typeInfo);
       llvm::outs() << "}";
     }
+
+    DataType *tp = PrintQualifier(typeInfo);
+    t->constBool = tp->constBool;
+    t->volatileBool = tp->volatileBool;
 
     return t;
   }
@@ -2217,7 +2224,8 @@ public:
     //llvm::outs()  << " " << typeInfo->getTypeClassName();
   }
   
-  void PrintQualifier(QualType Qual) {
+  DataType *PrintQualifier(QualType Qual) {
+    DataType *DT = new DataType();
     if (labelflag != 0) {
       if (Qual.isConstQualified()) {
 	os << " :const " << "\"true\"";
@@ -2246,6 +2254,12 @@ public:
 	llvm::outs() << " :volatile " << "\"true\"";
       }
     }
+    
+    if (Qual.isConstQualified()) 
+      DT->constBool = true;
+    if (Qual.isVolatileQualified())
+      DT->volatileBool = true;
+    return DT;
   }
     
   // Stmt : Binop, ReturnStmt, forstmt, ifstmt, ... etc
