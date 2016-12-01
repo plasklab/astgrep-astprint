@@ -1678,12 +1678,13 @@ public:
   // typeを文字列として出力
   //void PrintDisplayType(QualType typeInfo) {
   std::string PrintDisplayType(QualType typeInfo) {
+    /*
     if (labelflag != 0 || castflag != 0) {
       os << " :DisplayType " << "\"" << typeInfo.getAsString() << "\"";
     } else {
       llvm::outs() << " :DisplayType " << "\"" << typeInfo.getAsString() << "\"";
     }
-
+    */
     return typeInfo.getAsString();
   }
  
@@ -1882,60 +1883,28 @@ public:
     return t;
   }
 
-  //void PrintFunctionTypeInfo(QualType typeInfo) {
   FuncType *PrintFunctionTypeInfo(QualType typeInfo) {
     assert(labelflag == 0);
     FuncType *t = new FuncType();
-    if (castflag != 0) {
-      cast << "{:kind \"Func-type\""
-	   << " :ParmsType [";
       if (dyn_cast<FunctionProtoType>(typeInfo)) {
 	unsigned parms = dyn_cast<FunctionProtoType>(typeInfo)->getNumArgs();
 	if (parms != 0) {
 	  unsigned i = 0;
 	  while (i < parms) {
-	    if (i != 0) {
-	      cast << " ";
-	    }
 	    t->parmType.push_back(PrintTypeInfo(dyn_cast<FunctionProtoType>(typeInfo)->getArgType(i)));
 	    i++;
 	  }
 	}
       }
-      cast << "]";
       if (dyn_cast<FunctionType>(typeInfo)) {
-	cast << " :RetType ";
 	QualType rettype = dyn_cast<FunctionType>(typeInfo)->getResultType();
 	t->retType = PrintTypeInfo(rettype);
       } 
-      cast << "}";
-      castlabel += cast.str();
-      cast.str("");
-      cast.clear();
-    } else {
-      llvm::outs() << "{:kind \"Func-type\""
-		   << " :ParmsType [";
-      if (dyn_cast<FunctionProtoType>(typeInfo)) {
-	unsigned parms = dyn_cast<FunctionProtoType>(typeInfo)->getNumArgs();
-	if (parms != 0) {
-	  unsigned i = 0;
-	  while (i < parms) {
-	    if (i != 0) {
-	      llvm::outs() << " ";
-	    }
-	    t->parmType.push_back(PrintTypeInfo(dyn_cast<FunctionProtoType>(typeInfo)->getArgType(i)));
-	    i++;
-	  }
-	}
-      }
-      llvm::outs() << "]";
       if (dyn_cast<FunctionType>(typeInfo)) {
 	llvm::outs() << " :RetType ";
 	QualType rettype = dyn_cast<FunctionType>(typeInfo)->getResultType();
 	t->retType = PrintTypeInfo(rettype);
       } 
-      llvm::outs() << "}";
-    }
 
     return t;
   }
