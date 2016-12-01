@@ -2816,10 +2816,6 @@ public:
     if (icast->getCastKind() != 3) {
       QualType casttype = icast->getType();
       castType.push_back(PrintTypeInfo(casttype)); 
-      ct.push(castlabel);
-      castlabel = "";
-      cast.str("");
-      cast.clear();
     }
     castflag = 0;
     return true;
