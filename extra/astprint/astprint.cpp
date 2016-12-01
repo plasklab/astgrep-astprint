@@ -1395,56 +1395,6 @@ public:
   bool VisitFunctionDecl(FunctionDecl *Decl) {
     Node *np;
     FunctionDeclation *FD = new FunctionDeclation();
-    /*if (dyn_cast<CXXMethodDecl>(Decl)) {
-      CXXMethodDecl *method = dyn_cast<CXXMethodDecl>(Decl);
-      last_func = method->getQualifiedNameAsString();
-      QualType functype = method->getResultType();
-      llvm::outs() << "{:kind \"Method\""
-		   << " :name " << "\"" << last_func << "\"";
-      checkSpecifier(method->getStorageClass());
-      llvm::outs() << " :type [";
-      PrintTypeInfo(functype);
-      checkCast();
-      llvm::outs() << "]";
-      PrintSourceRange(method->getSourceRange());
-      llvm::outs() << "\n :Parm [";
-      if (method->param_size()) {
-	linefeedflag = 0;
-	for (int i = 0; i < (int)method->param_size(); i++) {
-	  TraverseDecl(method->getParamDecl(i));
-	}
-      }
-      llvm::outs() << "]\n :body [";
-      linefeedflag = 0;
-      linefeedbody = 0;
-      TraverseStmt(method->getBody());
-      llvm::outs() << "]}";
-    } else {
-      last_func = Decl->getQualifiedNameAsString();
-      QualType functype = Decl->getType();
-      llvm::outs() << "{:kind \"Funcdef\""
-		   << " :name " << "\"" << last_func << "\"";
-      checkSpecifier(Decl->getStorageClass());
-      llvm::outs() << " :type [";
-      PrintTypeInfo(functype);
-      checkCast();
-      llvm::outs() << "]";
-      PrintSourceRange(Decl->getSourceRange());
-      llvm::outs() << "\n :Parm [";
-      if (Decl->param_size()) {
-	linefeedflag = 0;
-	for (int i = 0; i < (int)Decl->param_size(); i++) {
-	  TraverseDecl(Decl->getParamDecl(i));
-	}
-      }
-      llvm::outs() << "]\n :body [";
-      linefeedflag = 0;
-      linefeedbody = 0;
-      TraverseStmt(Decl->getBody());
-      llvm::outs() << "]}";
-    }
-*/
-    // 修正版
     FD->name = Decl->getQualifiedNameAsString();
     FD->type = PrintTypeInfo(Decl->getType());
     if (Decl->param_size()) {
