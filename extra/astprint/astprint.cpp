@@ -1401,7 +1401,6 @@ public:
       for (int i = 0; i < (int)Decl->param_size(); i++) {
         int j = prog.size();
         TraverseDecl(Decl->getParamDecl(i));
-        //FD->parm[i] = PpArray[0];
         FD->parm[i] = prog[j];
         prog.erase(prog.begin() + j);
       }
@@ -2597,19 +2596,6 @@ public:
  
   // ReturnStmt
   bool VisitReturnStmt(ReturnStmt *Ret) {
-    /*
-    llvm::outs() << "{:kind \"Ret\"";
-    checkLabel(); 
-    PrintSourceRange(Ret->getSourceRange());
-    if (Ret->getRetValue()) {
-      llvm::outs() << " :value ";
-      linefeedflag = 0;
-      TraverseStmt(Ret->getRetValue());
-    } else {
-      
-    }
-    llvm::outs() << "}";
-    */
     ReturnStatement *RS = new ReturnStatement();
     if (Ret->getRetValue()) {
       int i = prog.size();
