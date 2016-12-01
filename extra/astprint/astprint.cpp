@@ -1235,10 +1235,6 @@ void ReturnStatement::printAST() {
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
 private:
   std::vector<Node *> prog;
-  //std::vector<Declation *> DpArray;
-  //std::vector<ParameterDeclation *> PpArray;
-  //std::vector<Expression *> EpArray;
-  //std::vector<Statement *> SpArray;
 
 public:
   explicit MyAstVisitor(ASTContext *Context, llvm::StringRef InFile) : Context(Context), source_file(InFile) {}
