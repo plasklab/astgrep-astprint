@@ -1966,26 +1966,6 @@ public:
   //void PrintPointerTypeInfo(QualType typeInfo) {
   PointeeType *PrintPointerTypeInfo(QualType typeInfo) {
     PointeeType *t = new PointeeType();
-    if (dyn_cast<PointerType>(typeInfo)) {
-      QualType elmtype = dyn_cast<PointerType>(typeInfo)->getPointeeType();
-      assert(labelflag == 0);
-      if (castflag != 0) {
-	cast << "{:kind \"Pointer-type\""
-	     << " :Pointee ";
-	PrintTypeInfo(elmtype);
-	PrintQualifier(typeInfo);
-	cast << "}";
-	castlabel += cast.str();
-	cast.str("");
-	cast.clear();
-      } else {
-	llvm::outs() << "{:kind \"Pointer-type\""
-		     << " :Pointee ";
-	PrintTypeInfo(elmtype);
-	PrintQualifier(typeInfo);
-	llvm::outs() << "}";
-      }
-    }
     QualType elmtype = dyn_cast<PointerType>(typeInfo)->getPointeeType();
     t->pointee = PrintTypeInfo(elmtype);
 
