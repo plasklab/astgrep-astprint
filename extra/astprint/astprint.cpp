@@ -1901,7 +1901,6 @@ public:
 	t->retType = PrintTypeInfo(rettype);
       } 
       if (dyn_cast<FunctionType>(typeInfo)) {
-	llvm::outs() << " :RetType ";
 	QualType rettype = dyn_cast<FunctionType>(typeInfo)->getResultType();
 	t->retType = PrintTypeInfo(rettype);
       } 
