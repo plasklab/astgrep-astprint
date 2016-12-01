@@ -3319,8 +3319,6 @@ public:
     IL->endFile = t.endFile;
     IL->endLine = t.endLine;
     IL->endColumn = t.endColumn;
-    //Expression *ep = IL;
-    //EpArray.push_back(ep);
     Node *np = IL;
     prog.push_back(np);
 
@@ -3396,7 +3394,8 @@ public:
       PrintSourceRange(Char->getSourceRange());
       llvm::outs() << "}";
     }
-*/
+    */
+    // 修正版
     CL->value = Char->getValue();
     CL->type.push_back(PrintTypeInfo(vartype));
     if (castType.size() != 0) {
