@@ -694,7 +694,6 @@ void ConditionalOp::printAST() {
 class Literal : public Expression {
 public:
   DataType *type;
-  std::string value;
   virtual void printAST();
 };
 
@@ -704,6 +703,7 @@ void Literal::printAST() {
 
 class IntLiteral : public Literal {
 public:
+  std::string value;
   IntLiteral();
   void printAST();
 };
@@ -713,7 +713,7 @@ IntLiteral::IntLiteral() {
 }
 
 void IntLiteral::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :value \"" << value << "\" :type ";
+  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << " :type ";
   type->printType();
   PrintLocation();
   llvm::outs() << "}";
@@ -721,6 +721,7 @@ void IntLiteral::printAST() {
 
 class CharLiteral : public Literal {
 public:
+  char value;
   CharLiteral();
   void printAST();
 };
@@ -738,6 +739,7 @@ void CharLiteral::printAST() {
 
 class FloatLiteral : public Literal {
 public:
+  float value;
   FloatLiteral();
   void printAST();
 };
@@ -747,7 +749,7 @@ FloatLiteral::FloatLiteral() {
 }
 
 void FloatLiteral::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :value \"" << value << "\" :type ";
+  llvm::outs() << "{:kind \"" << kind << "\" :value " << value << " :type ";
   type->printType();
   llvm::outs() << " ";
   PrintLocation();
@@ -3329,7 +3331,7 @@ public:
     llvm::outs() << "}";
     */
     // 修正版
-    //FL->value = Float->getValueAsApproximateDouble().toString(10, true);
+    FL->value = Float->getValueAsApproximateDouble();
     FL->type = PrintTypeInfo(vartype);
     Node t = PrintSourceRange(Float->getSourceRange());
     FL->beginFile = t.beginFile;
@@ -3362,6 +3364,7 @@ public:
   bool VisitCharacterLiteral(CharacterLiteral *Char) {
     CharLiteral *CL = new CharLiteral();
     QualType vartype = Char->getType();
+    /*
     if (labelflag != 0) {
       getLabelValue(Char);
     } else {
@@ -3376,7 +3379,7 @@ public:
       PrintSourceRange(Char->getSourceRange());
       llvm::outs() << "}";
     }
-
+*/
     CL->value = Char->getValue();
     CL->type = PrintTypeInfo(vartype);
     Node t = PrintSourceRange(Char->getSourceRange());
