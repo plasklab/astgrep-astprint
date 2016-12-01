@@ -2136,35 +2136,6 @@ public:
   
   DataType *PrintQualifier(QualType Qual) {
     DataType *DT = new DataType();
-    if (labelflag != 0) {
-      if (Qual.isConstQualified()) {
-	os << " :const " << "\"true\"";
-      }
-      if (Qual.isVolatileQualified()) {
-	os << " :volatile " << "\"true\"";
-      }
-      caselabel += os.str();
-      os.str("");
-      os.clear();
-    } else if (castflag != 0) {
-      if (Qual.isConstQualified()) {
-	cast << " :const " << "\"true\"";
-      }
-      if (Qual.isVolatileQualified()) {
-	cast << " :volatile " << "\"true\"";
-      }
-      castlabel += cast.str();
-      cast.str("");
-      cast.clear();
-    } else {
-      if (Qual.isConstQualified()) {
-	llvm::outs() << " :const " << "\"true\"";
-      }
-      if (Qual.isVolatileQualified()) {
-	llvm::outs() << " :volatile " << "\"true\"";
-      }
-    }
-    
     if (Qual.isConstQualified()) 
       DT->constBool = true;
     if (Qual.isVolatileQualified())
