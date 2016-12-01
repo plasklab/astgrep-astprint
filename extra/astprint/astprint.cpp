@@ -26,6 +26,8 @@ using namespace llvm::opt;
 class DataType {
 public:
   std::string kind;
+  bool constBool;
+  bool volatileBool;
   virtual void printType();
   virtual ~DataType() {};
 };
@@ -64,14 +66,10 @@ void BoolType::printType() {
 
 class SignedType : public DataType {
 public:
-  bool constBool;
-  bool volatileBool;
 };
 
 class UnsignedType : public DataType {
 public:
-  bool constBool;
-  bool volatileBool;
 };
 
 class IntType : public SignedType {
@@ -925,6 +923,7 @@ FunctionDeclation::FunctionDeclation() {
 void FunctionDeclation::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :type ";
   type->printType();
+  PrintLocation();
   llvm::outs() << "\n :Parm [";
   if (parm.size() != 0) {
     for (int i = 0; i < (int)parm.size(); i++) {
@@ -937,9 +936,7 @@ void FunctionDeclation::printAST() {
       body[i]->printAST();
     }
   }
-  llvm::outs() << "]";
-  PrintLocation();
-  llvm::outs() << "}\n";
+  llvm::outs() << "]}\n";
 }
 
 class TypeDeclation : public Declation {
