@@ -2974,22 +2974,7 @@ public:
       os.str("");
       os.clear();
     } else {
-      if (vardecl) {// 変数の場合
-	QualType vartype = vardecl->getType();
-	scope = (vardecl->isFileVarDecl() == 1? "global":"local");
-	std::string Declreftype = Declref->getType().getAsString();
-	llvm::outs() << "{:kind \"DRE\"" 
-		     << " :name " << "\"" << Declref->getNameInfo() << "\""
-		     << " :scope " << "\"" << scope << "\"";
-	checkLabel(); 
-	checkSpecifier(vardecl->getStorageClass());
-	PrintDisplayType(vartype);
-	llvm::outs() << " :type [";
-	PrintTypeInfo(vartype);
-	checkCast();
-	llvm::outs() << "]";
-	PrintSourceRange(Declref->getSourceRange());
-	llvm::outs() << "}";
+      if (vardecl) {
       } else if (funcdecl) {// 関数の場合
 	QualType functype = funcdecl->getType();
 	std::string Declreftype = funcdecl->getResultType().getAsString();
