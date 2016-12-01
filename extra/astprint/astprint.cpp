@@ -3072,7 +3072,7 @@ public:
     }
     if (icast->getCastKind() != 3) {
       QualType casttype = icast->getType();
-      PrintTypeInfo(casttype); 
+      castType.push_back(PrintTypeInfo(casttype)); 
       ct.push(castlabel);
       castlabel = "";
       cast.str("");
@@ -3306,6 +3306,12 @@ public:
 */
     IL->value = Int->getValue().toString(10, true);
     IL->type.push_back(PrintTypeInfo(vartype));
+    if (castType.size() != 0) {
+      for (int i = 0; i < (int)castType.size(); i++) {
+        IL->type.push_back(castType[0]);
+        castType.erase(castType.begin());
+      }
+    }
     Node t = PrintSourceRange(Int->getSourceRange());
     IL->beginFile = t.beginFile;
     IL->beginLine = t.beginLine;
@@ -3338,6 +3344,12 @@ public:
     // 修正版
     FL->value = Float->getValueAsApproximateDouble();
     FL->type.push_back(PrintTypeInfo(vartype));
+    if (castType.size() != 0) {
+      for (int i = 0; i < (int)castType.size(); i++) {
+        FL->type.push_back(castType[0]);
+        castType.erase(castType.begin());
+      }
+    }
     Node t = PrintSourceRange(Float->getSourceRange());
     FL->beginFile = t.beginFile;
     FL->beginLine = t.beginLine;
@@ -3387,6 +3399,12 @@ public:
 */
     CL->value = Char->getValue();
     CL->type.push_back(PrintTypeInfo(vartype));
+    if (castType.size() != 0) {
+      for (int i = 0; i < (int)castType.size(); i++) {
+        CL->type.push_back(castType[0]);
+        castType.erase(castType.begin());
+      }
+    }
     Node t = PrintSourceRange(Char->getSourceRange());
     CL->beginFile = t.beginFile;
     CL->beginLine = t.beginLine;
