@@ -1032,8 +1032,6 @@ void DoStatement::printAST() {
 
 class ForStatement : public RepetitionStatement {
 public:
-  //Expression *init;
-  //Expression *update;
   Node *init;
   Node *update;
   ForStatement();
@@ -1060,14 +1058,11 @@ void ForStatement::printAST() {
 
 class BranchStatement : public Statement {
 public:
-  //Expression *condition;
   Node *condition;
 };
 
 class IfStatement : public BranchStatement {
 public:
-  //std::vector<Expression *> then;
-  //std::vector<Expression *> denial;
   std::vector<Node *> then;
   std::vector<Node *> denial;
   IfStatement();
@@ -1099,7 +1094,6 @@ void IfStatement::printAST() {
 
 class SwitchStatement : public BranchStatement {
 public:
-  //std::vector<Expression *> body;
   std::vector<Node *> body;
   SwitchStatement();
   void printAST();
@@ -1139,7 +1133,6 @@ void LabelStatement::printAST() {
 
 class CaseStatement : public Statement {
 public:
-  //Literal *value;
   Node *value;
   CaseStatement();
   void printAST();
@@ -1243,8 +1236,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
@@ -1253,8 +1244,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
@@ -1263,8 +1252,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
@@ -1289,8 +1276,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
@@ -1299,8 +1284,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
@@ -1322,8 +1305,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
@@ -1741,7 +1722,6 @@ public:
     return TDF;
   }
 
-  //void PrintBuiltinTypeInfo(QualType typeInfo) {
   DataType *PrintBuiltinTypeInfo(QualType typeInfo) {
     DataType *t;
     switch (dyn_cast<BuiltinType>(typeInfo)->getKind()) {
@@ -2123,7 +2103,6 @@ public:
       //llvm::outs() << "\nenter " << stmt->getStmtClassName() << "\n";
       switch (stmt->getStmtClass()) {
       case Stmt::BreakStmtClass:
-	llvm::outs() << "\n";
         //llvm::outs() << "stmt:1";
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2140,7 +2119,6 @@ public:
 	break;
       case Stmt::ContinueStmtClass: 
         //llvm::outs() << "stmt:4";
-	llvm::outs() << "\n";
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::DeclStmtClass: 
@@ -2158,8 +2136,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2168,8 +2144,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2178,8 +2152,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2188,8 +2160,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2204,8 +2174,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2214,8 +2182,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2224,8 +2190,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2239,8 +2203,6 @@ public:
 	} else if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	ArraySub = 1;
 	RecursiveASTVisitor::TraverseStmt(stmt);
@@ -2250,8 +2212,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	FuncCall = 1;
 	RecursiveASTVisitor::TraverseStmt(stmt);
@@ -2268,8 +2228,6 @@ public:
 	  ArraySub = 0;
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2287,8 +2245,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	llvm::outs() << "[";	
 	RecursiveASTVisitor::TraverseStmt(stmt);
@@ -2299,8 +2255,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2316,8 +2270,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2326,8 +2278,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2340,8 +2290,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2349,8 +2297,6 @@ public:
         //llvm::outs() << "stmt:27";
 	if (linefeedflag == 0) {
 	  linefeedflag = 1;
-	} else {
-	  //llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2359,8 +2305,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2368,8 +2312,6 @@ public:
         //llvm::outs() << "stmt:29";
 	if (linefeedflag == 0) {
 	  linefeedflag = 1;
-	} else {
-	  //llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
@@ -2378,8 +2320,6 @@ public:
 	if (linefeedflag == 0 || linefeedbody == 0) {
 	  linefeedflag = 1;
 	  linefeedbody = 1;
-	} else {
-	  llvm::outs() << "\n";
 	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
