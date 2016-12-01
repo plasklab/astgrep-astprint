@@ -3316,20 +3316,6 @@ public:
   bool VisitIntegerLiteral(IntegerLiteral *Int) {
     IntLiteral *IL = new IntLiteral();
     QualType vartype = Int->getType();
-    /*
-    if (labelflag != 0) {
-      getLabelValue(Int);
-    } else {
-      llvm::outs() << "{:kind \"IntegerLiteral\""
-		   << " :value " << Int->getValue();
-      llvm::outs() << " :type [";
-      PrintTypeInfo(vartype);
-      checkCast();
-      llvm::outs() << "]";
-      PrintSourceRange(Int->getSourceRange());
-      llvm::outs() << "}";
-    }
-*/
     IL->value = Int->getValue().toString(10, true);
     IL->type.push_back(PrintTypeInfo(vartype));
     if (castType.size() != 0) {
@@ -3355,17 +3341,6 @@ public:
   bool VisitFloatingLiteral(FloatingLiteral *Float) {
     FloatLiteral *FL = new FloatLiteral();
     QualType vartype = Float->getType();
-    /*
-    llvm::outs() << "{:kind \"FloatingLiteral\""
-		 << " :value " << Float->getValueAsApproximateDouble();
-    llvm::outs() << " :type [";
-    PrintTypeInfo(vartype);
-    checkCast();
-    llvm::outs() << "]";
-    PrintSourceRange(Float->getSourceRange());
-    llvm::outs() << "}";
-    */
-    // 修正版
     FL->value = Float->getValueAsApproximateDouble();
     FL->type.push_back(PrintTypeInfo(vartype));
     if (castType.size() != 0) {
