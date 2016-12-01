@@ -3380,23 +3380,6 @@ public:
   bool VisitCharacterLiteral(CharacterLiteral *Char) {
     CharLiteral *CL = new CharLiteral();
     QualType vartype = Char->getType();
-    /*
-    if (labelflag != 0) {
-      getLabelValue(Char);
-    } else {
-      llvm::outs() << "{:kind \"CharacterLiteral\""
-		   << " :value " << "\"" << Char->getValue() << "\""
-		   << " :character " << "\""
-		   << EscapeChar(char(Char->getValue())) << "\"";
-      llvm::outs() << " :type [";
-      PrintTypeInfo(vartype);
-      checkCast();
-      llvm::outs() << "]";
-      PrintSourceRange(Char->getSourceRange());
-      llvm::outs() << "}";
-    }
-    */
-    // 修正版
     CL->value = Char->getValue();
     CL->type.push_back(PrintTypeInfo(vartype));
     if (castType.size() != 0) {
