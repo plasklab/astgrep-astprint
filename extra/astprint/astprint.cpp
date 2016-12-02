@@ -997,15 +997,15 @@ WhileStatement::WhileStatement() {
 }
 
 void WhileStatement::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :condition ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  PrintLocation();
+  llvm::outs() << "\n :condition ";
   condition->printAST();
-  llvm::outs() << " :body [";
+  llvm::outs() << "\n :body [";
   for (int i = 0; i < (int)body.size(); i++) {
     body[i]->printAST();
   }
-  llvm::outs() << "]";
-  PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "]}\n";
 }
 
 class DoStatement : public RepetitionStatement {
@@ -2620,17 +2620,28 @@ public:
   
   // WhileStmt
   bool VisitWhileStmt(WhileStmt *While) {
-    llvm::outs() << "{:kind \"While\"";
-    checkLabel(); 
-    PrintSourceRange(While->getSourceRange());
-    llvm::outs() << "\n :condition ";
-    linefeedflag = 0;
+    WhileStatement *WS = new WhileStatement();
+    int i = prog.size();
     TraverseStmt(While->getCond());
-    llvm::outs() << "\n :body [";
-    linefeedflag = 0;
-    linefeedbody = 0;
+    WS->condition = prog[i];
+    prog.pop_back();
+    i = prog.size();
     TraverseStmt(While->getBody());
-    llvm::outs() << "]}";
+    int j = prog.size();
+    for (int k = i; k < j; k++) {
+      WS->body.push_back(prog[i]);
+      prog.erase(prog.begin() + i);
+    }
+    Node t = PrintSourceRange(While->getSourceRange());
+    WS->beginFile = t.beginFile;
+    WS->beginLine = t.beginLine;
+    WS->beginColumn = t.beginColumn;
+    WS->endFile = t.endFile;
+    WS->endLine = t.endLine;
+    WS->endColumn = t.endColumn;
+    Node *np = WS;
+    prog.push_back(np);
+
     return false;
   }
  
