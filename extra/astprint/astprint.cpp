@@ -630,7 +630,7 @@ void BinOp::printAST() {
   left->printAST();
   llvm::outs() << "\n :right ";
   right->printAST();
-  llvm::outs() << "}\n";
+  llvm::outs() << "}";
 }
 
 class UnOp : public Operator {
@@ -1043,17 +1043,19 @@ ForStatement::ForStatement() {
 }
 
 void ForStatement::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :init ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  PrintLocation();
+  llvm::outs() << "\n :init ";
   init->printAST();
-  llvm::outs() << " :update ";
+  llvm::outs() << "\n :condition ";
+  condition->printAST();
+  llvm::outs() << "\n :update ";
   update->printAST();
-  llvm::outs() << " :body [";
+  llvm::outs() << "\n :body [";
   for (int i = 0; i < (int)body.size(); i++) {
     body[i]->printAST();
   }
-  llvm::outs() << "] ";
-  PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "]}\n";
 }
 
 class BranchStatement : public Statement {
@@ -2493,27 +2495,40 @@ public:
 
   // ForStmt
   bool VisitForStmt(ForStmt *For) {
-    llvm::outs() << "{:kind \"For\"";
-    checkLabel(); 
-    PrintSourceRange(For->getSourceRange());
-    llvm::outs() << "\n :init [";
-    linefeedflag = 0;
+    ForStatement *FS = new ForStatement();
+    int i = prog.size();
     TraverseStmt(For->getInit());
-    llvm::outs() << "]\n :condition ";
-    linefeedflag = 0;
-    if (For->getCond() == NULL) {
-      llvm::outs() << "[]";
-    } else {
+    FS->init = prog[i];
+    prog.pop_back();
+    i = prog.size();
+    if (For->getCond() != NULL) {
       TraverseStmt(For->getCond());
+      FS->condition = prog[i];
+      prog.pop_back();
     }
-    llvm::outs() << "\n :update [";
-    linefeedflag = 0;
+    i = prog.size();
     TraverseStmt(For->getInc());
-    llvm::outs() << "]\n :body [";
-    linefeedflag = 0;
-    linefeedbody = 0;
+    FS->update = prog[i];
+    prog.pop_back();
+    i = prog.size();
     TraverseStmt(For->getBody());
-    llvm::outs() << "]}";
+    int j = prog.size();
+    for (int k = i; k < j; k++) {
+      FS->body.push_back(prog[i]);
+      prog.erase(prog.begin() + i);
+    }
+
+    Node t = PrintSourceRange(For->getSourceRange());
+    FS->beginFile = t.beginFile;
+    FS->beginLine = t.beginLine;
+    FS->beginColumn = t.beginColumn;
+    FS->endFile = t.endFile;
+    FS->endLine = t.endLine;
+    FS->endColumn = t.endColumn;
+
+    Node *np = FS;
+    prog.push_back(np);
+      
     return false;
   }
 
