@@ -1019,15 +1019,15 @@ DoStatement::DoStatement() {
 }
 
 void DoStatement::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :condition ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  PrintLocation();
+  llvm::outs() << "\n :condition ";
   condition->printAST();
-  llvm::outs() << " :body [";
+  llvm::outs() << "\n :body [";
   for (int i = 0; i < (int)body.size(); i++) {
     body[i]->printAST();
   }
-  llvm::outs() << "]";
-  PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "]}\n";
 }
 
 class ForStatement : public RepetitionStatement {
@@ -2480,17 +2480,28 @@ public:
 
   // DoStmt
   bool VisitDoStmt(DoStmt *Do) {
-    llvm::outs() << "{:kind \"Do\"";
-    checkLabel(); 
-    PrintSourceRange(Do->getSourceRange());
-    llvm::outs() << "\n :condition ";
-    linefeedflag = 0;
+    DoStatement *DS = new DoStatement();
+    int i = prog.size();
     TraverseStmt(Do->getCond());
-    llvm::outs() << "\n :body [";
-    linefeedflag = 0;
-    linefeedbody = 0;
+    DS->condition = prog[i];
+    prog.pop_back();
+    i = prog.size();
     TraverseStmt(Do->getBody());
-    llvm::outs() << "]}";
+    int j = prog.size();
+    for (int k = i; k < j; k++) {
+      DS->body.push_back(prog[i]);
+      prog.erase(prog.begin() + i);
+    }
+    Node t = PrintSourceRange(Do->getSourceRange());
+    DS->beginFile = t.beginFile;
+    DS->beginLine = t.beginLine;
+    DS->beginColumn = t.beginColumn;
+    DS->endFile = t.endFile;
+    DS->endLine = t.endLine;
+    DS->endColumn = t.endColumn;
+    Node *np = DS;
+    prog.push_back(np);
+
     return false;
   }
 
