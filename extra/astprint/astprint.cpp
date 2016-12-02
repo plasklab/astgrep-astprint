@@ -1147,11 +1147,11 @@ CaseStatement::CaseStatement() {
 }
 
 void CaseStatement::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :value ";
-  value->printAST();
-  llvm::outs() << " ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "\n :value ";
+  value->printAST();
+  llvm::outs() << "}\n";
 }
 
 
@@ -2434,15 +2434,25 @@ public:
  
   // CaseStmt
   bool VisitCaseStmt(CaseStmt *Case) {
-    os << "{:kind \"Case\"";
-    PrintSourceRange(Case->getSourceRange());
-    os  << " :value ";
-    caselabel += os.str();
-    os.str("");
-    os.clear();
+    CaseStatement *CS = new CaseStatement();
+    int i = prog.size();
+    TraverseStmt(Case->getLHS());
+    CS->value = prog[i];
+    prog.pop_back();
+    Node t = PrintSourceRange(Case->getSourceRange());
+    CS->beginFile = t.beginFile;
+    CS->beginLine = t.beginLine;
+    CS->beginColumn = t.beginColumn;
+    CS->endFile = t.endFile;
+    CS->endLine = t.endLine;
+    CS->endColumn = t.endColumn;
+    Node *np = CS;
+    prog.push_back(np);
+    skipcount = 1;
 
     /* FIXME: print case conditions other than literals
      */
+    /*
     assert(Case->getLHS() != NULL);
     switch (Case->getLHS()->getStmtClass()) {
     case Stmt::IntegerLiteralClass:
@@ -2454,6 +2464,8 @@ public:
       skipcount = 1;
       return true;
     }
+    */
+    return true;
   }
   
   // CompoundStmt
