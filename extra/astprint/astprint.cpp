@@ -1103,20 +1103,21 @@ public:
 };
 
 SwitchStatement::SwitchStatement() {
-  kind = "switch";
+  kind = "Switch";
 }
 
 void SwitchStatement::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :dondition ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  PrintLocation();
+  llvm::outs() << "\n :condition ";
   condition->printAST();
-  llvm::outs() << " :body [";
+  llvm::outs() << "\n :body [";
   for (int i = 0; i < (int)body.size(); i ++) {
     body[i]->printAST();
   }
-  llvm::outs() << "] ";
-  PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "]}\n";
 }
+
 class LabelStatement : public Statement {
 public:
   std::string name;
@@ -2604,6 +2605,7 @@ public:
 
   // SwitchStmt
   bool VisitSwitchStmt(SwitchStmt *Switch) {
+    /*
     llvm::outs() << "{:kind \"Switch\"";
     checkLabel(); 
     PrintSourceRange(Switch->getSourceRange());
@@ -2615,6 +2617,29 @@ public:
     linefeedbody = 0;
     TraverseStmt(Switch->getBody());
     llvm::outs() << "]}";
+    */
+    SwitchStatement *SS = new SwitchStatement();
+    int i = prog.size();
+    TraverseStmt(Switch->getCond());
+    SS->condition = prog[i];
+    prog.pop_back();
+    i = prog.size();
+    TraverseStmt(Switch->getBody());
+    int j = prog.size();
+    for (int k = i; k < j; k++) {
+      SS->body.push_back(prog[i]);
+      prog.erase(prog.begin() + i);
+    }
+    Node t = PrintSourceRange(Switch->getSourceRange());
+    SS->beginFile = t.beginFile;
+    SS->beginLine = t.beginLine;
+    SS->beginColumn = t.beginColumn;
+    SS->endFile = t.endFile;
+    SS->endLine = t.endLine;
+    SS->endColumn = t.endColumn;
+    Node *tp = SS;
+    prog.push_back(tp);
+
     return false;
   }
   
