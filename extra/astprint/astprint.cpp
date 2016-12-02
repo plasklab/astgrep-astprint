@@ -1076,22 +1076,23 @@ IfStatement::IfStatement() {
 }
 
 void IfStatement::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :condition ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  PrintLocation();
+  llvm::outs() << "\n :condition ";
   condition->printAST();
-  llvm::outs() << " :then [";
+  llvm::outs() << "\n :then [";
   for (int i = 0; i < (int)then.size(); i++) {
     then[i]->printAST();
   }
   llvm::outs() << "]";
   if (denial.size() != 0) {
-    llvm::outs() << " :else [";
+    llvm::outs() << "\n :else [";
     for (int i = 0; i < (int)denial.size(); i++) {
       denial[i]->printAST();
     }
     llvm::outs() << "] ";
   }
-  PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
 
 class SwitchStatement : public BranchStatement {
@@ -2544,24 +2545,37 @@ public:
 
   // IfStmt
   bool VisitIfStmt(IfStmt *If) {
-    llvm::outs() << "{:kind \"If\"";
-    checkLabel(); 
-    PrintSourceRange(If->getSourceRange());
-    llvm::outs() << "\n :condition ";
-    linefeedflag = 0;
+    IfStatement * IS = new IfStatement();
+    int i = prog.size();
     TraverseStmt(If->getCond());
-    llvm::outs() << "\n :then [";
-    linefeedflag = 0;
+    IS->condition = prog[i];
+    prog.pop_back();
+    i = prog.size();
     TraverseStmt(If->getThen());
-    llvm::outs() << "]";
-    if (If->getElse()) {
-      llvm::outs() << "\n :else [";
-      linefeedflag = 0;
-      TraverseStmt(If->getElse());
-      llvm::outs() << "]}";
-    } else {
-      llvm::outs() << "}";
+    int j = prog.size();
+    for (int k = i; k < j; k++) {
+      IS->then.push_back(prog[i]);
+      prog.erase(prog.begin() + i);
     }
+    if (If->getElse()) {
+      i = prog.size();
+      TraverseStmt(If->getElse());
+      j = prog.size();
+      for (int k = i; k < j; k++) {
+        IS->denial.push_back(prog[i]);
+        prog.erase(prog.begin() + i);
+      }
+    }
+    Node t = PrintSourceRange(If->getSourceRange());
+    IS->beginFile = t.beginFile;
+    IS->beginLine = t.beginLine;
+    IS->beginColumn = t.beginColumn;
+    IS->endFile = t.endFile;
+    IS->endLine = t.endLine;
+    IS->endColumn = t.endColumn;
+    Node *np = IS;
+    prog.push_back(np);
+
     return false;
   }
 
@@ -3253,7 +3267,7 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    //llvm::outs() << "\n----------------------------------------------------------------------\n";
+    llvm::outs() << "\n----------------------------------------------------------------------\n";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
