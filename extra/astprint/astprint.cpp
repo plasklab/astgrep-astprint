@@ -2605,19 +2605,6 @@ public:
 
   // SwitchStmt
   bool VisitSwitchStmt(SwitchStmt *Switch) {
-    /*
-    llvm::outs() << "{:kind \"Switch\"";
-    checkLabel(); 
-    PrintSourceRange(Switch->getSourceRange());
-    llvm::outs() << "\n :condition ";
-    linefeedflag = 0;
-    TraverseStmt(Switch->getCond());
-    llvm::outs() << "\n :body [";
-    linefeedflag = 0;
-    linefeedbody = 0;
-    TraverseStmt(Switch->getBody());
-    llvm::outs() << "]}";
-    */
     SwitchStatement *SS = new SwitchStatement();
     int i = prog.size();
     TraverseStmt(Switch->getCond());
