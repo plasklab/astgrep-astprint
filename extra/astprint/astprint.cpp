@@ -2416,13 +2416,19 @@ public:
     return true;
   }
 
-  //
   // BreakStmt
   bool VisitBreakStmt(BreakStmt *Break) {
-    llvm::outs()  << "{:kind \"Break\"";
-    checkLabel(); 
-    PrintSourceRange(Break->getSourceRange());
-    llvm::outs() << "}";
+    BreakStatement *BS = new BreakStatement();
+    Node t = PrintSourceRange(Break->getSourceRange());
+    BS->beginFile = t.beginFile;
+    BS->beginLine = t.beginLine;
+    BS->beginColumn = t.beginColumn;
+    BS->endFile = t.endFile;
+    BS->endLine = t.endLine;
+    BS->endColumn = t.endColumn;
+    Node *np = BS;
+    prog.push_back(np);
+
     return true;
   }
  
