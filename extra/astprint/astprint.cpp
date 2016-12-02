@@ -630,7 +630,7 @@ void BinOp::printAST() {
   left->printAST();
   llvm::outs() << "\n :right ";
   right->printAST();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
 
 class UnOp : public Operator {
@@ -1154,6 +1154,21 @@ void CaseStatement::printAST() {
   llvm::outs() << "}\n";
 }
 
+class DefaultStatement : public Statement {
+public:
+  DefaultStatement();
+  void printAST();
+};
+
+DefaultStatement::DefaultStatement() {
+  kind = "Default";
+}
+
+void DefaultStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  PrintLocation();
+  llvm::outs() << "}\n";
+}
 
 class GotoStatement : public Statement {
 public:
@@ -1169,7 +1184,7 @@ GotoStatement::GotoStatement() {
 void GotoStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :goto \"" << jump << "\" ";
   PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
 
 class ContinueStatement : public Statement {
@@ -1185,7 +1200,7 @@ ContinueStatement::ContinueStatement() {
 void ContinueStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" ";
   PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
 
 class BreakStatement : public Statement {
@@ -1201,7 +1216,7 @@ BreakStatement::BreakStatement() {
 void BreakStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" ";
   PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
 
 class ReturnStatement : public Statement {
@@ -2487,6 +2502,7 @@ public:
   
   // DefaultStmt
   bool VisitDefaultStmt(DefaultStmt *Default) {
+    /*
     os << "{:kind \"Default\"";
     PrintSourceRange(Default->getSourceRange());
     os << "}";
@@ -2494,6 +2510,18 @@ public:
     os.str("");
     os.clear();
     labelflag = 0;
+    */
+    DefaultStatement *DS = new DefaultStatement();
+    Node t = PrintSourceRange(Default->getSourceRange());
+    DS->beginFile = t.beginFile;
+    DS->beginLine = t.beginLine;
+    DS->beginColumn = t.beginColumn;
+    DS->endFile = t.endFile;
+    DS->endLine = t.endLine;
+    DS->endColumn = t.endColumn;
+    Node *np = DS;
+    prog.push_back(np);
+
     return true;
   }
 
