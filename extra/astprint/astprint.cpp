@@ -1869,59 +1869,7 @@ public:
 
   //void PrintArrayTypeInfo(QualType typeInfo) {
   ArrayDataType *PrintArrayTypeInfo(QualType typeInfo) {
-    //QualType elmtype;
     ArrayDataType *t = new ArrayDataType();
-    /*
-    if (dyn_cast<ArrayType>(typeInfo)) {
-      elmtype = dyn_cast<ArrayType>(typeInfo)->getElementType();
-      assert(labelflag == 0);
-      if (castflag != 0) {
-	cast << "{:kind \"Array-type\"";
-	if (dyn_cast<ConstantArrayType>(typeInfo)) {
-	  cast << " :Arraysize \"" 
-	       << dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true) << "\"";
-          //std::string index = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
-          t->arraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
-          //t.arraySize = atoi(index);
-	}
-	if (dyn_cast<VariableArrayType>(typeInfo)) {
-	  Expr *vaexpr = dyn_cast<VariableArrayType>(typeInfo)->getSizeExpr();
-	  cast << " :ArraySizeExpression ";
-	  linefeedflag = 0;
-	  TraverseStmt(vaexpr);
-	}
-	PrintQualifier(typeInfo);
-	cast << " :type [";
-	t->type = PrintTypeInfo(elmtype);
-	cast << "]}";
-	castlabel += cast.str();
-	cast.str("");
-	cast.clear();
-      } else {
-	llvm::outs()  << "{:kind \"Array-type\"";
-	if (dyn_cast<ConstantArrayType>(typeInfo)) {
-	  llvm::outs() << " :ArraySize \"" 
-		       << dyn_cast<ConstantArrayType>(typeInfo)->getSize() << "\"";
-          //std::string index  = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
-          t->arraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
-          //t.arraySize = std::stoi(index);
-	}
-	if (dyn_cast<VariableArrayType>(typeInfo)) {
-	  Expr *vaexpr = dyn_cast<VariableArrayType>(typeInfo)->getSizeExpr();
-	  llvm::outs() << " :ArraySizeExpression ";
-	  linefeedflag = 0;
-	  TraverseStmt(vaexpr);
-	}
-	PrintQualifier(typeInfo);
-	llvm::outs() << " :type [";
-	t->type = PrintTypeInfo(elmtype);
-	llvm::outs() << "]}";
-      }
-    } else if (dyn_cast<ParenType>(typeInfo)) {
-      elmtype = dyn_cast<ParenType>(typeInfo)->getInnerType();
-      PrintTypeInfo(elmtype);
-    }
-    */
     QualType elmtype = dyn_cast<ArrayType>(typeInfo)->getElementType();
     t->arraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
     t->type = PrintTypeInfo(elmtype);
