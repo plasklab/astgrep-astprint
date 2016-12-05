@@ -3305,8 +3305,8 @@ public:
 
   // ImplicitCastの有無
   void checkCast() {
-    if (labelflag != 0)
-      llvm::outs() << "labelflag != 0 in checkCast";
+    //if (labelflag != 0)
+    //  llvm::outs() << "labelflag != 0 in checkCast";
     while (!ct.empty()) {
       llvm::outs() << " " << ct.top();
       ct.pop();
@@ -3347,7 +3347,7 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    llvm::outs() << "\n----------------------------------------------------------------------\n";
+    //llvm::outs() << "\n----------------------------------------------------------------------\n";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
