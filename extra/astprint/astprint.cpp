@@ -583,8 +583,7 @@ void MemberReference::printAST() {
 
 class StructReference : public Reference {
 public:
-  DeclationReferenceExpression *structs;
-  //MemberReference *structMember;
+  Node *structs;
   Node *structMember;
   StructReference();
   void printAST();
@@ -2907,6 +2906,35 @@ public:
     Expr *base = mem->getBase();
     ValueDecl *vdecl = mem->getMemberDecl();
     QualType memtype = mem->getType();
+    StructReference *SR = new StructReference();
+    if (mem->isLValue() || mem->isRValue()) {
+      int i = prog.size();
+      TraverseStmt(base);
+      SR->structs = prog[i];
+      prog.pop_back();
+      i = prog.size();
+      TraverseDecl(vdecl);
+      SR->structMember = prog[i];
+      prog.pop_back();
+      SR->type.push_back(PrintTypeInfo(memtype));
+      if (castType.size() != 0) {
+        for (int i = 0; i < (int)castType.size(); i++) {
+          SR->type.push_back(castType[0]);
+          castType.erase(castType.begin());
+        }
+      }
+      Node t = PrintSourceRange(mem->getSourceRange());
+      SR->beginFile = t.beginFile;
+      SR->beginLine = t.beginLine;
+      SR->beginColumn = t.beginColumn;
+      SR->endFile = t.endFile;
+      SR->endLine = t.endLine;
+      SR->endColumn = t.endColumn;
+      Node *np = SR;
+      prog.push_back(np);
+      return false;
+    }
+    /*
     if (mem->isLValue() || mem->isRValue()) {
       llvm::outs() << "{:kind \"Struct\""
 		   << " :struct ";
@@ -2926,6 +2954,7 @@ public:
       //TraverseDecl(mem->getMemberDecl());
       return false; 
     }
+    */
     if(mem->isArrow()) {
       llvm::outs() << "{:kind \"Binop\" :op \"->\"";
       checkLabel(); 
