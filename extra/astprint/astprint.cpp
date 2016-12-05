@@ -1395,32 +1395,7 @@ public:
     FD->endColumn = t.endColumn;
     Node *np = FD;
     prog.push_back(np);
-    /*
-    if (labelflag != 0) {
-      os << "{:kind \"Field\""
-	 << " :name " << "\"" << (std::string)field->getName() << "\""
-	 << " :scope " << "\"member\"";
-      os << " :type [";
-      PrintTypeInfo(fieldtype);
-      checkCast();
-      os << "]";
-      PrintSourceRange(field->getSourceRange());
-      os << "}";
-      caselabel += os.str();
-      os.str("");
-      os.clear();
-    } else {
-      llvm::outs() << "{:kind \"Field\""
-		   << " :name " << "\"" << field->getName() << "\""
-		   << " :scope " << "\"member\"";
-      llvm::outs() << " :type [";
-      PrintTypeInfo(fieldtype);
-      checkCast();
-      llvm::outs() << "]";
-      PrintSourceRange(field->getSourceRange());
-      llvm::outs() << "}";
-    }
-    */
+
     return false;
   }
   
