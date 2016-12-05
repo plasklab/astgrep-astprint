@@ -435,7 +435,7 @@ void FuncType::printType() {
 
 class ArrayDataType : public DataType {
 public:
-  int arraySize;
+  std::string arraySize;
   DataType *type;
   ArrayDataType();
   void printType();
@@ -446,7 +446,7 @@ ArrayDataType::ArrayDataType() {
 }
 
 void ArrayDataType::printType() {
-  llvm::outs() << "{:kind \"" << kind << "\" :array-size " << arraySize << " :type ";
+  llvm::outs() << "{:kind \"" << kind << "\" :array-size \"" << arraySize << "\" :type ";
   type->printType();
   llvm::outs() << "}";
 }
@@ -785,9 +785,7 @@ void ArrayReference::printAST() {
 
 class FunctionCall : public Expression {
 public:
-  //DeclationReferenceExpression *func;
   Node *func;
-  //std::vector<DeclationReferenceExpression *> parm;
   std::vector<Node *> parm;
   FunctionCall();
   void printAST();
@@ -830,11 +828,10 @@ FieldDeclation::FieldDeclation() : scope("member") {
 
 void FieldDeclation::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \" " << name 
-               << "\" :scope " << scope << " type";
+               << "\" :scope \"" << scope << "\" :type";
   type->printType();
-  llvm::outs() << " ";
   PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
 
 class ObjectDeclation : public Declation {
@@ -950,13 +947,13 @@ StructDeclation::StructDeclation() {
 }
 
 void StructDeclation::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\"\n :member [";
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
+  PrintLocation();
+  llvm::outs() << "\n :member [";
   for (int i = 0; i < (int)member.size(); i++) {
     member[i]->printAST();
   }
-  llvm::outs() << "]";
-  PrintLocation();
-  llvm::outs() << "}\n";
+  llvm::outs() << "]}\n";
 }
 
 class UnionDeclation : public TypeDeclation {
@@ -1384,7 +1381,21 @@ public:
   //
   // FieldDecl (Structure Member) 
   bool VisitFieldDecl(FieldDecl *field) {
+    FieldDeclation *FD = new FieldDeclation();
     QualType fieldtype = field->getType();
+    FD->name = (std::string)field->getName();
+    FD->scope = "member";
+    FD->type = PrintTypeInfo(fieldtype);
+    Node t = PrintSourceRange(field->getSourceRange());
+    FD->beginFile = t.beginFile;
+    FD->beginLine = t.beginLine;
+    FD->beginColumn = t.beginColumn;
+    FD->endFile = t.endFile;
+    FD->endLine = t.endLine;
+    FD->endColumn = t.endColumn;
+    Node *np = FD;
+    prog.push_back(np);
+    /*
     if (labelflag != 0) {
       os << "{:kind \"Field\""
 	 << " :name " << "\"" << (std::string)field->getName() << "\""
@@ -1409,6 +1420,7 @@ public:
       PrintSourceRange(field->getSourceRange());
       llvm::outs() << "}";
     }
+    */
     return false;
   }
   
@@ -1480,6 +1492,7 @@ public:
 
   // RecordDecl (Structure?)
   bool VisitRecordDecl(RecordDecl *record) {
+    /*
     std::string recordkind;
     if (record->isStruct()) {
       recordkind = "\"Structdef\"";
@@ -1521,6 +1534,31 @@ public:
 	} 
       }
     llvm::outs() << "]}";
+    }
+    */
+    if (record->isStruct()) {
+      StructDeclation *SD = new StructDeclation();
+      SD->name = (std::string)record->getName();
+      if (!(record->field_empty())) {
+        RecordDecl::field_iterator itr = record->field_begin();
+        int i = prog.size();
+        while (itr != record->field_end()) {
+          TraverseDecl(itr->getCanonicalDecl());
+          SD->member.push_back(prog[i]);
+          prog.erase(prog.begin() + i);
+          itr++;
+        }
+      }
+      Node t = PrintSourceRange(record->getSourceRange());
+      SD->beginFile = t.beginFile;
+      SD->beginLine = t.beginLine;
+      SD->beginColumn = t.beginColumn;
+      SD->endFile = t.endFile;
+      SD->endLine = t.endLine;
+      SD->endColumn = t.endColumn;
+      Node *np = SD;
+      prog.push_back(np);
+    } else if (record->isUnion()) {
     }
     return false;
   }
@@ -1831,8 +1869,9 @@ public:
 
   //void PrintArrayTypeInfo(QualType typeInfo) {
   ArrayDataType *PrintArrayTypeInfo(QualType typeInfo) {
-    QualType elmtype;
+    //QualType elmtype;
     ArrayDataType *t = new ArrayDataType();
+    /*
     if (dyn_cast<ArrayType>(typeInfo)) {
       elmtype = dyn_cast<ArrayType>(typeInfo)->getElementType();
       assert(labelflag == 0);
@@ -1842,6 +1881,7 @@ public:
 	  cast << " :Arraysize \"" 
 	       << dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true) << "\"";
           //std::string index = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
+          t->arraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
           //t.arraySize = atoi(index);
 	}
 	if (dyn_cast<VariableArrayType>(typeInfo)) {
@@ -1863,6 +1903,7 @@ public:
 	  llvm::outs() << " :ArraySize \"" 
 		       << dyn_cast<ConstantArrayType>(typeInfo)->getSize() << "\"";
           //std::string index  = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
+          t->arraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
           //t.arraySize = std::stoi(index);
 	}
 	if (dyn_cast<VariableArrayType>(typeInfo)) {
@@ -1880,6 +1921,10 @@ public:
       elmtype = dyn_cast<ParenType>(typeInfo)->getInnerType();
       PrintTypeInfo(elmtype);
     }
+    */
+    QualType elmtype = dyn_cast<ArrayType>(typeInfo)->getElementType();
+    t->arraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
+    t->type = PrintTypeInfo(elmtype);
 
     return t;
   }
