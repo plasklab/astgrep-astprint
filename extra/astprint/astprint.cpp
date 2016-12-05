@@ -881,6 +881,7 @@ VariableDeclation::VariableDeclation() {
   kind = "VarDecl";
   autoBool = false;
   staticBool = false;
+  init = NULL;
 }
 
 void VariableDeclation::printAST() {
@@ -894,7 +895,7 @@ void VariableDeclation::printAST() {
   llvm::outs() << " :display-type \"" << displayType << "\" :type ";
   type->printType();
   PrintLocation();
-  if (init != 0) {
+  if (init != NULL) {
     llvm::outs() << "\n :init ";
     init->printAST();
   }
