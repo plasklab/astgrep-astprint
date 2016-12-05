@@ -863,7 +863,8 @@ ParameterDeclation::ParameterDeclation() {
 }
 
 void ParameterDeclation::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :type ";
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :display-type \"" 
+               << displayType << "\" :type ";
   type->printType();
   PrintLocation();
   llvm::outs() << "}";
@@ -1412,16 +1413,16 @@ public:
   
   // FunctionDecl
   bool VisitFunctionDecl(FunctionDecl *Decl) {
-    Node *np;
     FunctionDeclation *FD = new FunctionDeclation();
     FD->name = Decl->getQualifiedNameAsString();
     FD->type = PrintTypeInfo(Decl->getType());
     if (Decl->param_size()) {
-      for (int i = 0; i < (int)Decl->param_size(); i++) {
-        int j = prog.size();
-        TraverseDecl(Decl->getParamDecl(i));
-        FD->parm[i] = prog[j];
-        prog.erase(prog.begin() + j);
+      int i = prog.size();
+      int j = Decl->param_size();
+      for (int k = 0; k < j; k++) {
+        TraverseDecl(Decl->getParamDecl(k));
+        FD->parm.push_back(prog[i]);
+        prog.erase(prog.begin() + i);
       }
     }
     int i = prog.size();
@@ -1440,7 +1441,7 @@ public:
     FD->endFile = t.endFile;
     FD->endLine = t.endLine;
     FD->endColumn = t.endColumn;
-    np = FD;
+    Node *np = FD;
     prog.push_back(np);
 
     return false;
@@ -1537,8 +1538,10 @@ public:
     if (Decl->hasInit()) {
       int i = prog.size();
       TraverseStmt(Decl->getInit());
-      VD->init = prog[i];
-      prog.pop_back();
+      if (i < (int)prog.size()) {
+        VD->init = prog[i];
+        prog.pop_back();
+      }
     }
     Node t = PrintSourceRange(Decl->getSourceRange());
     VD->beginFile = t.beginFile;
@@ -3347,7 +3350,7 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    //llvm::outs() << "\n----------------------------------------------------------------------\n";
+    llvm::outs() << "\n----------------------------------------------------------------------\n";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
