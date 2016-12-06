@@ -1091,22 +1091,25 @@ void StructDeclation::printAST() {
 
 class UnionDeclation : public TypeDeclation {
 public:
-  UnionDeclation();
+  UnionDeclation(std::string name, std::vector<Node *> member, Node loc);
   void printAST();
 };
 
-UnionDeclation::UnionDeclation() {
+UnionDeclation::UnionDeclation(std::string name, std::vector<Node *> member, Node loc) {
   kind = "UnionDecl";
+  name = name;
+  member(member);
+  setLocation(loc);
 }
 
 void UnionDeclation::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\"\n :member [";
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\""
+  PrintLocation();
+  llvm::outs() << "\n :member [";
   for (int i = 0; i < (int)member.size(); i++) {
     member[i]->printAST();
   }
-  llvm::outs() << "]";
-  PrintLocation();
-  llvm::outs() << "}\n";
+  llvm::outs() << "]}\n";
 }
 
 class Statement : public Node {
