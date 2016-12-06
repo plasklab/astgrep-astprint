@@ -642,12 +642,15 @@ class StructReference : public Reference {
 public:
   Node *structs;
   Node *structMember;
-  StructReference();
+  StructReference(Node *str, Node strMem, Node loc);
   void printAST();
 };
 
-StructReference::StructReference() {
+StructReference::StructReference(Node *str, Node strMem, Node loc) {
   kind = "Struct";
+  structs = str;
+  structMember = strMem;
+  setLocation(loc);
 }
 
 void StructReference::printAST() {
