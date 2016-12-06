@@ -2560,14 +2560,9 @@ public:
 
   // BreakStmt
   bool VisitBreakStmt(BreakStmt *Break) {
-    BreakStatement *BS = new BreakStatement();
     Node t = PrintSourceRange(Break->getSourceRange());
-    BS->beginFile = t.beginFile;
-    BS->beginLine = t.beginLine;
-    BS->beginColumn = t.beginColumn;
-    BS->endFile = t.endFile;
-    BS->endLine = t.endLine;
-    BS->endColumn = t.endColumn;
+
+    BreakStatement *BS = new BreakStatement(t);
     Node *np = BS;
     prog.push_back(np);
 
