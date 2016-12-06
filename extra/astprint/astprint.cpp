@@ -2639,37 +2639,39 @@ public:
 
   // ForStmt
   bool VisitForStmt(ForStmt *For) {
-    ForStatement *FS = new ForStatement();
     int i = prog.size();
-    TraverseStmt(For->getInit());
-    FS->init = prog[i];
-    prog.pop_back();
-    i = prog.size();
-    if (For->getCond() != NULL) {
-      TraverseStmt(For->getCond());
-      FS->condition = prog[i];
+    Node *init;
+    if (For->getInit() != NULL) {
+      TraverseStmt(For->getInit());
+      init = prog[i];
       prog.pop_back();
     }
     i = prog.size();
-    TraverseStmt(For->getInc());
-    FS->update = prog[i];
-    prog.pop_back();
+    Node *condition;
+    if (For->getCond() != NULL) {
+      TraverseStmt(For->getCond());
+      condition = prog[i];
+      prog.pop_back();
+    }
+    i = prog.size();
+    Node *update;
+    if (For->getInd() != NULL) {
+      TraverseStmt(For->getInc());
+      update = prog[i];
+      prog.pop_back();
+    }
     i = prog.size();
     TraverseStmt(For->getBody());
     int j = prog.size();
+    std::vector<Node *> prog;
     for (int k = i; k < j; k++) {
-      FS->body.push_back(prog[i]);
+      body.push_back(prog[i]);
       prog.erase(prog.begin() + i);
     }
 
     Node t = PrintSourceRange(For->getSourceRange());
-    FS->beginFile = t.beginFile;
-    FS->beginLine = t.beginLine;
-    FS->beginColumn = t.beginColumn;
-    FS->endFile = t.endFile;
-    FS->endLine = t.endLine;
-    FS->endColumn = t.endColumn;
 
+    ForStatement *FS = new ForStatement(condition, body, init, update, t);
     Node *np = FS;
     prog.push_back(np);
       
