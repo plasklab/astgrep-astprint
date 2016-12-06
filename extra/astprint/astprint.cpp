@@ -2735,25 +2735,21 @@ public:
 
   // SwitchStmt
   bool VisitSwitchStmt(SwitchStmt *Switch) {
-    SwitchStatement *SS = new SwitchStatement();
     int i = prog.size();
     TraverseStmt(Switch->getCond());
-    SS->condition = prog[i];
+    Node *condition = prog[i];
     prog.pop_back();
     i = prog.size();
     TraverseStmt(Switch->getBody());
     int j = prog.size();
+    std::vector<Node *> body;
     for (int k = i; k < j; k++) {
-      SS->body.push_back(prog[i]);
+      body.push_back(prog[i]);
       prog.erase(prog.begin() + i);
     }
     Node t = PrintSourceRange(Switch->getSourceRange());
-    SS->beginFile = t.beginFile;
-    SS->beginLine = t.beginLine;
-    SS->beginColumn = t.beginColumn;
-    SS->endFile = t.endFile;
-    SS->endLine = t.endLine;
-    SS->endColumn = t.endColumn;
+
+    SwitchStatement *SS = new SwitchStatement(condition, body, t);
     Node *tp = SS;
     prog.push_back(tp);
 
