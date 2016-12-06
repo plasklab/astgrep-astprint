@@ -580,6 +580,7 @@ void Expression::printAST() {
 class Reference : public Expression {
 public:
   std::string name;
+  //std::vector<Node *> label;
   //Reference(std::string name);
 };
 /*
@@ -601,11 +602,19 @@ DeclationReferenceExpression::DeclationReferenceExpression(std::string n, std::s
   scope = s;
   type = dts;
   setLocation(loc);
+  //label = l;
 }
 
 void DeclationReferenceExpression::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name 
-               << "\" :scope \"" << scope << "\" :type [";
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
+  /*if (c.size() != 0) {
+    llvm::outs() << " :label [";
+    while (c.size() != 0) {
+      c->printAST();
+    }
+    llvm::outs() << "]";
+  }*/
+  llvm::outs() << " :scope \"" << scope << "\" :type [";
   for (int i = 0; i < (int)type.size(); i++) {
     type[i]->printType();
   }
@@ -696,7 +705,7 @@ void BinOp::printAST() {
   left->printAST();
   llvm::outs() << "\n :right ";
   right->printAST();
-  llvm::outs() << "}\n";
+  llvm::outs() << "}";
 }
 
 class UnOp : public Operator {
@@ -978,11 +987,7 @@ VariableDeclation::VariableDeclation(std::string n, std::string s, std::string d
   scope = s;
   displayType = display;
   type = dt;
-  if (init == NULL) {
-    init = NULL;
-  } else {
-    init = i;
-  }
+  init = i;
   setLocation(loc);
   autoBool = au;
   staticBool = sta;
@@ -1175,9 +1180,9 @@ void ForStatement::printAST() {
   PrintLocation();
   llvm::outs() << "\n :init ";
   init->printAST();
-  llvm::outs() << "\n :condition ";
+  llvm::outs() << " :condition ";
   condition->printAST();
-  llvm::outs() << "\n :update ";
+  llvm::outs() << " :update ";
   update->printAST();
   llvm::outs() << "\n :body [";
   for (int i = 0; i < (int)body.size(); i++) {
@@ -1222,7 +1227,7 @@ void IfStatement::printAST() {
     for (int i = 0; i < (int)denial.size(); i++) {
       denial[i]->printAST();
     }
-    llvm::outs() << "] ";
+    llvm::outs() << "]";
   }
   llvm::outs() << "}\n";
 }
@@ -1687,8 +1692,8 @@ public:
         init = prog[i];
         prog.pop_back();
       }
-      //init->printAST();
-    }
+    } else 
+      init = NULL;
     Node t = PrintSourceRange(Decl->getSourceRange());
 
     VariableDeclation *VD = new VariableDeclation(name, scope, displayType, type, init, t, false, false);
@@ -3365,7 +3370,7 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    //llvm::outs() << "\n----------------------------------------------------------------------\n";
+    llvm::outs() << "\n----------------------------------------------------------------------\n";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
