@@ -510,6 +510,7 @@ public:
   int endLine;
   int endColumn;
   void PrintLocation();
+  void setLocation(Node loc);
   //Node(std::string kind, std::string beginFile, int beginLine, int beginColumn,
   //             std::string endFile, int endLine, int endColumn);
   virtual void printAST();
@@ -527,6 +528,15 @@ Node::Node(std::string kind, std::string beginFile, int beginLine, int beginColu
   endColumn = endColumn;
 }
 */
+void Node::setLocation(Node loc) {
+  beginFile = loc.beginFile;
+  beginLine = loc.beginLine;
+  beginColumn = loc.beginColumn;
+  endFile = loc.endFile;
+  endLine = loc.endLine;
+  endColumn = loc.endColumn;
+}
+
 void Node::PrintLocation() {
   llvm::outs() << " :loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
   	   << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]";
@@ -583,14 +593,9 @@ DeclationReferenceExpression::DeclationReferenceExpression(std::string name, std
   type.push_back(dt);
   for (int i = 0; i != (int)dts.size(); i++) {
     type.push_back(dts[0]);
-    dts.erase[0];
+    dts.erase(dts.begin());
   }
-  beginFile = loc.beginFile;
-  beginLine = loc.beginLine;
-  beginColumn = loc.beginColumn;
-  endFile = loc.endFile;
-  endLine = loc.endLine;
-  endColumn = loc.endColumn;
+  setLocation(loc);
 }
 
 void DeclationReferenceExpression::printAST() {
@@ -607,12 +612,20 @@ void DeclationReferenceExpression::printAST() {
 class MemberReference : public Reference {
 public:
   std::string scope;
-  MemberReference();
+  MemberReference(std::string name, DataType *dt, std::vector<DataType *> dts, Node loc);
   void printAST();  
 };
 
-MemberReference::MemberReference() : scope("member") {
+MemberReference::MemberReference(std::string name, DataType *dt, std::vector<DataType *> dts, Node loc) {
   kind = "Field";
+  scope = "Member";
+  name = name;
+  type.push_back(dt);
+  for (int i = 0; i != (int)dts.size(); i++) {
+    type.pusch_back(dts[0]);
+    dts.erase(dts.begin());
+  }
+  setLocation(loc);
 }
 
 void MemberReference::printAST() {
