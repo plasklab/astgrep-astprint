@@ -1248,12 +1248,15 @@ void IfStatement::printAST() {
 class SwitchStatement : public BranchStatement {
 public:
   std::vector<Node *> body;
-  SwitchStatement();
+  SwitchStatement(Node *cond, std::vector<Node *> body, Node loc);
   void printAST();
 };
 
-SwitchStatement::SwitchStatement() {
+SwitchStatement::SwitchStatement(Node *cond, std::vector<Node *> body, Node loc) {
   kind = "Switch";
+  condition = cond;
+  body(body);
+  setLocation(loc);
 }
 
 void SwitchStatement::printAST() {
