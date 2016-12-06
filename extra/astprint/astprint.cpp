@@ -3021,27 +3021,6 @@ public:
       prog.push_back(np);
       return false;
     }
-    /*
-    if (mem->isLValue() || mem->isRValue()) {
-      llvm::outs() << "{:kind \"Struct\""
-		   << " :struct ";
-      linefeedflag = 0;
-      TraverseStmt(base);
-      llvm::outs() << " :structmember ";
-      linefeedflag = 0;
-      TraverseDecl(vdecl);
-      llvm::outs() << " :type [";
-      PrintTypeInfo(memtype);
-      checkCast();
-      llvm::outs() << "]";
-      PrintSourceRange(mem->getSourceRange());
-      llvm::outs() << "}";
-      
-      //linefeedflag = 0;
-      //TraverseDecl(mem->getMemberDecl());
-      return false; 
-    }
-    */
     if(mem->isArrow()) {
       llvm::outs() << "{:kind \"Binop\" :op \"->\"";
       checkLabel(); 
