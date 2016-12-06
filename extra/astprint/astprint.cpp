@@ -95,14 +95,14 @@ void IntType::printType() {
 
 class UnsignedIntType : public UnsignedType {
 public:
-  UnsignedIntType();
+  UnsignedIntType(bool cons, bool vol);
   void printType();
 };
 
-UnsignedIntType::UnsignedIntType() {
+UnsignedIntType::UnsignedIntType(bool cons, bool vol) {
   kind = "UnsignedIntType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void UnsignedIntType::printType() {
@@ -116,14 +116,14 @@ void UnsignedIntType::printType() {
 
 class FloatType : public SignedType {
 public:
-  FloatType();
+  FloatType(bool cons, bool vol);
   void printType();
 };
 
-FloatType::FloatType() {
+FloatType::FloatType(bool cons, bool vol) {
   kind = "FloatType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void FloatType::printType() {
