@@ -781,18 +781,14 @@ void Literal::printAST() {
 class IntLiteral : public Literal {
 public:
   std::string value;
-  IntLiteral(std::string value, DataType *dt, std::vector<DataType *> dts, Node loc);
+  IntLiteral(std::string value, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-IntLiteral::IntLiteral(std::string value, DataType *dt, std::vector<DataType *> dts, Node loc) {
+IntLiteral::IntLiteral(std::string value, std::vector<DataType *> dts, Node loc) {
   kind = "IntegerLiteral";
   value = value;
-  type.push_back(dt);
-  while (0 != (int)dts.size()) {
-    type.push_back(dts[0]);
-    dts.erase(dts.begin());
-  }
+  type(dts);
   setLocation(loc);
 }
 
@@ -809,18 +805,14 @@ void IntLiteral::printAST() {
 class CharLiteral : public Literal {
 public:
   char value;
-  CharLiteral(char value, DataType *dt, std::vector<DataType *> dts, Node loc);
+  CharLiteral(char value, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-CharLiteral::CharLiteral(char value, DataType *dt, std::vector<DataType *> dts, Node loc) {
+CharLiteral::CharLiteral(char value, std::vector<DataType *> dts, Node loc) {
   kind = "CharacterLiteral";
   value = value;
-  type.push_back(dt);
-  while (0 != (int)dts.size()) {
-    type.push_back(dts[0]);
-    dts.erase(dts.begin());
-  }
+  type(dts);
   setLocation(loc);
 }
 
@@ -837,18 +829,14 @@ void CharLiteral::printAST() {
 class FloatLiteral : public Literal {
 public:
   float value;
-  FloatLiteral(float value, DataType *dt, std::vector<DataType *> dts, Node loc);
+  FloatLiteral(float value, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-FloatLiteral::FloatLiteral(float value, DataType *dt, std::vector<DataType *> dts, Node loc) {
+FloatLiteral::FloatLiteral(float value, std::vector<DataType *> dts, Node loc) {
   kind = "FloatingLiteral";
   value = value;
-  type.push_back(dt);
-  while (0 != dts.size()) {
-    type.push_back(dts[0]);
-    dts.erase(dts.begin());
-  }
+  type(dts);
   setLocation(loc);
 }
 
@@ -3208,23 +3196,19 @@ public:
 
   // IntegerLiteral
   bool VisitIntegerLiteral(IntegerLiteral *Int) {
-    IntLiteral *IL = new IntLiteral();
     QualType vartype = Int->getType();
-    IL->value = Int->getValue().toString(10, true);
-    IL->type.push_back(PrintTypeInfo(vartype));
+    std::string value = Int->getValue().toString(10, true);
+    std::vector<DataType *> type;
+    type.push_back(PrintTypeInfo(vartype));
     if (castType.size() != 0) {
       for (int i = 0; i < (int)castType.size(); i++) {
-        IL->type.push_back(castType[0]);
+        type.push_back(castType[0]);
         castType.erase(castType.begin());
       }
     }
     Node t = PrintSourceRange(Int->getSourceRange());
-    IL->beginFile = t.beginFile;
-    IL->beginLine = t.beginLine;
-    IL->beginColumn = t.beginColumn;
-    IL->endFile = t.endFile;
-    IL->endLine = t.endLine;
-    IL->endColumn = t.endColumn;
+
+    IntLiteral *IL = new IntLiteral(value, type, t);
     Node *np = IL;
     prog.push_back(np);
 
