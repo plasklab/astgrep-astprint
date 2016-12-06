@@ -705,7 +705,7 @@ void BinOp::printAST() {
   left->printAST();
   llvm::outs() << "\n :right ";
   right->printAST();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
 
 class UnOp : public Operator {
@@ -930,8 +930,8 @@ FieldDeclation::FieldDeclation(std::string n, DataType *dt, Node loc) {
 }
 
 void FieldDeclation::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :name \" " << name 
-               << "\" :scope \"" << scope << "\" :type";
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name 
+               << "\" :scope \"" << scope << "\" :type ";
   type->printType();
   PrintLocation();
   llvm::outs() << "}\n";
@@ -1991,65 +1991,19 @@ public:
     return t;
   }
 
-  //void PrintStructureTypeInfo(QualType typeInfo) {
   StructureType *PrintStructureTypeInfo(QualType typeInfo) {
-    StructureType *t = new StructureType("tameshi");
-    assert(labelflag == 0);
-    if (castflag != 0) {
-      if (dyn_cast<ElaboratedType>(typeInfo)) {
-	QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
-	PrintTypeInfo(etype);
-      } 
-      if (dyn_cast<RecordType>(typeInfo)) {
-	RecordDecl *rdecl = dyn_cast<RecordType>(typeInfo)->getDecl();
-	cast << "{:kind \"Structure-type\"";
-	PrintQualifier(typeInfo);
-	cast << " :name" << " \"" << (std::string)rdecl->getName() << "\"";
-	/* FIXME: Output members of anonymous struct while taking
-	 *        cast into account. Disable this function for the time being.
-	 */
-	if (false && rdecl->getName() == "") {
-	  cast << "\n :member[";
-	  linefeedflag = 0;
-	  if (!(rdecl->field_empty())) {
-	    RecordDecl::field_iterator itr = rdecl->field_begin();
-	    while (itr != rdecl->field_end()) {
-	      TraverseDecl(itr->getCanonicalDecl());
-	      itr++;
-	    } 
-	  }
-	  cast << "]";
-	}
-	cast << "}";
-      }
-      castlabel += cast.str();
-      cast.str("");
-      cast.clear();
-    } else {
-      if (dyn_cast<ElaboratedType>(typeInfo)) {
-	QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
-	PrintTypeInfo(etype);
-      } 
-      if (dyn_cast<RecordType>(typeInfo)) {
-	llvm::outs() << "{:kind \"Structure-type\"";
-	PrintQualifier(typeInfo);
-	RecordDecl *rdecl = dyn_cast<RecordType>(typeInfo)->getDecl();
-	llvm::outs() << " :name" << " \"" << rdecl->getName() << "\"";  
-	if (rdecl->getName() == "") {
-	  llvm::outs() << "\n :member[";
-	  linefeedflag = 0;
-	  if (!(rdecl->field_empty())) {
-	    RecordDecl::field_iterator itr = rdecl->field_begin();
-	    while (itr != rdecl->field_end()) {
-	      TraverseDecl(itr->getCanonicalDecl());
-	      itr++;
-	    } 
-	  }
-	  llvm::outs() << "]";
-	}
-	llvm::outs() << "}";
+    std::string name = "";
+    if (dyn_cast<ElaboratedType>(typeInfo)) {
+      QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
+      if (dyn_cast<RecordType>(etype)) {
+        RecordDecl *rdecl = dyn_cast<RecordType>(etype)->getDecl();
+        name = rdecl->getName();
+      } else {
+        PrintTypeInfo(etype);
       }
     }
+
+    StructureType *t = new StructureType(name);
 
     return t;
   }
@@ -3370,7 +3324,7 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    llvm::outs() << "\n----------------------------------------------------------------------\n";
+    //llvm::outs() << "\n----------------------------------------------------------------------\n";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
