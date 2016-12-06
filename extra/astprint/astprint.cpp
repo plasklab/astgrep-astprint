@@ -1175,12 +1175,17 @@ class ForStatement : public RepetitionStatement {
 public:
   Node *init;
   Node *update;
-  ForStatement();
+  ForStatement(Node *cond, std::vector<Node *> body, Node *init, Node *update, Node loc);
   void printAST();
 };
 
-ForStatement::ForStatement() {
+ForStatement::ForStatement(Node *cond, std::vector<Node *> body, Node *init, Node *update, Node loc) {
   kind = "For";
+  condition = cond;
+  body(body);
+  init = init;
+  update = update;
+  setLocation(loc);
 }
 
 void ForStatement::printAST() {
