@@ -1123,12 +1123,15 @@ public:
 
 class WhileStatement : public RepetitionStatement {
 public:
-  WhileStatement();
+  WhileStatement(Node *cond, std::vector<Node *> body, Node loc);
   void printAST();
 };
 
-WhileStatement::WhileStatement() {
+WhileStatement::WhileStatement(Node *cond, std::vector<Node *> body, Node loc) {
   kind = "While";
+  condition = cond;
+  body(body);
+  setLocation(loc);
 }
 
 void WhileStatement::printAST() {
