@@ -1555,18 +1555,12 @@ public:
   //
   // FieldDecl (Structure Member) 
   bool VisitFieldDecl(FieldDecl *field) {
-    FieldDeclation *FD = new FieldDeclation();
     QualType fieldtype = field->getType();
-    FD->name = (std::string)field->getName();
-    FD->scope = "member";
-    FD->type = PrintTypeInfo(fieldtype);
+    std::string name = (std::string)field->getName();
+    DataType *type = PrintTypeInfo(fieldtype);
     Node t = PrintSourceRange(field->getSourceRange());
-    FD->beginFile = t.beginFile;
-    FD->beginLine = t.beginLine;
-    FD->beginColumn = t.beginColumn;
-    FD->endFile = t.endFile;
-    FD->endLine = t.endLine;
-    FD->endColumn = t.endColumn;
+
+    FieldDeclation *FD = new FieldDeclation(name, type, t);
     Node *np = FD;
     prog.push_back(np);
 
