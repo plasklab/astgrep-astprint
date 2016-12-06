@@ -591,7 +591,7 @@ DeclationReferenceExpression::DeclationReferenceExpression(std::string name, std
   name = name;
   scope = scope;
   type.push_back(dt);
-  for (int i = 0; i != (int)dts.size(); i++) {
+  while (0 != (int)dts.size()) {
     type.push_back(dts[0]);
     dts.erase(dts.begin());
   }
@@ -621,7 +621,7 @@ MemberReference::MemberReference(std::string name, DataType *dt, std::vector<Dat
   scope = "Member";
   name = name;
   type.push_back(dt);
-  for (int i = 0; i != (int)dts.size(); i++) {
+  while (0 != (int)dts.size()) {
     type.pusch_back(dts[0]);
     dts.erase(dts.begin());
   }
@@ -678,7 +678,7 @@ BinOp::BinOp() {
   kind = "BinOp";
   op = op;
   type.push_back(dt);
-  for (int i = 0; i != (int)dts.size(); i++) {
+  while(0 != (int)dts.size()) {
     type.push_back(dts[0]);
     dts.erase(dts.begin());
   }
@@ -705,12 +705,20 @@ class UnOp : public Operator {
 public:
   std::string op;
   Node *operand;
-  UnOp();
+  UnOp(std::string op, DataType *dt, std::vector<DataType *> dts, Node *operand, Node loc);
   void printAST();
 };
 
-UnOp::UnOp() {
+UnOp::UnOp(std::string op, DataType *dt, std::vector<DataType *> dts, Node *operand, Node loc) {
   kind = "UnOp";
+  op = op;
+  type.push_back(dt);
+  while(0 != (int)size.begin()) {
+    type.push_back(dts[0]);
+    dts.erase(dts.begin());
+  }
+  operand = operand;
+  setLocation(loc);
 }
 
 void UnOp::printAST() {
