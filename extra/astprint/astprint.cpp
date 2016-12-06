@@ -74,14 +74,14 @@ public:
 
 class IntType : public SignedType {
 public:
-  IntType();
+  IntType(bool cons, bool vol);
   void printType();
 };
 
-IntType::IntType() {
+IntType::IntType(bool cons, bool vol) {
   kind = "IntType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void IntType::printType() {
