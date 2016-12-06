@@ -2763,28 +2763,6 @@ public:
 
   // CallExpr
   bool VisitCallExpr(CallExpr *call) {
-    /*
-    llvm::outs() << "{:kind \"FuncCall\"";
-    checkLabel();
-    llvm::outs() << " :type [";
-    PrintTypeInfo(call->getType());
-    checkCast();
-    llvm::outs() << "]";
-    PrintSourceRange(call->getSourceRange());
-    llvm::outs() << "\n :Func [";
-    linefeedflag = 0;
-    TraverseStmt(call->getCallee());
-    llvm::outs() << "]\n :Parm [";
-    if (call->getNumArgs() != 0) {
-      int argnum = 0;
-      linefeedflag = 0;
-      while (argnum != (int)call->getNumArgs()) {
-	TraverseStmt(call->getArg(argnum));
-	argnum++;
-      }
-    }
-    llvm::outs() << "]}";
-    */
     DataType *type = PrintTypeInfo(call->getType());
     int i = prog.size();
     TraverseStmt(call->getCallee());
@@ -2825,9 +2803,6 @@ public:
 
   // DeclRefExpr(DRE)
   bool VisitDeclRefExpr(DeclRefExpr *Declref) {
-    /*if (Declref->hasTemplateKWAndArgsInfo()) {
-      llvm::outs() << Declref->getNameInfo();
-    }*/
     ValueDecl *valuedecl = Declref->getDecl();
     VarDecl *vardecl = dyn_cast<VarDecl>(valuedecl);
     FunctionDecl *funcdecl = dyn_cast<FunctionDecl>(valuedecl);
@@ -2867,104 +2842,6 @@ public:
 
       DRE = new DeclationReferenceExpression(name, scope, type, t, sp);
     }
-    // 既存版
-    /*
-    if (labelflag != 0) {
-      if (vardecl) {// 変数の場合
-	QualType vartype = vardecl->getType();
-	scope = (vardecl->isFileVarDecl() == 1? "global":"local");
-	std::string Declreftype = Declref->getType().getAsString();
-	os << "{:kind \"DRE\"" 
-	   << " :name " << "\"" << Declref->getNameInfo().getAsString() << "\""
-	   << " :scope " << "\"" << scope << "\"";
-	checkSpecifier(vardecl->getStorageClass());
-	PrintDisplayType(vartype);
-	os << " :type [";
-	PrintTypeInfo(vartype);
-	checkCast();
-	os << "]";
-	PrintSourceRange(Declref->getSourceRange());
-	os << "}";
-	if (casetoji != 0) {
-	  os << "}";
-	  casetoji = 0;
-	  labelflag = 0;
-	}
-	caselabel += os.str();
-	os.str("");
-	os.clear();
-      } else if (funcdecl) {// 関数の場合
-	QualType functype = funcdecl->getType();
-	std::string Declreftype = funcdecl->getResultType().getAsString();
-	os << "{:kind \"DRE\"" 
-	   << " :name " << "\"" << Declref->getNameInfo().getAsString() << "\"";
-	checkSpecifier(funcdecl->getStorageClass());
-	PrintDisplayType(functype);
-	os << " :type [";
-	PrintTypeInfo(functype);
-	checkCast();
-	os << "]";
-	PrintSourceRange(Declref->getSourceRange());
-	os << "}";
-	if (casetoji != 0) {
-	  os << "}";
-	  casetoji = 0;
-	  labelflag = 0;
-	}
-	caselabel += os.str();
-	os.str("");
-	os.clear();
-      } else {
-	QualType Declreftype = Declref->getType();
-	os << "{:kind \"DRE\"" 
-	   << " :name " << "\"" << Declref->getNameInfo().getAsString() << "\"";
-	PrintDisplayType(Declreftype);
-	os << " :type [";
-	PrintTypeInfo(Declreftype);
-	checkCast();
-	os << "]";
-	PrintSourceRange(Declref->getSourceRange());
-	os << "}";
-      }
-      if (casetoji != 0) {
-	os << "}";
-	casetoji = 0;
-	labelflag = 0;
-      }
-      caselabel += os.str();
-      os.str("");
-      os.clear();
-    } else {
-      if (vardecl) {
-      } else if (funcdecl) {// 関数の場合
-	QualType functype = funcdecl->getType();
-	std::string Declreftype = funcdecl->getResultType().getAsString();
-	llvm::outs() << "{:kind \"DRE\"" 
-		     << " :name " << "\"" << Declref->getNameInfo() << "\"";
-	checkLabel(); 
-	checkSpecifier(funcdecl->getStorageClass());
-	PrintDisplayType(functype);
-	llvm::outs() << " :type [";
-	PrintTypeInfo(functype);
-	checkCast();
-	llvm::outs() << "]";
-	PrintSourceRange(Declref->getSourceRange());
-	llvm::outs() << "}";
-      } else {
-	QualType Declreftype = Declref->getType();
-	llvm::outs() << "{:kind \"DRE\"" 
-		     << " :name " << "\"" << Declref->getNameInfo() << "\"";
-	checkLabel(); 
-	PrintDisplayType(Declreftype);
-	llvm::outs() << " :type [";
-	PrintTypeInfo(Declreftype);
-	checkCast();
-	llvm::outs() << "]";
-	PrintSourceRange(Declref->getSourceRange());
-	llvm::outs() << "}";
-      }
-    }
-    */
     Node *np = DRE;
     prog.push_back(np);
 
