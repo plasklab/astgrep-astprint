@@ -2935,28 +2935,6 @@ public:
   
   // UnaryExprOrTypeTraitExpr
   bool VisitUnaryExprOrTypeTraitExpr(UnaryExprOrTypeTraitExpr *expr) {
-    /*
-    switch(expr->getKind()) {
-    case UETT_SizeOf:
-      llvm::outs() << "{:kind \"SizeOf\"";
-      llvm::outs() << " :type [";
-      PrintTypeInfo(expr->getType());
-      checkCast();
-      llvm::outs() << "]";
-      if (expr->isArgumentType()) {
-	llvm::outs() << " :ArgumentType [";
-	PrintTypeInfo(expr->getArgumentType());
-	llvm::outs() << "]";
-      } else {
-	llvm::outs() << " :Argument ";
-	TraverseStmt(expr->getArgumentExpr());
-      }
-      PrintSourceRange(expr->getSourceRange());
-      llvm::outs() << "}";
-      return false;
-    default: 
-      break;
-    }*/
     switch (expr->getKind()) {
     case UETT_SizeOf:
     {
