@@ -895,12 +895,16 @@ class FunctionCall : public Expression {
 public:
   Node *func;
   std::vector<Node *> parm;
-  FunctionCall();
+  FunctionCall(DataType *dt, Node *func, std::vector<Node *> parm, Node loc);
   void printAST();
 };
 
-FunctionCall::FunctionCall() {
+FunctionCall::FunctionCall(DataType *dt, Node *func, std::vector<Node *> parm, Node loc) {
   kind = "FuncCall";
+  type.push_back(dt);
+  func = func;
+  parm(parm);
+  setLocation();
 }
 
 void FunctionCall::printAST() {
