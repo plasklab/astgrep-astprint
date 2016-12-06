@@ -1274,12 +1274,14 @@ void SwitchStatement::printAST() {
 class LabelStatement : public Statement {
 public:
   std::string name;
-  LabelStatement();
+  LabelStatement(std::string name, Node loc);
   void printAST();
 };
 
-LabelStatement::LabelStatement() {
+LabelStatement::LabelStatement(std::string name, Node loc) {
   kind = "Label";
+  name = name;
+  setLocation(loc);
 }
 
 void LabelStatement::printAST() {
