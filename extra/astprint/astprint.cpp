@@ -930,12 +930,16 @@ class FieldDeclation : public Declation {
 public:
   std::string scope;
   DataType *type;
-  FieldDeclation();
+  FieldDeclation(std::string name, DataType *dt, Node loc);
   void printAST();
 };
 
-FieldDeclation::FieldDeclation() : scope("member") {
+FieldDeclation::FieldDeclation(std::string name, DataType *dt, Node loc) {
   kind = "FieldDecl";
+  scope = "Member";
+  name = name;
+  type.push_back(dt);
+  setLocation(loc);
 }
 
 void FieldDeclation::printAST() {
