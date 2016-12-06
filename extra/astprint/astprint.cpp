@@ -868,12 +868,15 @@ class ArrayReference : public Reference {
 public:
   Node *array;
   Node *index;
-  ArrayReference();
+  ArrayReference(Node *array, Node *index, Node loc);
   void printAST();
 };
 
-ArrayReference::ArrayReference() {
+ArrayReference::ArrayReference(Node *array, Node *index, Node loc) {
   kind = "ArrayRef";
+  array = array;
+  index = index;
+  setLocation(loc);
 }
 
 void ArrayReference::printAST() {
