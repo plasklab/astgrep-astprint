@@ -647,14 +647,15 @@ class StructReference : public Reference {
 public:
   Node *structs;
   Node *structMember;
-  StructReference(Node *str, Node strMem, Node loc);
+  StructReference(Node *str, Node strMem, std::vector<DataType *> type, Node loc);
   void printAST();
 };
 
-StructReference::StructReference(Node *str, Node strMem, Node loc) {
+StructReference::StructReference(Node *str, Node strMem, std::vector<DataType *> type, Node loc) {
   kind = "Struct";
   structs = str;
   structMember = strMem;
+  type(type);
   setLocation(loc);
 }
 
@@ -2996,30 +2997,26 @@ public:
     Expr *base = mem->getBase();
     ValueDecl *vdecl = mem->getMemberDecl();
     QualType memtype = mem->getType();
-    StructReference *SR = new StructReference();
     if (mem->isLValue() || mem->isRValue()) {
       int i = prog.size();
       TraverseStmt(base);
-      SR->structs = prog[i];
+      Node *structs = prog[i];
       prog.pop_back();
       i = prog.size();
       TraverseDecl(vdecl);
-      SR->structMember = prog[i];
+      Node *structMember = prog[i];
       prog.pop_back();
-      SR->type.push_back(PrintTypeInfo(memtype));
+      std::vector<DataType *> type;
+      type.push_back(PrintTypeInfo(memtype));
       if (castType.size() != 0) {
         for (int i = 0; i < (int)castType.size(); i++) {
-          SR->type.push_back(castType[0]);
+          type.push_back(castType[0]);
           castType.erase(castType.begin());
         }
       }
       Node t = PrintSourceRange(mem->getSourceRange());
-      SR->beginFile = t.beginFile;
-      SR->beginLine = t.beginLine;
-      SR->beginColumn = t.beginColumn;
-      SR->endFile = t.endFile;
-      SR->endLine = t.endLine;
-      SR->endColumn = t.endColumn;
+
+      StructReference *SR = new StructReference(structs, structMember, type, t);
       Node *np = SR;
       prog.push_back(np);
       return false;
