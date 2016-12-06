@@ -1148,12 +1148,15 @@ void WhileStatement::printAST() {
 
 class DoStatement : public RepetitionStatement {
 public:
-  DoStatement();
+  DoStatement(Node *cond, std::vector<Node *> body, Node loc);
   void printAST();
 };
 
-DoStatement::DoStatement() {
+DoStatement::DoStatement(Node *cond, std::vector<Node *> body, Node loc) {
   kind = "Do";
+  condition = cond;
+  body(body);
+  setLocation(loc);
 }
 
 void DoStatement::printAST() {
