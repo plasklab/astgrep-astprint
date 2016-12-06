@@ -938,7 +938,7 @@ FieldDeclation::FieldDeclation(std::string name, DataType *dt, Node loc) {
   kind = "FieldDecl";
   scope = "Member";
   name = name;
-  type.push_back(dt);
+  type = dt;
   setLocation(loc);
 }
 
@@ -965,14 +965,18 @@ public:
 
 class ParameterDeclation : public DeclationOfVariables {
 public:
-  ParameterDeclation();
+  ParameterDeclation(std::string name, std::string dispType, DataType *dt, Node loc, bool au, bool sta);
   void printAST();
 };
 
-ParameterDeclation::ParameterDeclation() {
+ParameterDeclation::ParameterDeclation(std::string name, std::string dispType, DataType *dt, Node loc, bool au, bool sta) {
   kind = "ParmDecl";
-  autoBool = false;
-  staticBool = false;
+  name = name;
+  displayType = dispType;
+  type = dt;
+  setLocation(loc);
+  autoBool = au;
+  staticBool = sta;
 }
 
 void ParameterDeclation::printAST() {
