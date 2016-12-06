@@ -811,12 +811,19 @@ void IntLiteral::printAST() {
 class CharLiteral : public Literal {
 public:
   char value;
-  CharLiteral();
+  CharLiteral(char value, DataType *dt, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-CharLiteral::CharLiteral() {
+CharLiteral::CharLiteral(char value, DataType *dt, std::vector<DataType *> dts, Node loc) {
   kind = "CharacterLiteral";
+  value = value;
+  type.push_back(dt);
+  while (0 != (int)dts.size()) {
+    type.push_back(dts[0]);
+    dts.erase(dts.begin());
+  }
+  setLocation(loc);
 }
 
 void CharLiteral::printAST() {
