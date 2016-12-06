@@ -1029,12 +1029,17 @@ public:
   DataType *type;
   std::vector<Node *> parm;
   std::vector<Node *> body;
-  FunctionDeclation();
+  FunctionDeclation(std::string name, DataType *dt, std::vector<Node *> parm, std::vector<Node *> body, Node loc);
   void printAST();
 };
 
-FunctionDeclation::FunctionDeclation() {
+FunctionDeclation::FunctionDeclation(std::string name, DataType *dt, std::vector<Node *> parm, std::vector<Node *> body, Node loc) {
   kind = "FuncDecl";
+  name = name;
+  type = dt;
+  parm(parm);
+  body(body);
+  setLocation(loc);
 }
 
 void FunctionDeclation::printAST() {
