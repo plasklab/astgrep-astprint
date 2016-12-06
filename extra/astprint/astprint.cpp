@@ -3217,23 +3217,19 @@ public:
 
   // FloatingLiteral
   bool VisitFloatingLiteral(FloatingLiteral *Float) {
-    FloatLiteral *FL = new FloatLiteral();
     QualType vartype = Float->getType();
-    FL->value = Float->getValueAsApproximateDouble();
-    FL->type.push_back(PrintTypeInfo(vartype));
+    float value = Float->getValueAsApproximateDouble();
+    std::vector<DataType *> type;
+    type.push_back(PrintTypeInfo(vartype));
     if (castType.size() != 0) {
       for (int i = 0; i < (int)castType.size(); i++) {
-        FL->type.push_back(castType[0]);
+        type.push_back(castType[0]);
         castType.erase(castType.begin());
       }
     }
     Node t = PrintSourceRange(Float->getSourceRange());
-    FL->beginFile = t.beginFile;
-    FL->beginLine = t.beginLine;
-    FL->beginColumn = t.beginColumn;
-    FL->endFile = t.endFile;
-    FL->endLine = t.endLine;
-    FL->endColumn = t.endColumn;
+
+    FloatLiteral *FL = new FloatLiteral(value, type, t);
     Node *np = FL;
     prog.push_back(np);
 
