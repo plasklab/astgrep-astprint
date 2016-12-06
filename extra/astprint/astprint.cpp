@@ -850,26 +850,26 @@ class ArrayReference : public Reference {
 public:
   Node *array;
   Node *index;
-  ArrayReference(Node *arr, Node *i, Node loc);
+  ArrayReference(Node *arr, Node *i, DataType *tp, Node loc);
   void printAST();
 };
 
-ArrayReference::ArrayReference(Node *arr, Node *i, Node loc) {
+ArrayReference::ArrayReference(Node *arr, Node *i, DataType *dt, Node loc) {
   kind = "ArrayRef";
   array = arr;
   index = i;
+  type.push_back(dt);
   setLocation(loc);
 }
 
 void ArrayReference::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :type ";
   type[0]->printType();
-  llvm::outs() << " :array ";
-  array->printAST();
-  llvm::outs() << " :index ";
-  index->printAST();
-  llvm::outs() << " ";
   PrintLocation();
+  llvm::outs() << "\n :array ";
+  array->printAST();
+  llvm::outs() << "\n :index ";
+  index->printAST();
   llvm::outs() <<"}";
 }
 
@@ -2745,6 +2745,7 @@ public:
   //
   // ArraySubscriptExpr
   bool VisitArraySubscriptExpr(ArraySubscriptExpr *arrsub) {
+    /*
     llvm::outs() << "{:kind \"ArrayRef\"";
     checkLabel(); 
     llvm::outs() << " :type [";
@@ -2758,6 +2759,21 @@ public:
     linefeedflag = 0;
     TraverseStmt(arrsub->getRHS()); 
     llvm::outs() << "}";
+    */
+    int i = prog.size();
+    TraverseStmt(arrsub->getLHS());
+    Node *array = prog[i];
+    prog.pop_back();
+    i = prog.size();
+    TraverseStmt(arrsub->getRHS());
+    Node *index = prog[i];
+    prog.pop_back();
+    DataType *type = PrintTypeInfo(arrsub->getType());
+    Node t = PrintSourceRange(arrsub->getSourceRange());
+
+    ArrayReference *AR = new ArrayReference(array, index, type, t);
+    Node *np = AR;
+    prog.push_back(np);
     return false;
   }
 
