@@ -1366,12 +1366,13 @@ void ContinueStatement::printAST() {
 
 class BreakStatement : public Statement {
 public:
-  BreakStatement();
+  BreakStatement(Node loc);
   void printAST();
 };
 
-BreakStatement::BreakStatement() {
+BreakStatement::BreakStatement(Node loc) {
   kind = "Break";
+  setLocation(loc);
 }
 
 void BreakStatement::printAST() {
