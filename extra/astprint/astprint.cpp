@@ -1384,12 +1384,14 @@ void BreakStatement::printAST() {
 class ReturnStatement : public Statement {
 public:
   Node *value;
-  ReturnStatement();
+  ReturnStatement(Node *val, Node loc);
   void printAST();
 };
 
-ReturnStatement::ReturnStatement() {
+ReturnStatement::ReturnStatement(Node *val, Node loc) {
   kind = "Ret";
+  value = val;
+  setLocation(loc);
 }
 
 void ReturnStatement::printAST() {
