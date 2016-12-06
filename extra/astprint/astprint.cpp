@@ -2671,15 +2671,6 @@ public:
 
   // LabelStmt
   bool VisitLabelStmt(LabelStmt *Label) {
-    /*
-    os << "{:kind \"Label\"";
-    PrintSourceRange(Label->getSourceRange());
-    os  << " :name " << "\"" << Label->getName() << "\"}";
-    caselabel += os.str();
-    os.str("");
-    os.clear();
-    labelflag = 0;
-    */
     std::string name = Label->getName();
     Node t = PrintSourceRange(Label->getSourceRange());
 
