@@ -1702,30 +1702,26 @@ public:
 
   // VarDecl
   bool VisitVarDecl(VarDecl *Decl) {
-    VariableDeclation *VD = new VariableDeclation();
-    QualType vartype = Decl->getType();
     if (Decl->getKind() == 50) {
       return true;
     }
-    VD->name = Decl -> getNameAsString();
-    VD->scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
-    VD->type = PrintTypeInfo(vartype);
-    VD->displayType = PrintDisplayType(vartype);
+    QualType vartype = Decl->getType();
+    std::string name = Decl -> getNameAsString();
+    std::string scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
+    DataType *type = PrintTypeInfo(vartype);
+    std::stirng displayType = PrintDisplayType(vartype);
+    Node *init;
     if (Decl->hasInit()) {
       int i = prog.size();
       TraverseStmt(Decl->getInit());
       if (i < (int)prog.size()) {
-        VD->init = prog[i];
+        init = prog[i];
         prog.pop_back();
       }
     }
     Node t = PrintSourceRange(Decl->getSourceRange());
-    VD->beginFile = t.beginFile;
-    VD->beginLine = t.beginLine;
-    VD->beginColumn = t.beginColumn;
-    VD->endFile = t.endFile;
-    VD->endLine = t.endLine;
-    VD->endColumn = t.endColumn;
+
+    VariableDeclation *VD = new VariableDeclation(name, scope, displayType, type, init, t, false, false);
     Node *np = VD;
     prog.push_back(np);
 
