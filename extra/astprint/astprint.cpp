@@ -2975,22 +2975,14 @@ public:
       }
     }
 
-    DRE->beginFile = t.beginFile;
-    DRE->beginLine = t.beginLine;
-    DRE->beginColumn = t.beginColumn;
-    DRE->endFile = t.endFile;
-    DRE->endLine = t.endLine;
-    DRE->endColumn = t.endColumn;
     Node *np = DRE;
     prog.push_back(np);
+
     return true;
   }
 
   // ImplicitCastExpr
   bool VisitImplicitCastExpr(ImplicitCastExpr *icast) {
-    if (labelflag != 0) {
-	  return true;
-    }
     if (icast->getCastKind() != 3) {
       QualType casttype = icast->getType();
       castType.push_back(PrintTypeInfo(casttype)); 
