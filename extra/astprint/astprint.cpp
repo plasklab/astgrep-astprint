@@ -676,18 +676,14 @@ public:
   std::string op;
   Node *left;
   Node *right;
-  BinOp(std::string op, DataType *dt, std::vector<DataType *> dts, Node *left, Node *right, Node loc);
+  BinOp(std::string op, std::vector<DataType *> dts, Node *left, Node *right, Node loc);
   void printAST();
 };
 
-BinOp::BinOp() {
+BinOp::BinOp(std::string op, std::vector<DataType *> dts, Node *left, Node *right, Node loc) {
   kind = "BinOp";
   op = op;
-  type.push_back(dt);
-  while(0 != (int)dts.size()) {
-    type.push_back(dts[0]);
-    dts.erase(dts.begin());
-  }
+  type(dts);
   left = left;
   right = right;
   setLocation(loc);
@@ -3116,32 +3112,26 @@ public:
 
   // BinaryOperator
   bool VisitBinaryOperator(BinaryOperator *Binop) {
-    BinOp *BO = new BinOp();
-    BO->op = Binop->getOpcodeStr();
-    BO->type.push_back(PrintTypeInfo(Binop->getType()));
+    std::string op = Binop->getOpcodeStr();
+    std::vector<DataTyep *> type;
+    type.push_back(PrintTypeInfo(Binop->getType()));
     if (castType.size() != 0) {
       for (int i = 0; i < (int)castType.size(); i++) {
-        BO->type.push_back(castType[0]);
+        type.push_back(castType[0]);
         castType.erase(castType.begin());
       }
     }
     int i = prog.size();
     TraverseStmt(Binop->getLHS());
-    BO->left = prog[i];
+    Node *left = prog[i];
     prog.pop_back();
     i = prog.size();
     TraverseStmt(Binop->getRHS());
-    BO->right = prog[i];
+    Node *right = prog[i];
     prog.pop_back();
-
     Node t = PrintSourceRange(Binop->getSourceRange());
-    BO->beginFile = t.beginFile;
-    BO->beginLine = t.beginLine;
-    BO->beginColumn = t.beginColumn;
-    BO->endFile = t.endFile;
-    BO->endLine = t.endLine;
-    BO->endColumn = t.endColumn;
 
+    BinOp *BO = new BinOp(op, type, left, right, loc);
     Node *np = BO;
     prog.push_back(np);
 
