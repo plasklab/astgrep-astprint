@@ -137,14 +137,14 @@ void FloatType::printType() {
 
 class UnsignedFloatType : public UnsignedType {
 public:
-  UnsignedFloatType();
+  UnsignedFloatType(bool cons, bool vol);
   void printType();
 };
 
-UnsignedFloatType::UnsignedFloatType() {
+UnsignedFloatType::UnsignedFloatType(bool cons, bool vol) {
   kind = "UnsignedFloatType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void UnsignedFloatType::printType() {
@@ -158,14 +158,14 @@ void UnsignedFloatType::printType() {
 
 class LongType : public SignedType {
 public:
-  LongType();
+  LongType(bool cons, bool vol);
   void printType();
 };
 
-LongType::LongType() {
+LongType::LongType(bool cons, bool vol) {
   kind = "LongType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void LongType::printType() {
@@ -179,14 +179,14 @@ void LongType::printType() {
 
 class UnsignedLongType : public UnsignedType {
 public:
-  UnsignedLongType();
+  UnsignedLongType(bool cons, bool vol);
   void printType();
 };
 
-UnsignedLongType::UnsignedLongType() {
+UnsignedLongType::UnsignedLongType(bool cons, bool vol) {
   kind = "UnsignedLongType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void UnsignedLongType::printType() {
@@ -200,14 +200,14 @@ void UnsignedLongType::printType() {
 
 class LongLongType : public SignedType {
 public:
-  LongLongType();
+  LongLongType(bool cons, bool vol);
   void printType();
 };
 
-LongLongType::LongLongType() {
+LongLongType::LongLongType(bool cons, bool vol) {
   kind = "LongLongType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void LongLongType::printType() {
@@ -221,14 +221,14 @@ void LongLongType::printType() {
 
 class UnsignedLongLongType : public UnsignedType {
 public:
-  UnsignedLongLongType();
+  UnsignedLongLongType(bool cons, bool vol);
   void printType();
 };
 
-UnsignedLongLongType::UnsignedLongLongType() {
+UnsignedLongLongType::UnsignedLongLongType(bool cons, bool vol) {
   kind = "UnsignedLongLongType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void UnsignedLongLongType::printType() {
@@ -242,14 +242,14 @@ void UnsignedLongLongType::printType() {
 
 class DoubleType : public SignedType {
 public:
-  DoubleType();
+  DoubleType(bool cons, bool vol);
   void printType();
 };
 
-DoubleType::DoubleType() {
+DoubleType::DoubleType(bool cons, bool vol) {
   kind = "DoubleType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void DoubleType::printType() {
@@ -263,14 +263,14 @@ void DoubleType::printType() {
 
 class UnsignedDoubleType : public UnsignedType {
 public:
-  UnsignedDoubleType();
+  UnsignedDoubleType(bool cons, bool vol);
   void printType();
 };
 
-UnsignedDoubleType::UnsignedDoubleType() {
+UnsignedDoubleType::UnsignedDoubleType(bool cons, bool vol) {
   kind = "UnsingedDoubleType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void UnsignedDoubleType::printType() {
@@ -284,14 +284,14 @@ void UnsignedDoubleType::printType() {
 
 class LongDoubleType : public SignedType {
 public:
-  LongDoubleType();
+  LongDoubleType(bool cons, bool vol);
   void printType();
 };
 
-LongDoubleType::LongDoubleType() {
+LongDoubleType::LongDoubleType(bool cons, bool vol) {
   kind = "LongDoubleType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void LongDoubleType::printType() {
@@ -305,14 +305,14 @@ void LongDoubleType::printType() {
 
 class ShortType : public SignedType {
 public:
-  ShortType();
+  ShortType(bool cons, bool vol);
   void printType();
 };
 
-ShortType::ShortType() {
+ShortType::ShortType(bool cons, bool vol) {
   kind = "ShortType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void ShortType::printType() {
@@ -326,14 +326,14 @@ void ShortType::printType() {
 
 class UnsignedShortType : public UnsignedType {
 public:
-  UnsignedShortType();
+  UnsignedShortType(bool cons, bool vol);
   void printType();
 };
 
-UnsignedShortType::UnsignedShortType() {
+UnsignedShortType::UnsignedShortType(bool cons, bool vol) {
   kind = "UnsingedShortType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void UnsignedShortType::printType() {
@@ -347,14 +347,14 @@ void UnsignedShortType::printType() {
 
 class CharType : public SignedType {
 public:
-  CharType();
+  CharType(bool cons, bool vol);
   void printType();
 };
 
-CharType::CharType() {
+CharType::CharType(bool cons, bool vol) {
   kind = "CharType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void CharType::printType() {
@@ -368,14 +368,14 @@ void CharType::printType() {
 
 class UnsignedCharType : public UnsignedType {
 public:
-  UnsignedCharType();
+  UnsignedCharType(bool cons, bool vol);
   void printType();
 };
 
-UnsignedCharType::UnsignedCharType() {
+UnsignedCharType::UnsignedCharType(bool cons, bool vol) {
   kind = "UnsignedChartType";
-  constBool = false;
-  volatileBool = false;
+  constBool = cons;
+  volatileBool = vol;
 }
 
 void UnsignedCharType::printType() {
@@ -390,12 +390,13 @@ void UnsignedCharType::printType() {
 class PointeeType : public DataType {
 public:
   DataType *pointee;
-  PointeeType();
+  PointeeType(DataType *point);
   void printType();
 };
 
-PointeeType::PointeeType() {
+PointeeType::PointeeType(DataType *point) {
   kind = "PointerType";
+  pointee = point;
 }
 
 void PointeeType::printType() {
@@ -408,12 +409,14 @@ class FuncType : public DataType {
 public:
   std::vector<DataType*> parmType;
   DataType *retType;
-  FuncType();
+  FuncType(std::vector<DataType *> parmType, DataType *retType);
   void printType();
 };
 
-FuncType::FuncType() {
+FuncType::FuncType(std::vector<DataType *> parmType, DataType *retType) {
   kind = "FuncType";
+  parmType(parmType);
+  retType = retType;
 }
 
 void FuncType::printType() {
@@ -437,12 +440,14 @@ class ArrayDataType : public DataType {
 public:
   std::string arraySize;
   DataType *type;
-  ArrayDataType();
+  ArrayDataType(std::string size, DataType *type);
   void printType();
 };
 
-ArrayDataType::ArrayDataType() {
+ArrayDataType::ArrayDataType(std::string size, DataType *type) {
   kind = "ArrayType";
+  arraySize = size;
+  type = type;
 }
 
 void ArrayDataType::printType() {
@@ -454,12 +459,13 @@ void ArrayDataType::printType() {
 class StructureType : public DataType {
 public:
   std::string name;
-  StructureType();
+  StructureType(std::string name);
   void printType();
 };
 
-StructureType::StructureType() {
+StructureType::StructureType(std::string name) {
   kind = "StructureType";
+  name = name;
 }
 
 void StructureType::printType() {
@@ -469,12 +475,13 @@ void StructureType::printType() {
 class UnionType : public DataType {
 public:
   std::string name;
-  UnionType();
+  UnionType(std::string name);
   void printType();
 };
 
-UnionType::UnionType() {
+UnionType::UnionType(std::string name) {
   kind = "UnionType";
+  name = name;
 }
 
 void UnionType::printType() {
@@ -486,12 +493,14 @@ class RenameType : public DataType {
 public:
   std::string typeName;
   DataType *typedefType;
-  RenameType();
+  RenameType(std::string typeName, DataType *defType);
   void printType();
 };
 
-RenameType::RenameType() {
+RenameType::RenameType(std::string typeName, DataType *defType) {
   kind = "TypedefType";
+  typeName = typeName;
+  typedefType = defType;
 }
 
 void RenameType::printType() {
