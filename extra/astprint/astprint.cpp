@@ -2690,34 +2690,31 @@ public:
 
   // IfStmt
   bool VisitIfStmt(IfStmt *If) {
-    IfStatement * IS = new IfStatement();
     int i = prog.size();
     TraverseStmt(If->getCond());
-    IS->condition = prog[i];
+    Node *condition = prog[i];
     prog.pop_back();
     i = prog.size();
     TraverseStmt(If->getThen());
     int j = prog.size();
+    std::vector<Node *> then;
     for (int k = i; k < j; k++) {
-      IS->then.push_back(prog[i]);
+      then.push_back(prog[i]);
       prog.erase(prog.begin() + i);
     }
+    std::vector<Node *> denial;
     if (If->getElse()) {
       i = prog.size();
       TraverseStmt(If->getElse());
       j = prog.size();
       for (int k = i; k < j; k++) {
-        IS->denial.push_back(prog[i]);
+        denial.push_back(prog[i]);
         prog.erase(prog.begin() + i);
       }
     }
     Node t = PrintSourceRange(If->getSourceRange());
-    IS->beginFile = t.beginFile;
-    IS->beginLine = t.beginLine;
-    IS->beginColumn = t.beginColumn;
-    IS->endFile = t.endFile;
-    IS->endLine = t.endLine;
-    IS->endColumn = t.endColumn;
+
+    IfStatement *IS = new IfStatement(condition, then, denial, t);
     Node *np = IS;
     prog.push_back(np);
 
