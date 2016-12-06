@@ -1999,11 +1999,11 @@ public:
 
   //void PrintArrayTypeInfo(QualType typeInfo) {
   ArrayDataType *PrintArrayTypeInfo(QualType typeInfo) {
-    ArrayDataType *t = new ArrayDataType();
     QualType elmtype = dyn_cast<ArrayType>(typeInfo)->getElementType();
-    t->arraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
-    t->type = PrintTypeInfo(elmtype);
+    std::string arraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
+    DataType *type = PrintTypeInfo(elmtype);
 
+    ArrayDataType *t = new ArrayDataType(arraySize, type);
     return t;
   }
 
