@@ -571,12 +571,26 @@ Reference::Reference(std::string name) {
 class DeclationReferenceExpression : public Reference {
 public:
   std::string scope;
-  DeclationReferenceExpression();
+  DeclationReferenceExpression(std::string name, std::string scope, DataType *dt, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-DeclationReferenceExpression::DeclationReferenceExpression() {
+DeclationReferenceExpression::DeclationReferenceExpression(std::string name, std::string scope,
+  DataType *dt, std::vector<DataType *> dts, Node loc) {
   kind = "DRE";
+  name = name;
+  scope = scope;
+  type.push_back(dt);
+  for (int i = 0; i != (int)dts.size(); i++) {
+    type.push_back(dts[0]);
+    dts.erase[0];
+  }
+  beginFile = loc.beginFile;
+  beginLine = loc.beginLine;
+  beginColumn = loc.beginColumn;
+  endFile = loc.endFile;
+  endLine = loc.endLine;
+  endColumn = loc.endColumn;
 }
 
 void DeclationReferenceExpression::printAST() {
@@ -788,9 +802,7 @@ void FloatLiteral::printAST() {
 
 class ArrayReference : public Reference {
 public:
-  //DeclationReferenceExpression *array;
   Node *array;
-  //Literal *index;
   Node *index;
   ArrayReference();
   void printAST();
