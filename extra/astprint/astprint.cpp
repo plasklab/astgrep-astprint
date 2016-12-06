@@ -1790,15 +1790,7 @@ public:
   }
   
   // typeを文字列として出力
-  //void PrintDisplayType(QualType typeInfo) {
   std::string PrintDisplayType(QualType typeInfo) {
-    /*
-    if (labelflag != 0 || castflag != 0) {
-      os << " :DisplayType " << "\"" << typeInfo.getAsString() << "\"";
-    } else {
-      llvm::outs() << " :DisplayType " << "\"" << typeInfo.getAsString() << "\"";
-    }
-    */
     return typeInfo.getAsString();
   }
  
