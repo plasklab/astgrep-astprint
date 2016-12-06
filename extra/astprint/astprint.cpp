@@ -990,15 +990,20 @@ void ParameterDeclation::printAST() {
 class VariableDeclation : public DeclationOfVariables {
 public:
   Node *init;
-  VariableDeclation();
+  VariableDeclation(std::string name, std::string scope, std::string dispType, DataType *dt, Node *init, Node loc, bool au, bool sta);
   void printAST();
 };
 
-VariableDeclation::VariableDeclation() {
+VariableDeclation::VariableDeclation(std::string name, std::string scope, std::string dispType, DataType *dt, Node *init, Node loc, bool au, bool sta) {
   kind = "VarDecl";
-  autoBool = false;
-  staticBool = false;
-  init = NULL;
+  name = name;
+  scope = scope;
+  displayType = dispType;
+  type = dt;
+  init = init;
+  setLocation(loc);
+  autoBool = au;
+  staticBool = sta;
 }
 
 void VariableDeclation::printAST() {
