@@ -1976,27 +1976,24 @@ public:
   }
 
   FuncType *PrintFunctionTypeInfo(QualType typeInfo) {
-    assert(labelflag == 0);
-    FuncType *t = new FuncType();
-      if (dyn_cast<FunctionProtoType>(typeInfo)) {
-	unsigned parms = dyn_cast<FunctionProtoType>(typeInfo)->getNumArgs();
-	if (parms != 0) {
-	  unsigned i = 0;
-	  while (i < parms) {
-	    t->parmType.push_back(PrintTypeInfo(dyn_cast<FunctionProtoType>(typeInfo)->getArgType(i)));
-	    i++;
-	  }
-	}
+    std::vector<DataType *> parmType
+    DataType *retType
+    if (dyn_cast<FunctionProtoType>(typeInfo)) {
+      unsigned parms = dyn_cast<FunctionProtoType>(typeInfo)->getNumArgs();
+      if (parms != 0) {
+       unsigned i = 0;
+       while (i < parms) {
+	  parmType.push_back(PrintTypeInfo(dyn_cast<FunctionProtoType>(typeInfo)->getArgType(i)));
+	  i++;
+       }
       }
-      if (dyn_cast<FunctionType>(typeInfo)) {
-	QualType rettype = dyn_cast<FunctionType>(typeInfo)->getResultType();
-	t->retType = PrintTypeInfo(rettype);
-      } 
-      if (dyn_cast<FunctionType>(typeInfo)) {
-	QualType rettype = dyn_cast<FunctionType>(typeInfo)->getResultType();
-	t->retType = PrintTypeInfo(rettype);
-      } 
+    }
+    if (dyn_cast<FunctionType>(typeInfo)) {
+      QualType rettype = dyn_cast<FunctionType>(typeInfo)->getResultType();
+      retType = PrintTypeInfo(rettype);
+    } 
 
+    FuncType *t = new FuncType(parmType, retType);
     return t;
   }
 
