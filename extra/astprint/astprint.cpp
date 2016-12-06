@@ -510,10 +510,23 @@ public:
   int endLine;
   int endColumn;
   void PrintLocation();
+  //Node(std::string kind, std::string beginFile, int beginLine, int beginColumn,
+  //             std::string endFile, int endLine, int endColumn);
   virtual void printAST();
   virtual ~Node() {};
 };
-
+/*
+Node::Node(std::string kind, std::string beginFile, int beginLine, int beginColumn,
+             std::string endFile, int endLine, int endColumn) {
+  kind = kind;
+  beginFile = beginFile;
+  beginLine = beginLine;
+  beginColumn = beginColumn;
+  endFile = endFile;
+  endLine = endLine;
+  endColumn = endColumn;
+}
+*/
 void Node::PrintLocation() {
   llvm::outs() << " :loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
   	   << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]";
@@ -526,9 +539,21 @@ void Node::printAST() {
 class Expression : public Node {
 public:
   std::vector<DataType *> type;
+  //Expression(DataType *dt, std::vector<DataType *> type);
   virtual void printAST();
 };
-
+/*
+Expression::Expression(DataType *dt, std::vector<DataType *> type):Node(kind) {
+  type.push_back(dt);
+  if (type.size() != 0) {
+    int i = type.size();
+    for (int j = 0; j < i; j++) {
+      type.push_back(type[0]);
+      type.erase(type.begin() + i);
+    }
+  }
+}
+*/
 void Expression::printAST() {
   llvm::outs() << "No Expression";
 }
@@ -536,8 +561,13 @@ void Expression::printAST() {
 class Reference : public Expression {
 public:
   std::string name;
+  //Reference(std::string name);
 };
-
+/*
+Reference::Reference(std::string name) {
+  name = name;
+}
+*/
 class DeclationReferenceExpression : public Reference {
 public:
   std::string scope;
