@@ -670,12 +670,21 @@ public:
   std::string op;
   Node *left;
   Node *right;
-  BinOp();
+  BinOp(std::string op, DataType *dt, std::vector<DataType *> dts, Node *left, Node *right, Node loc);
   void printAST();
 };
 
 BinOp::BinOp() {
   kind = "BinOp";
+  op = op;
+  type.push_back(dt);
+  for (int i = 0; i != (int)dts.size(); i++) {
+    type.push_back(dts[0]);
+    dts.erase(dts.begin());
+  }
+  left = left;
+  right = right;
+  setLocation(loc);
 }
 
 void BinOp::printAST() {
