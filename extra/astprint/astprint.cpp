@@ -1866,6 +1866,10 @@ public:
   }
 
   DataType *PrintBuiltinTypeInfo(QualType typeInfo) {
+    DataType *tp = PrintQualifier(typeInfo);
+    bool constBool = tp->constBool;
+    bool volatileBool = tp->volatileBool;
+
     DataType *t;
     switch (dyn_cast<BuiltinType>(typeInfo)->getKind()) {
       case BuiltinType::Void:
@@ -1880,72 +1884,72 @@ public:
       }
       case BuiltinType::UChar:
       {
-	t = new UnsignedCharType();
+	t = new UnsignedCharType(constBool, volatileBool);
         break;
       }
       case BuiltinType::UShort:
       {
-	t = new UnsignedShortType();
+	t = new UnsignedShortType(constBool, volatileBool);
         break;
       }
       case BuiltinType::UInt:
       {
-	t = new UnsignedIntType();
+	t = new UnsignedIntType(constBool, volatileBool);
         break;
       }
       case BuiltinType::ULong:
       {
-	t = new UnsignedLongType();
+	t = new UnsignedLongType(constBool, volatileBool);
         break;
       }
       case BuiltinType::ULongLong:
       {
-	t = new UnsignedLongLongType();
+	t = new UnsignedLongLongType(constBool, volatileBool);
         break;
       }
       case BuiltinType::Char_S:
       {
-	t = new CharType();
+	t = new CharType(constBool, volatileBool);
         break;
       }
       case BuiltinType::SChar:
       {
-	t = new CharType();
+	t = new CharType(constBool, volatileBool);
         break;
       }
       case BuiltinType::Short:
       {
-	t = new ShortType();
+	t = new ShortType(constBool, volatileBool);
         break;
       }
       case BuiltinType::Int:
       {
-	t = new IntType();
+	t = new IntType(constBool, volatileBool);
         break;
       }
       case BuiltinType::Long:
       {
-	t = new LongType();
+	t = new LongType(constBool, volatileBool);
         break;
       }
       case BuiltinType::LongLong:
       {
-	t = new LongLongType();
+	t = new LongLongType(constBool, volatileBool);
         break;
       }
       case BuiltinType::Float:
       {
-	t = new FloatType();
+	t = new FloatType(constBool, volatileBool);
         break;
       }
       case BuiltinType::Double:
       {
-	t = new DoubleType();
+	t = new DoubleType(constBool, volatileBool);
         break;
       }
       case BuiltinType::LongDouble:
       {
-	t = new LongDoubleType();
+	t = new LongDoubleType(constBool, volatileBool);
         break;
       }
 	//以下c++に関するもの
@@ -1967,11 +1971,7 @@ public:
 	break;
       }
     }
-    assert(labelflag == 0);
-    DataType *tp = PrintQualifier(typeInfo);
-    t->constBool = tp->constBool;
-    t->volatileBool = tp->volatileBool;
-
+    
     return t;
   }
 
