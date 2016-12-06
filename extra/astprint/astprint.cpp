@@ -1661,6 +1661,24 @@ public:
       Node *np = SD;
       prog.push_back(np);
     } else if (record->isUnion()) {
+      std::string name = (std::string)record->getName();
+      std::vector<Node *> member;
+      if (!(record->field_empty())) {
+        RecordDecl::field_iterator itr = record->field_begin();
+        int i = prog.size();
+        while (itr != record->field_end()) {
+          TraverseDecl(itr->getCanonicalDecl());
+          member.push_back(prog[i]);
+          prog.erase(prog.begin() + i);
+          itr++;
+        }
+      }
+      Node t = PrintSourceRange(record->getSourceRange());
+
+      UnionDeclation *UD = new UnionDeclation(name, member, t);
+      Node *np = UD;
+      prog.push_back(np);
+
     }
     return false;
   }
@@ -2025,8 +2043,8 @@ public:
     return t;
   }
 
-  //void PrintUnionTypeInfo(QualType typeInfo) {
   UnionType *PrintUnionTypeInfo(QualType typeInfo) {
+    /*
     UnionType *t = new UnionType("tameshi");
     if (castflag != 0) {
       if (dyn_cast<ElaboratedType>(typeInfo)) {
@@ -2079,7 +2097,19 @@ public:
 	}
 	llvm::outs() << "}";
       }
+    }*/
+    std::string name = "";
+    if (dyn_cast<ElaboratedType>(typeInfo)) {
+        QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
+      if (dyn_cast<RecordType>(etype)) {
+        //RecordDecl *rdecl = dyn_cast<RecordType>(typeInfo)->getDecl();
+        //name = rdecl->getName();
+      } else {
+        PrintTypeInfo(etype);
+      }
     }
+
+    UnionType *t = new UnionType(name);
     return t;
   }
 
