@@ -607,13 +607,15 @@ DeclationReferenceExpression::DeclationReferenceExpression(std::string n, std::s
 void DeclationReferenceExpression::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
   spe->printSpecifier();
-  llvm::outs() << " :scope \"" << scope << "\" :type [";
+  if (scope != "") {
+    llvm::outs() << " :scope \"" << scope << "\"";
+  }
+  llvm::outs() << " :type [";
   for (int i = 0; i < (int)type.size(); i++) {
     type[i]->printType();
   }
-  llvm::outs() << "] ";
   PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "]}";
 }
 
 class MemberReference : public Reference {
@@ -698,7 +700,7 @@ void BinOp::printAST() {
   left->printAST();
   llvm::outs() << "\n :right ";
   right->printAST();
-  llvm::outs() << "}\n";
+  llvm::outs() << "}";
 }
  
 class UnOp : public Operator {
@@ -1564,14 +1566,14 @@ public:
     FunctionDeclation *FD = new FunctionDeclation(name, type, parm, body, t, sp);
     Node *np = FD;
     prog.push_back(np);
-    np->printAST();
     return false;
   }
 
   // ParmVarDecl
   bool VisitParmVarDecl(ParmVarDecl *Decl) {
-    std::string varname = Decl->getNameAsString();
+    //std::string varname = Decl->getNameAsString();
     QualType vartype = Decl->getType();
+    /*
     llvm::outs() << "{:kind \"Parm\"" 
 		 << " :name " << "\"" << varname  << "\"";
     llvm::outs() << " :type [";
@@ -1580,12 +1582,14 @@ public:
     llvm::outs() << "]";
     PrintSourceRange(Decl->getSourceRange());
     llvm::outs() << "}";
+    */
     // 修正版
     std::string name = Decl->getNameAsString();
     DataType *type = PrintTypeInfo(vartype);
+    std::string disp = PrintDisplayType(vartype);
     Node t = PrintSourceRange(Decl->getSourceRange());
 
-    ParameterDeclation *PD = new ParameterDeclation(name, "不明", type, t);
+    ParameterDeclation *PD = new ParameterDeclation(name, disp, type, t);
     Node *np = PD;
     prog.push_back(np);
     return true;
@@ -1991,8 +1995,13 @@ public:
 
   //void PrintPointerTypeInfo(QualType typeInfo) {
   PointeeType *PrintPointerTypeInfo(QualType typeInfo) {
-    QualType elmtype = dyn_cast<PointerType>(typeInfo)->getPointeeType();
-    DataType *pointee = PrintTypeInfo(elmtype);
+    DataType *pointee;
+    if (dyn_cast<PointerType>(typeInfo)) {
+      QualType elmtype = dyn_cast<PointerType>(typeInfo)->getPointeeType();
+      pointee = PrintTypeInfo(elmtype);
+    } else {
+      pointee = new DataType();
+    }
 
     PointeeType *t = new PointeeType(pointee);
     return t;
@@ -2081,21 +2090,21 @@ public:
     //if (dyn_cast<AutoType>(typeInfo))
     //  t = PrintAutoTypeInfo(typeInfo);
     //else if (dyn_cast<TypedefType>(typeInfo))
-    if (dyn_cast<TypedefType>(typeInfo))
+    if (dyn_cast<TypedefType>(typeInfo)) {
       return PrintTypedefTypeInfo(typeInfo);
-    else if (dyn_cast<BuiltinType>(typeInfo))
+    } else if (dyn_cast<BuiltinType>(typeInfo)) {
       return PrintBuiltinTypeInfo(typeInfo);
-    else if (typeInfo->isFunctionType())
+    } else if (typeInfo->isFunctionType()) {
       return PrintFunctionTypeInfo(typeInfo);
-    else if (typeInfo->isArrayType()) 
+    } else if (typeInfo->isArrayType()) {
       return PrintArrayTypeInfo(typeInfo);
-    else if (typeInfo->isPointerType())
+    } else if (typeInfo->isPointerType()) {
       return PrintPointerTypeInfo(typeInfo);
-    else if (typeInfo->isStructureType())
+    } else if (typeInfo->isStructureType()) {
       return PrintStructureTypeInfo(typeInfo);
-    else if (typeInfo->isUnionType()) 
+    } else if (typeInfo->isUnionType()) {
       return PrintUnionTypeInfo(typeInfo);
-    else {
+    } else {
       assert(labelflag == 0);
       if (castflag != 0) {
 	cast << "{:kind \"Unknown-type\""
@@ -2754,6 +2763,7 @@ public:
 
   // CallExpr
   bool VisitCallExpr(CallExpr *call) {
+    /*
     llvm::outs() << "{:kind \"FuncCall\"";
     checkLabel();
     llvm::outs() << " :type [";
@@ -2774,6 +2784,31 @@ public:
       }
     }
     llvm::outs() << "]}";
+    */
+    DataType *type = PrintTypeInfo(call->getType());
+    int i = prog.size();
+    TraverseStmt(call->getCallee());
+    Node *func = prog[i];
+    prog.pop_back();
+    std::vector<Node *> parm;
+    if (call->getNumArgs() != 0) {
+      i = prog.size();
+      int argnum = 0;
+      while (argnum != (int)call->getNumArgs()) {
+        TraverseStmt(call->getArg(argnum));
+        argnum++;
+      }
+      while (i != (int)prog.size()) {
+        parm.push_back(prog[i]);
+        prog.erase(prog.begin() + i);
+      }
+    }
+    Node t = PrintSourceRange(call->getSourceRange());
+
+    FunctionCall *FC = new FunctionCall(type, func, parm, t);
+    Node *np = FC;
+    prog.push_back(np);
+
     return false;
   }
 
@@ -2790,9 +2825,9 @@ public:
 
   // DeclRefExpr(DRE)
   bool VisitDeclRefExpr(DeclRefExpr *Declref) {
-    if (Declref->hasTemplateKWAndArgsInfo()) {
+    /*if (Declref->hasTemplateKWAndArgsInfo()) {
       llvm::outs() << Declref->getNameInfo();
-    }
+    }*/
     ValueDecl *valuedecl = Declref->getDecl();
     VarDecl *vardecl = dyn_cast<VarDecl>(valuedecl);
     FunctionDecl *funcdecl = dyn_cast<FunctionDecl>(valuedecl);
@@ -2817,9 +2852,23 @@ public:
 
       DRE = new DeclationReferenceExpression(name, scope, type, t, sp);
     } else if (funcdecl) {
+      QualType funcType = funcdecl->getType();
+      std::string name = Declref->getNameInfo().getAsString();
+      Speci *sp = checkSpecifier(funcdecl->getStorageClass());
+      std::vector<DataType *>type;
+      type.push_back(PrintTypeInfo(funcType));
+      if (castType.size() != 0) {
+        while (castType.size() != 0) {
+          type.push_back(castType[0]);
+          castType.erase(castType.begin());
+        }
+      }
+      Node t = PrintSourceRange(Declref->getSourceRange());
 
+      DRE = new DeclationReferenceExpression(name, scope, type, t, sp);
     }
     // 既存版
+    /*
     if (labelflag != 0) {
       if (vardecl) {// 変数の場合
 	QualType vartype = vardecl->getType();
@@ -2915,7 +2964,7 @@ public:
 	llvm::outs() << "}";
       }
     }
-
+    */
     Node *np = DRE;
     prog.push_back(np);
 
@@ -3332,7 +3381,7 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    //llvm::outs() << "\n----------------------------------------------------------------------\n";
+    llvm::outs() << "\n----------------------------------------------------------------------\n";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
