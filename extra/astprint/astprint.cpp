@@ -2605,23 +2605,9 @@ public:
   
   // DefaultStmt
   bool VisitDefaultStmt(DefaultStmt *Default) {
-    /*
-    os << "{:kind \"Default\"";
-    PrintSourceRange(Default->getSourceRange());
-    os << "}";
-    caselabel += os.str();
-    os.str("");
-    os.clear();
-    labelflag = 0;
-    */
-    DefaultStatement *DS = new DefaultStatement();
     Node t = PrintSourceRange(Default->getSourceRange());
-    DS->beginFile = t.beginFile;
-    DS->beginLine = t.beginLine;
-    DS->beginColumn = t.beginColumn;
-    DS->endFile = t.endFile;
-    DS->endLine = t.endLine;
-    DS->endColumn = t.endColumn;
+
+    DefaultStatement *DS = new DefaultStatement(t);
     Node *np = DS;
     prog.push_back(np);
 
@@ -2630,25 +2616,21 @@ public:
 
   // DoStmt
   bool VisitDoStmt(DoStmt *Do) {
-    DoStatement *DS = new DoStatement();
     int i = prog.size();
     TraverseStmt(Do->getCond());
-    DS->condition = prog[i];
+    Node *condition = prog[i];
     prog.pop_back();
     i = prog.size();
     TraverseStmt(Do->getBody());
     int j = prog.size();
+    std::vector<Node *> body;
     for (int k = i; k < j; k++) {
-      DS->body.push_back(prog[i]);
+      body.push_back(prog[i]);
       prog.erase(prog.begin() + i);
     }
     Node t = PrintSourceRange(Do->getSourceRange());
-    DS->beginFile = t.beginFile;
-    DS->beginLine = t.beginLine;
-    DS->beginColumn = t.beginColumn;
-    DS->endFile = t.endFile;
-    DS->endLine = t.endLine;
-    DS->endColumn = t.endColumn;
+
+    DoStatement *DS = new DoStatement(condition, body, t);
     Node *np = DS;
     prog.push_back(np);
 
