@@ -1331,12 +1331,14 @@ void DefaultStatement::printAST() {
 class GotoStatement : public Statement {
 public:
   std::string jump;
-  GotoStatement();
+  GotoStatement(std::string jump, Node loc);
   void printAST();
 };
 
-GotoStatement::GotoStatement() {
+GotoStatement::GotoStatement(std::string jump, Node loc) {
   kind = "Goto";
+  jump = jump;
+  setLocation(loc);
 }
 
 void GotoStatement::printAST() {
