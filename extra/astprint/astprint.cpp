@@ -590,20 +590,16 @@ Reference::Reference(std::string name) {
 class DeclationReferenceExpression : public Reference {
 public:
   std::string scope;
-  DeclationReferenceExpression(std::string name, std::string scope, DataType *dt, std::vector<DataType *> dts, Node loc);
+  DeclationReferenceExpression(std::string name, std::string scope, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
 DeclationReferenceExpression::DeclationReferenceExpression(std::string name, std::string scope,
-  DataType *dt, std::vector<DataType *> dts, Node loc) {
+  std::vector<DataType *> dts, Node loc) {
   kind = "DRE";
   name = name;
   scope = scope;
-  type.push_back(dt);
-  while (0 != (int)dts.size()) {
-    type.push_back(dts[0]);
-    dts.erase(dts.begin());
-  }
+  type(dts);
   setLocation(loc);
 }
 
@@ -2781,22 +2777,16 @@ public:
  
   // ReturnStmt
   bool VisitReturnStmt(ReturnStmt *Ret) {
-    ReturnStatement *RS = new ReturnStatement();
+    Node *value;
     if (Ret->getRetValue()) {
       int i = prog.size();
       TraverseStmt(Ret->getRetValue());
-      RS->value = prog[i];
+      value = prog[i];
       prog.pop_back();
     }
-
     Node t = PrintSourceRange(Ret->getSourceRange());
-    RS->beginFile = t.beginFile;
-    RS->beginLine = t.beginLine;
-    RS->beginColumn = t.beginColumn;
-    RS->endFile = t.endFile;
-    RS->endLine = t.endLine;
-    RS->endColumn = t.endColumn;
 
+    ReturnStatement *RS = new ReturnStatement(value, t);
     Node *tp = RS;
     prog.push_back(tp);
 
@@ -2869,18 +2859,22 @@ public:
     std::string scope = "";
 
     // 修正版
-    DeclationReferenceExpression *DRE = new DeclationReferenceExpression();
+    DeclationReferenceExpression *DRE;
     if (vardecl) {
       QualType vartype = vardecl->getType();
-      DRE->name = Declref->getNameInfo().getAsString();
-      DRE->scope = (vardecl->isFileVarDecl() == 1 ? "global" : "local");
-      DRE->type.push_back(PrintTypeInfo(vartype));
+      std::string name = Declref->getNameInfo().getAsString();
+      std::string scope = (vardecl->isFileVarDecl() == 1 ? "global" : "local");
+      std::vector<DataType *> type;
+      type.push_back(PrintTypeInfo(vartype));
       if (castType.size() != 0) {
         for (int i = 0; i < (int)castType.size(); i++) {
-          DRE->type.push_back(castType[0]);
+          type.push_back(castType[0]);
           castType.erase(castType.begin());
         }
       }
+      Node t = PrintSourceRange(Declref->getSourceRange());
+
+      DRE = new DeclationReferenceExpression(name, scope, type, t);
     } else if (funcdecl) {
 
     }
@@ -2981,7 +2975,6 @@ public:
       }
     }
 
-    Node t = PrintSourceRange(Declref->getSourceRange());
     DRE->beginFile = t.beginFile;
     DRE->beginLine = t.beginLine;
     DRE->beginColumn = t.beginColumn;
