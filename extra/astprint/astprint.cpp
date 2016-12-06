@@ -2626,11 +2626,20 @@ public:
 
   // GotoStmt
   bool VisitGotoStmt(GotoStmt *Goto) {
+    /*
     NamedDecl *label = dyn_cast<NamedDecl>(Goto->getLabel());
     llvm::outs() << "{:kind \"Goto\"";
     checkLabel(); 
     PrintSourceRange(Goto->getSourceRange());
     llvm::outs() << " :goto " << "\"" << label->getName() << "\"}";
+    */
+    NamedDecl *label = dyn_cast<NamedDecl>(Goto->getLabel());
+    std::string name = label->getName();
+    Node t = PrintSourceRange(Goto->getSourceRange());
+
+    GotoStatement *GS = new GotoStatement(name, t);
+    Node *np = GS;
+    prog.push_back(np);
     return true;
   }
 
