@@ -2571,37 +2571,18 @@ public:
  
   // CaseStmt
   bool VisitCaseStmt(CaseStmt *Case) {
-    CaseStatement *CS = new CaseStatement();
     int i = prog.size();
+    Node *value;
     TraverseStmt(Case->getLHS());
-    CS->value = prog[i];
+    value = prog[i];
     prog.pop_back();
     Node t = PrintSourceRange(Case->getSourceRange());
-    CS->beginFile = t.beginFile;
-    CS->beginLine = t.beginLine;
-    CS->beginColumn = t.beginColumn;
-    CS->endFile = t.endFile;
-    CS->endLine = t.endLine;
-    CS->endColumn = t.endColumn;
+
+    CaseStatement *CS = new CaseStatement(value, t);
     Node *np = CS;
     prog.push_back(np);
     skipcount = 1;
 
-    /* FIXME: print case conditions other than literals
-     */
-    /*
-    assert(Case->getLHS() != NULL);
-    switch (Case->getLHS()->getStmtClass()) {
-    case Stmt::IntegerLiteralClass:
-    case Stmt::CharacterLiteralClass:
-      return true;
-    default:
-      caselabel += "\"unsupported\"}";
-      labelflag = 0;
-      skipcount = 1;
-      return true;
-    }
-    */
     return true;
   }
   
