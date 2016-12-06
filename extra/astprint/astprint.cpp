@@ -1794,8 +1794,6 @@ public:
 
     //DataType *tp = PrintQualifier(typeInfo);
     std::string typeName = (std::string)TDtype->getName();
-    //bool constBool = tp->constBool;
-    //bool volatileBool = tp->volatileBool;
     DataType *typedefType = PrintTypeInfo(TDtype->getUnderlyingType());
 
     RenameType *TDF = new RenameType(typeName, typedefType);
@@ -1976,66 +1974,13 @@ public:
   }
 
   UnionType *PrintUnionTypeInfo(QualType typeInfo) {
-    /*
-    UnionType *t = new UnionType("tameshi");
-    if (castflag != 0) {
-      if (dyn_cast<ElaboratedType>(typeInfo)) {
-	QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
-	PrintTypeInfo(etype);
-      } 
-      if (dyn_cast<RecordType>(typeInfo)) {
-	RecordDecl *rdecl = dyn_cast<RecordType>(typeInfo)->getDecl();
-	cast << "{:kind \"Union-type\"";
-	PrintQualifier(typeInfo);
-	cast << " :name" << " \"" << (std::string)rdecl->getName() << "\"";
-	if (rdecl->getName() == "") {
-	  cast << "\n :member[";
-	  linefeedflag = 0;
-	  if (!(rdecl->field_empty())) {
-	    RecordDecl::field_iterator itr = rdecl->field_begin();
-	    while (itr != rdecl->field_end()) {
-	      TraverseDecl(itr->getCanonicalDecl());
-	      itr++;
-	    } 
-	  }
-	  cast << "]";
-	}
-	cast << "}";
-      }
-      castlabel += cast.str();
-      cast.str("");
-      cast.clear();
-    } else {
-      if (dyn_cast<ElaboratedType>(typeInfo)) {
-	QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
-	PrintTypeInfo(etype);
-      } 
-      if (dyn_cast<RecordType>(typeInfo)) {
-	RecordDecl *rdecl = dyn_cast<RecordType>(typeInfo)->getDecl();
-	llvm::outs() << "{:kind \"Union-type\"";
-	PrintQualifier(typeInfo);
-	llvm::outs() << " :name" << " \"" << rdecl->getName() << "\"";
-	if (rdecl->getName() == "") {
-	  llvm::outs() << "\n :member [";
-	  linefeedflag = 0;
-	  if (!(rdecl->field_empty())) {
-	    RecordDecl::field_iterator itr = rdecl->field_begin();
-	    while (itr != rdecl->field_end()) {
-	      TraverseDecl(itr->getCanonicalDecl());
-	      itr++;
-	    } 
-	  }
-	  llvm::outs() << "]";
-	}
-	llvm::outs() << "}";
-      }
-    }*/
     std::string name = "";
     if (dyn_cast<ElaboratedType>(typeInfo)) {
         QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
       if (dyn_cast<RecordType>(etype)) {
         //RecordDecl *rdecl = dyn_cast<RecordType>(typeInfo)->getDecl();
         //name = rdecl->getName();
+        name = "tameshi";
       } else {
         PrintTypeInfo(etype);
       }
