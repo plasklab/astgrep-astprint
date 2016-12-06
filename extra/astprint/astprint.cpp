@@ -711,18 +711,14 @@ class UnOp : public Operator {
 public:
   std::string op;
   Node *operand;
-  UnOp(std::string op, DataType *dt, std::vector<DataType *> dts, Node *operand, Node loc);
+  UnOp(std::string op, std::vector<DataType *> dts, Node *operand, Node loc);
   void printAST();
 };
 
-UnOp::UnOp(std::string op, DataType *dt, std::vector<DataType *> dts, Node *operand, Node loc) {
+UnOp::UnOp(std::string op, std::vector<DataType *> dts, Node *operand, Node loc) {
   kind = "UnOp";
   op = op;
-  type.push_back(dt);
-  while(0 != (int)size.begin()) {
-    type.push_back(dts[0]);
-    dts.erase(dts.begin());
-  }
+  type(type);
   operand = operand;
   setLocation(loc);
 }
@@ -3093,29 +3089,25 @@ public:
   // UnaryOperator
   bool VisitUnaryOperator(UnaryOperator *Unop) {
     UnaryOperator::Opcode opcode = Unop->getOpcode();
-    UnOp *UO = new UnOp();
-    UO->op = Unop->getOpcodeStr(opcode);
-    UO->type.push_back(PrintTypeInfo(Unop->getType()));
+    std::string op = Unop->getOpcodeStr(opcode);
+    std::vector<DataType *> type;
+    type.push_back(PrintTypeInfo(Unop->getType()));
     if (castType.size() != 0) {
       for (int i = 0; i < (int)castType.size(); i++) {
-        UO->type.push_back(castType[0]);
+        type.push_back(castType[0]);
         castType.erase(castType.begin());
       }
     }
     int i = prog.size();
+    Node *operand;
     TraverseStmt(Unop->getSubExpr());
     if (i < (int)prog.size()) {
-      UO->operand = prog[i];
+      operand = prog[i];
       prog.pop_back();
     }
-
     Node t = PrintSourceRange(Unop->getSourceRange());
-    UO->beginFile = t.beginFile;
-    UO->beginLine = t.beginLine;
-    UO->beginColumn = t.beginColumn; 
-    UO->endFile = t.endFile;
-    UO->endLine = t.endLine;
-    UO->endColumn = t.endColumn;
+
+    UnOp *UO = new UnOp(op, type, operand, t);
     Node *np = UO;
     prog.push_back(np);
 
