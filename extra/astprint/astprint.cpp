@@ -415,7 +415,7 @@ public:
 
 FuncType::FuncType(std::vector<DataType *> parmType, DataType *retType) {
   kind = "FuncType";
-  parmType(parmType);
+  parmType = parmType;
   retType = retType;
 }
 
@@ -599,7 +599,7 @@ DeclationReferenceExpression::DeclationReferenceExpression(std::string name, std
   kind = "DRE";
   name = name;
   scope = scope;
-  type(dts);
+  type = dts;
   setLocation(loc);
 }
 
@@ -617,19 +617,15 @@ void DeclationReferenceExpression::printAST() {
 class MemberReference : public Reference {
 public:
   std::string scope;
-  MemberReference(std::string name, DataType *dt, std::vector<DataType *> dts, Node loc);
+  MemberReference(std::string name, std::vector<DataType *> dts, Node loc);
   void printAST();  
 };
 
-MemberReference::MemberReference(std::string name, DataType *dt, std::vector<DataType *> dts, Node loc) {
+MemberReference::MemberReference(std::string name, std::vector<DataType *> dts, Node loc) {
   kind = "Field";
   scope = "Member";
   name = name;
-  type.push_back(dt);
-  while (0 != (int)dts.size()) {
-    type.pusch_back(dts[0]);
-    dts.erase(dts.begin());
-  }
+  type = dts;
   setLocation(loc);
 }
 
@@ -647,15 +643,15 @@ class StructReference : public Reference {
 public:
   Node *structs;
   Node *structMember;
-  StructReference(Node *str, Node strMem, std::vector<DataType *> type, Node loc);
+  StructReference(Node *str, Node *strMem, std::vector<DataType *> type, Node loc);
   void printAST();
 };
 
-StructReference::StructReference(Node *str, Node strMem, std::vector<DataType *> type, Node loc) {
+StructReference::StructReference(Node *str, Node *strMem, std::vector<DataType *> type, Node loc) {
   kind = "Struct";
   structs = str;
   structMember = strMem;
-  type(type);
+  type = type;
   setLocation(loc);
 }
 
@@ -683,7 +679,7 @@ public:
 BinOp::BinOp(std::string op, std::vector<DataType *> dts, Node *left, Node *right, Node loc) {
   kind = "BinOp";
   op = op;
-  type(dts);
+  type = dts;
   left = left;
   right = right;
   setLocation(loc);
@@ -714,7 +710,7 @@ public:
 UnOp::UnOp(std::string op, std::vector<DataType *> dts, Node *operand, Node loc) {
   kind = "UnOp";
   op = op;
-  type(type);
+  type = type;
   operand = operand;
   setLocation(loc);
 }
@@ -736,18 +732,14 @@ public:
   Node *condition;
   Node *then;
   Node *denial;
-  ConditionalOp(DataType *dt, std::vector<DataType *> dts, Node *condition, Node *then, Node *denial, Node loc);
+  ConditionalOp(std::vector<DataType *> dts, Node *condition, Node *then, Node *denial, Node loc);
   void printAST();
 };
 
-ConditionalOp::ConditionalOp(DataType *dt, std::vector<DataType *> dts, Node *condition, Node *then, Node *denial, Node loc) {
+ConditionalOp::ConditionalOp(std::vector<DataType *> dts, Node *condition, Node *then, Node *denial, Node loc) {
   kind = "ConditionalOp";
-  type.push_back(dt);
-  while(0 != (int)dts.size()) {
-    type.push_back(dts[0]);
-    dts.erase(dts.begin());
-  }
-  condition = condtion;
+  type = dts;
+  condition = condition;
   then = then;
   denial = denial;
   setLocation(loc);
@@ -788,7 +780,7 @@ public:
 IntLiteral::IntLiteral(std::string value, std::vector<DataType *> dts, Node loc) {
   kind = "IntegerLiteral";
   value = value;
-  type(dts);
+  type = dts;
   setLocation(loc);
 }
 
@@ -812,7 +804,7 @@ public:
 CharLiteral::CharLiteral(char value, std::vector<DataType *> dts, Node loc) {
   kind = "CharacterLiteral";
   value = value;
-  type(dts);
+  type = dts;
   setLocation(loc);
 }
 
@@ -836,7 +828,7 @@ public:
 FloatLiteral::FloatLiteral(float value, std::vector<DataType *> dts, Node loc) {
   kind = "FloatingLiteral";
   value = value;
-  type(dts);
+  type = dts;
   setLocation(loc);
 }
 
@@ -889,8 +881,8 @@ FunctionCall::FunctionCall(DataType *dt, Node *func, std::vector<Node *> parm, N
   kind = "FuncCall";
   type.push_back(dt);
   func = func;
-  parm(parm);
-  setLocation();
+  parm = parm;
+  setLocation(loc);
 }
 
 void FunctionCall::printAST() {
@@ -1023,8 +1015,8 @@ FunctionDeclation::FunctionDeclation(std::string name, DataType *dt, std::vector
   kind = "FuncDecl";
   name = name;
   type = dt;
-  parm(parm);
-  body(body);
+  parm = parm;
+  body = body;
   setLocation(loc);
 }
 
@@ -1061,7 +1053,7 @@ public:
 StructDeclation::StructDeclation(std::string name, std::vector<Node *> member, Node loc) {
   kind = "StructDecl";
   name = name;
-  member(member);
+  member = member;
   setLocation(loc);
 }
 
@@ -1084,12 +1076,12 @@ public:
 UnionDeclation::UnionDeclation(std::string name, std::vector<Node *> member, Node loc) {
   kind = "UnionDecl";
   name = name;
-  member(member);
+  member = member;
   setLocation(loc);
 }
 
 void UnionDeclation::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\""
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
   PrintLocation();
   llvm::outs() << "\n :member [";
   for (int i = 0; i < (int)member.size(); i++) {
@@ -1116,7 +1108,7 @@ public:
 WhileStatement::WhileStatement(Node *cond, std::vector<Node *> body, Node loc) {
   kind = "While";
   condition = cond;
-  body(body);
+  body = body;
   setLocation(loc);
 }
 
@@ -1141,7 +1133,7 @@ public:
 DoStatement::DoStatement(Node *cond, std::vector<Node *> body, Node loc) {
   kind = "Do";
   condition = cond;
-  body(body);
+  body = body;
   setLocation(loc);
 }
 
@@ -1168,7 +1160,7 @@ public:
 ForStatement::ForStatement(Node *cond, std::vector<Node *> body, Node *init, Node *update, Node loc) {
   kind = "For";
   condition = cond;
-  body(body);
+  body = body;
   init = init;
   update = update;
   setLocation(loc);
@@ -1206,8 +1198,8 @@ public:
 IfStatement::IfStatement(Node *cond, std::vector<Node *> then, std::vector<Node *> denial, Node loc) {
   kind = "If";
   condition = cond;
-  then(then);
-  denial(denial);
+  then = then;
+  denial = denial;
   setLocation(loc);
 }
 
@@ -1241,7 +1233,7 @@ public:
 SwitchStatement::SwitchStatement(Node *cond, std::vector<Node *> body, Node loc) {
   kind = "Switch";
   condition = cond;
-  body(body);
+  body = body;
   setLocation(loc);
 }
 
@@ -1580,9 +1572,8 @@ public:
 
   // ParmVarDecl
   bool VisitParmVarDecl(ParmVarDecl *Decl) {
-    ParameterDeclation *PD = new ParameterDeclation();
+    /*
     std::string varname = Decl->getNameAsString();
-    QualType vartype = Decl->getType();
     llvm::outs() << "{:kind \"Parm\"" 
 		 << " :name " << "\"" << varname  << "\"";
     llvm::outs() << " :type [";
@@ -1591,17 +1582,14 @@ public:
     llvm::outs() << "]";
     PrintSourceRange(Decl->getSourceRange());
     llvm::outs() << "}";
-
+    */
     // 修正版
-    PD->name = Decl->getNameAsString();
-    PD->type = PrintTypeInfo(vartype);
+    std::string name = Decl->getNameAsString();
+    QualType vartype = Decl->getType();
+    DataType *type = PrintTypeInfo(vartype);
     Node t = PrintSourceRange(Decl->getSourceRange());
-    PD->beginFile = t.beginFile;
-    PD->beginLine = t.beginLine;
-    PD->beginColumn = t.beginColumn;
-    PD->endFile = t.endFile;
-    PD->endLine = t.endLine;
-    PD->endColumn = t.endColumn;
+
+    ParameterDeclation *PD = new ParameterDeclation(name, "不明", type, t, false, false);
     Node *np = PD;
     prog.push_back(np);
 
@@ -1655,7 +1643,7 @@ public:
     }
     */
     if (record->isStruct()) {
-      SD->name = (std::string)record->getName();
+      std::string name = (std::string)record->getName();
       std::vector<Node *> member;
       if (!(record->field_empty())) {
         RecordDecl::field_iterator itr = record->field_begin();
@@ -1686,7 +1674,7 @@ public:
     std::string name = Decl -> getNameAsString();
     std::string scope = (Decl -> isFileVarDecl() == 1 ? "global" : "local");
     DataType *type = PrintTypeInfo(vartype);
-    std::stirng displayType = PrintDisplayType(vartype);
+    std::string displayType = PrintDisplayType(vartype);
     Node *init;
     if (Decl->hasInit()) {
       int i = prog.size();
@@ -1811,7 +1799,8 @@ public:
 
   //void PrintTypedefTypeInfo(QualType typeInfo) {
   RenameType *PrintTypedefTypeInfo(QualType typeInfo) {
-    RenameType *TDF = new RenameType();
+    //RenameType *TDF = new RenameType();
+    RenameType *TDF;
     TypedefNameDecl *TDtype = dyn_cast<TypedefType>(typeInfo)->getDecl();
     assert(labelflag == 0);
     if (castflag != 0) {
@@ -1953,8 +1942,8 @@ public:
   }
 
   FuncType *PrintFunctionTypeInfo(QualType typeInfo) {
-    std::vector<DataType *> parmType
-    DataType *retType
+    std::vector<DataType *> parmType;
+    DataType *retType;
     if (dyn_cast<FunctionProtoType>(typeInfo)) {
       unsigned parms = dyn_cast<FunctionProtoType>(typeInfo)->getNumArgs();
       if (parms != 0) {
@@ -1989,13 +1978,13 @@ public:
     QualType elmtype = dyn_cast<PointerType>(typeInfo)->getPointeeType();
     DataType *pointee = PrintTypeInfo(elmtype);
 
-    PointeeType *t = new PointeeType(pintee);
+    PointeeType *t = new PointeeType(pointee);
     return t;
   }
 
   //void PrintStructureTypeInfo(QualType typeInfo) {
   StructureType *PrintStructureTypeInfo(QualType typeInfo) {
-    StructureType *t = new StructureType();
+    StructureType *t;// = new StructureType();
     assert(labelflag == 0);
     if (castflag != 0) {
       if (dyn_cast<ElaboratedType>(typeInfo)) {
@@ -2058,7 +2047,7 @@ public:
 
   //void PrintUnionTypeInfo(QualType typeInfo) {
   UnionType *PrintUnionTypeInfo(QualType typeInfo) {
-    UnionType *t = new UnionType();
+    UnionType *t;// = new UnionType();
     if (castflag != 0) {
       if (dyn_cast<ElaboratedType>(typeInfo)) {
 	QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
@@ -2632,7 +2621,7 @@ public:
     }
     i = prog.size();
     Node *update;
-    if (For->getInd() != NULL) {
+    if (For->getInc() != NULL) {
       TraverseStmt(For->getInc());
       update = prog[i];
       prog.pop_back();
@@ -2640,7 +2629,7 @@ public:
     i = prog.size();
     TraverseStmt(For->getBody());
     int j = prog.size();
-    std::vector<Node *> prog;
+    std::vector<Node *> body;
     for (int k = i; k < j; k++) {
       body.push_back(prog[i]);
       prog.erase(prog.begin() + i);
@@ -3101,7 +3090,7 @@ public:
   // BinaryOperator
   bool VisitBinaryOperator(BinaryOperator *Binop) {
     std::string op = Binop->getOpcodeStr();
-    std::vector<DataTyep *> type;
+    std::vector<DataType *> type;
     type.push_back(PrintTypeInfo(Binop->getType()));
     if (castType.size() != 0) {
       for (int i = 0; i < (int)castType.size(); i++) {
@@ -3119,7 +3108,7 @@ public:
     prog.pop_back();
     Node t = PrintSourceRange(Binop->getSourceRange());
 
-    BinOp *BO = new BinOp(op, type, left, right, loc);
+    BinOp *BO = new BinOp(op, type, left, right, t);
     Node *np = BO;
     prog.push_back(np);
 
