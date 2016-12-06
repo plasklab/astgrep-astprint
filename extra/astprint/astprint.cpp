@@ -1313,12 +1313,13 @@ void CaseStatement::printAST() {
 
 class DefaultStatement : public Statement {
 public:
-  DefaultStatement();
+  DefaultStatement(Node loc);
   void printAST();
 };
 
-DefaultStatement::DefaultStatement() {
+DefaultStatement::DefaultStatement(Node loc) {
   kind = "Default";
+  setLocation(loc);
 }
 
 void DefaultStatement::printAST() {
