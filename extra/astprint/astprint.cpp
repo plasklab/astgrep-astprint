@@ -2758,25 +2758,21 @@ public:
   
   // WhileStmt
   bool VisitWhileStmt(WhileStmt *While) {
-    WhileStatement *WS = new WhileStatement();
     int i = prog.size();
     TraverseStmt(While->getCond());
-    WS->condition = prog[i];
+    Node *condition = prog[i];
     prog.pop_back();
     i = prog.size();
     TraverseStmt(While->getBody());
     int j = prog.size();
+    std::vector<Node *> body;
     for (int k = i; k < j; k++) {
-      WS->body.push_back(prog[i]);
+      body.push_back(prog[i]);
       prog.erase(prog.begin() + i);
     }
     Node t = PrintSourceRange(While->getSourceRange());
-    WS->beginFile = t.beginFile;
-    WS->beginLine = t.beginLine;
-    WS->beginColumn = t.beginColumn;
-    WS->endFile = t.endFile;
-    WS->endLine = t.endLine;
-    WS->endColumn = t.endColumn;
+
+    WhileStatement *WS = new WhileStatement(condition, body, t);
     Node *np = WS;
     prog.push_back(np);
 
