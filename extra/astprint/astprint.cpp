@@ -839,12 +839,19 @@ void CharLiteral::printAST() {
 class FloatLiteral : public Literal {
 public:
   float value;
-  FloatLiteral();
+  FloatLiteral(float value, DataType *dt, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-FloatLiteral::FloatLiteral() {
+FloatLiteral::FloatLiteral(float value, DataType *dt, std::vector<DataType *> dts, Node loc) {
   kind = "FloatingLiteral";
+  value = value;
+  type.push_back(dt);
+  while (0 != dts.size()) {
+    type.push_back(dts[0]);
+    dts.erase(dts.begin());
+  }
+  setLocation(loc);
 }
 
 void FloatLiteral::printAST() {
