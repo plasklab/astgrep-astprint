@@ -1293,12 +1293,14 @@ void LabelStatement::printAST() {
 class CaseStatement : public Statement {
 public:
   Node *value;
-  CaseStatement();
+  CaseStatement(Node *val, Node loc);
   void printAST();
 };
 
-CaseStatement::CaseStatement() {
+CaseStatement::CaseStatement(Node *val, Node loc) {
   kind = "Case";
+  value = val;
+  setLocation(loc);
 }
 
 void CaseStatement::printAST() {
