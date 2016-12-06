@@ -509,6 +509,34 @@ void RenameType::printType() {
   llvm::outs() << "}";
 }
 
+class Specifire {
+public:
+  bool Static;
+  bool Auto;
+  bool Extern;
+  bool Register;
+  void setSpecifire(Specifire s);
+  void printSpecifire();
+};
+
+void Specifire::setSpecifire(Specifire s) {
+  Static = s.Static;
+  Auto = s.Auto;
+  Extern = s.Extern;
+  Register = s.Register;
+}
+
+void Specifire::printSpecifire() {
+  if (Auto)
+    llvm::outs() << " :auto \"true\"";
+  else if (Static)
+    llvm::outs() << " :static \"true\"";
+  else if (Extern)
+    llvm::outs() << " :extern \"true\"";
+  else if (Register)
+    llvm::outs() << " :register \"true\"";
+}
+
 class Node {
 public:
   std::string kind;
@@ -518,25 +546,14 @@ public:
   std::string endFile;
   int endLine;
   int endColumn;
+  Specifire spe;
   void PrintLocation();
   void setLocation(Node loc);
-  //Node(std::string kind, std::string beginFile, int beginLine, int beginColumn,
-  //             std::string endFile, int endLine, int endColumn);
   virtual void printAST();
   virtual ~Node() {};
 };
-/*
-Node::Node(std::string kind, std::string beginFile, int beginLine, int beginColumn,
-             std::string endFile, int endLine, int endColumn) {
-  kind = kind;
-  beginFile = beginFile;
-  beginLine = beginLine;
-  beginColumn = beginColumn;
-  endFile = endFile;
-  endLine = endLine;
-  endColumn = endColumn;
-}
-*/
+
+
 void Node::setLocation(Node loc) {
   beginFile = loc.beginFile;
   beginLine = loc.beginLine;
@@ -558,21 +575,9 @@ void Node::printAST() {
 class Expression : public Node {
 public:
   std::vector<DataType *> type;
-  //Expression(DataType *dt, std::vector<DataType *> type);
   virtual void printAST();
 };
-/*
-Expression::Expression(DataType *dt, std::vector<DataType *> type):Node(kind) {
-  type.push_back(dt);
-  if (type.size() != 0) {
-    int i = type.size();
-    for (int j = 0; j < i; j++) {
-      type.push_back(type[0]);
-      type.erase(type.begin() + i);
-    }
-  }
-}
-*/
+
 void Expression::printAST() {
   llvm::outs() << "No Expression";
 }
@@ -580,14 +585,8 @@ void Expression::printAST() {
 class Reference : public Expression {
 public:
   std::string name;
-  //std::vector<Node *> label;
-  //Reference(std::string name);
 };
-/*
-Reference::Reference(std::string name) {
-  name = name;
-}
-*/
+
 class DeclationReferenceExpression : public Reference {
 public:
   std::string scope;
@@ -602,18 +601,10 @@ DeclationReferenceExpression::DeclationReferenceExpression(std::string n, std::s
   scope = s;
   type = dts;
   setLocation(loc);
-  //label = l;
 }
 
 void DeclationReferenceExpression::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
-  /*if (c.size() != 0) {
-    llvm::outs() << " :label [";
-    while (c.size() != 0) {
-      c->printAST();
-    }
-    llvm::outs() << "]";
-  }*/
   llvm::outs() << " :scope \"" << scope << "\" :type [";
   for (int i = 0; i < (int)type.size(); i++) {
     type[i]->printType();
@@ -707,7 +698,7 @@ void BinOp::printAST() {
   right->printAST();
   llvm::outs() << "}\n";
 }
-
+ 
 class UnOp : public Operator {
 public:
   std::string op;
@@ -1549,10 +1540,12 @@ public:
   bool VisitFunctionDecl(FunctionDecl *Decl) {
     std::string name = Decl->getQualifiedNameAsString();
     DataType *type = PrintTypeInfo(Decl->getType());
+    llvm::outs() << "aaaaaaaaaaaaaa";
     std::vector<Node *> parm;
     std::vector<Node *> body;
 
     if (Decl->param_size()) {
+      /*
       int i = prog.size();
       int j = Decl->param_size();
       for (int k = 0; k < j; k++) {
@@ -1560,6 +1553,7 @@ public:
         parm.push_back(prog[i]);
         prog.erase(prog.begin() + i);
       }
+      */
     }
     int i = prog.size();
     TraverseStmt(Decl->getBody());
@@ -1581,8 +1575,8 @@ public:
 
   // ParmVarDecl
   bool VisitParmVarDecl(ParmVarDecl *Decl) {
-    /*
     std::string varname = Decl->getNameAsString();
+    QualType vartype = Decl->getType();
     llvm::outs() << "{:kind \"Parm\"" 
 		 << " :name " << "\"" << varname  << "\"";
     llvm::outs() << " :type [";
@@ -1591,17 +1585,16 @@ public:
     llvm::outs() << "]";
     PrintSourceRange(Decl->getSourceRange());
     llvm::outs() << "}";
-    */
     // 修正版
+    /*
     std::string name = Decl->getNameAsString();
-    QualType vartype = Decl->getType();
     DataType *type = PrintTypeInfo(vartype);
     Node t = PrintSourceRange(Decl->getSourceRange());
 
     ParameterDeclation *PD = new ParameterDeclation(name, "不明", type, t, false, false);
     Node *np = PD;
     prog.push_back(np);
-
+*/
     return true;
   }
 
@@ -1704,7 +1697,9 @@ public:
   }
   
   // 指定子:specifire::=(register, static, extern)
-  void checkSpecifier(StorageClass SC) {
+  //void checkSpecifier(StorageClass SC) {
+  bool checkSpecifier(StorageClass SC) {
+    /*
     if (labelflag != 0) {
       switch(SC) {
       case SC_Extern:
@@ -1771,6 +1766,21 @@ public:
       default:
 	break;
       }
+    }*/
+    switch (SC) {
+      case SC_Extern:
+        return true;
+      case SC_Static:
+        return true;
+      case SC_Auto:
+        return true;
+      case SC_Register:
+        return true;
+      case SC_None:
+      case SC_PrivateExtern:
+      case SC_OpenCLWorkGroupLocal:
+      default:
+        return false;
     }
   }
   
