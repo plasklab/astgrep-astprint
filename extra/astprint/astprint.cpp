@@ -3016,30 +3016,6 @@ public:
   
   // ConditionalOperator
   bool VisitConditionalOperator(ConditionalOperator *condop) {
-    /*
-    llvm::outs() << "{:kind \"Conditionalop\""; 
-      //<< " :op " << "\"" << condop->getOpcodeStr() << "\"";
-    checkLabel(); 
-    llvm::outs() << " :type [";
-    PrintTypeInfo(condop->getType());
-    checkCast();
-    llvm::outs() << "]";
-    PrintSourceRange(condop->getSourceRange());
-    llvm::outs() << "\n :operand1 ";
-    linefeedflag = 0;
-    TraverseStmt(condop->getCond());
-    llvm::outs() << "\n :operand2 ";
-    linefeedflag = 0;
-    TraverseStmt(condop->getTrueExpr());
-    llvm::outs() << "\n :operand3 ";
-    if (condop->getRHS()->getStmtClass() == 68) {
-      llvm::outs() << "{:kind \"NULL\" :value \"Null\"}";
-    } else {
-      linefeedflag = 0;
-      TraverseStmt(condop->getFalseExpr());
-    }
-    llvm::outs() << "}";
-    */
     std::vector<DataType *> type;
     type.push_back(PrintTypeInfo(condop->getType()));
     if (castType.size() != 0) {
