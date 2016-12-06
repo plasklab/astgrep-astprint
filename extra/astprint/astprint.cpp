@@ -2009,10 +2009,10 @@ public:
 
   //void PrintPointerTypeInfo(QualType typeInfo) {
   PointeeType *PrintPointerTypeInfo(QualType typeInfo) {
-    PointeeType *t = new PointeeType();
     QualType elmtype = dyn_cast<PointerType>(typeInfo)->getPointeeType();
-    t->pointee = PrintTypeInfo(elmtype);
+    DataType *pointee = PrintTypeInfo(elmtype);
 
+    PointeeType *t = new PointeeType(pintee);
     return t;
   }
 
