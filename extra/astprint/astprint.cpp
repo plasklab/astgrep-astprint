@@ -750,10 +750,11 @@ ConditionalOp::ConditionalOp(std::vector<DataType *> dts, Node *cond, Node *t, N
 }
 
 void ConditionalOp::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :type ";
+  llvm::outs() << "{:kind \"" << kind << "\" :type [";
   for (int i = 0; i < (int)type.size(); i++) {
     type[i]->printType();
   }
+  llvm::outs() << "]";
   PrintLocation();
   llvm::outs() << "\n :condition ";
   condition->printAST();
@@ -3015,6 +3016,7 @@ public:
   
   // ConditionalOperator
   bool VisitConditionalOperator(ConditionalOperator *condop) {
+    /*
     llvm::outs() << "{:kind \"Conditionalop\""; 
       //<< " :op " << "\"" << condop->getOpcodeStr() << "\"";
     checkLabel(); 
@@ -3037,7 +3039,33 @@ public:
       TraverseStmt(condop->getFalseExpr());
     }
     llvm::outs() << "}";
-      
+    */
+    std::vector<DataType *> type;
+    type.push_back(PrintTypeInfo(condop->getType()));
+    if (castType.size() != 0) {
+      while (castType.size() != 0) {
+        type.push_back(castType[0]);
+        castType.erase(castType.begin());
+      }
+    }
+    int i = prog.size();
+    TraverseStmt(condop->getCond());
+    Node *cond = prog[i];
+    prog.pop_back();
+    i = prog.size();
+    TraverseStmt(condop->getTrueExpr());
+    Node *then = prog[i];
+    prog.pop_back();
+    i = prog.size();
+    TraverseStmt(condop->getFalseExpr());
+    Node *dinal = prog[i];
+    prog.pop_back();
+    Node t = PrintSourceRange(condop->getSourceRange());
+
+    ConditionalOp *CO = new ConditionalOp(type, cond, then, dinal, t);
+    Node *np = CO;
+    prog.push_back(np);
+
     return false;
     
   }
