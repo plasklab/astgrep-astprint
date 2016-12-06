@@ -783,12 +783,19 @@ void Literal::printAST() {
 class IntLiteral : public Literal {
 public:
   std::string value;
-  IntLiteral();
+  IntLiteral(std::string value, DataType *dt, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-IntLiteral::IntLiteral() {
+IntLiteral::IntLiteral(std::string value, DataType *dt, std::vector<DataType *> dts, Node loc) {
   kind = "IntegerLiteral";
+  value = value;
+  type.push_back(dt);
+  while (0 != (int)dts.size()) {
+    type.push_back(dts[0]);
+    dts.erase(dts.begin());
+  }
+  setLocation(loc);
 }
 
 void IntLiteral::printAST() {
