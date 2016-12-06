@@ -1678,25 +1678,21 @@ public:
     }
     */
     if (record->isStruct()) {
-      StructDeclation *SD = new StructDeclation();
       SD->name = (std::string)record->getName();
+      std::vector<Node *> member;
       if (!(record->field_empty())) {
         RecordDecl::field_iterator itr = record->field_begin();
         int i = prog.size();
         while (itr != record->field_end()) {
           TraverseDecl(itr->getCanonicalDecl());
-          SD->member.push_back(prog[i]);
+          member.push_back(prog[i]);
           prog.erase(prog.begin() + i);
           itr++;
         }
       }
       Node t = PrintSourceRange(record->getSourceRange());
-      SD->beginFile = t.beginFile;
-      SD->beginLine = t.beginLine;
-      SD->beginColumn = t.beginColumn;
-      SD->endFile = t.endFile;
-      SD->endLine = t.endLine;
-      SD->endColumn = t.endColumn;
+
+      StructDeclation *SD = new StructDeclation(name, member, t);
       Node *np = SD;
       prog.push_back(np);
     } else if (record->isUnion()) {
