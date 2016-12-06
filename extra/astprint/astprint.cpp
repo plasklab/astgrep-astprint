@@ -1569,15 +1569,17 @@ public:
   
   // FunctionDecl
   bool VisitFunctionDecl(FunctionDecl *Decl) {
-    FunctionDeclation *FD = new FunctionDeclation();
-    FD->name = Decl->getQualifiedNameAsString();
-    FD->type = PrintTypeInfo(Decl->getType());
+    std::string name = Decl->getQualifiedNameAsString();
+    DataType *type = PrintTypeInfo(Decl->getType());
+    std::vector<Node *> parm;
+    std::vector<Node *> body;
+
     if (Decl->param_size()) {
       int i = prog.size();
       int j = Decl->param_size();
       for (int k = 0; k < j; k++) {
         TraverseDecl(Decl->getParamDecl(k));
-        FD->parm.push_back(prog[i]);
+        parm.push_back(prog[i]);
         prog.erase(prog.begin() + i);
       }
     }
@@ -1586,17 +1588,13 @@ public:
     int j = prog.size();
     if (i < j) {
       for (int k = i; k < j; k++) {
-        FD->body.push_back(prog[i]);
+        body.push_back(prog[i]);
         prog.erase(prog.begin() + i);
       }
     }
     Node t = PrintSourceRange(Decl->getSourceRange());
-    FD->beginFile = t.beginFile;
-    FD->beginLine = t.beginLine;
-    FD->beginColumn = t.beginColumn;
-    FD->endFile = t.endFile;
-    FD->endLine = t.endLine;
-    FD->endColumn = t.endColumn;
+
+    FunctionDeclation *FD = new FunctionDeclation(name, type, parm, body, t);
     Node *np = FD;
     prog.push_back(np);
 
