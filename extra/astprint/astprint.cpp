@@ -2935,6 +2935,7 @@ public:
   
   // UnaryExprOrTypeTraitExpr
   bool VisitUnaryExprOrTypeTraitExpr(UnaryExprOrTypeTraitExpr *expr) {
+    /*
     switch(expr->getKind()) {
     case UETT_SizeOf:
       llvm::outs() << "{:kind \"SizeOf\"";
@@ -2955,7 +2956,36 @@ public:
       return false;
     default: 
       break;
+    }*/
+    switch (expr->getKind()) {
+    case UETT_SizeOf:
+    {
+      std::string op = "sizeOf";
+      std::vector<DataType *> type;
+      type.push_back(PrintTypeInfo(expr->getType()));
+      if (castType.size() != 0) {
+        while (castType.size() != 0) {
+          type.push_back(castType[0]);
+          castType.pop_back();
+        }
+      }
+      int i = prog.size();
+      TraverseStmt(expr->getArgumentExpr());
+      Node *operand = prog[i];
+      prog.pop_back();
+      Node t = PrintSourceRange(expr->getSourceRange());
+
+      UnOp *UO = new UnOp(op, type, operand, t);
+      Node *np = UO;
+      prog.push_back(np);
+      return false;
     }
+    default:
+    {
+      break;
+    }
+    }
+
     return true;
   }
 
