@@ -3252,23 +3252,19 @@ public:
 
   // CharacterLiteral
   bool VisitCharacterLiteral(CharacterLiteral *Char) {
-    CharLiteral *CL = new CharLiteral();
     QualType vartype = Char->getType();
-    CL->value = Char->getValue();
-    CL->type.push_back(PrintTypeInfo(vartype));
+    char value = Char->getValue();
+    std::vector<DataType *> type;
+    type.push_back(PrintTypeInfo(vartype));
     if (castType.size() != 0) {
       for (int i = 0; i < (int)castType.size(); i++) {
-        CL->type.push_back(castType[0]);
+        type.push_back(castType[0]);
         castType.erase(castType.begin());
       }
     }
     Node t = PrintSourceRange(Char->getSourceRange());
-    CL->beginFile = t.beginFile;
-    CL->beginLine = t.beginLine;
-    CL->beginColumn = t.beginColumn;
-    CL->endFile = t.endFile;
-    CL->endLine = t.endLine;
-    CL->endColumn = t.endColumn;
+
+    CharLiteral *CL = new CharLiteral(value, type, t);
     Node *np = CL;
     prog.push_back(np);
 
