@@ -1213,12 +1213,16 @@ class IfStatement : public BranchStatement {
 public:
   std::vector<Node *> then;
   std::vector<Node *> denial;
-  IfStatement();
+  IfStatement(Node *cond, std::vector<Node *> then, std::vector<Node *> denial, Node loc);
   void printAST();
 };
 
-IfStatement::IfStatement() {
+IfStatement::IfStatement(Node *cond, std::vector<Node *> then, std::vector<Node *> denial, Node loc) {
   kind = "If";
+  condition = cond;
+  then(then);
+  denial(denial);
+  setLocation(loc);
 }
 
 void IfStatement::printAST() {
