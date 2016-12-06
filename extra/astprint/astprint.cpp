@@ -1068,12 +1068,15 @@ public:
 
 class StructDeclation : public TypeDeclation {
 public:
-  StructDeclation();
+  StructDeclation(std::string name, std::vector<Node *> member, Node loc);
   void printAST();
 };
 
-StructDeclation::StructDeclation() {
+StructDeclation::StructDeclation(std::string name, std::vector<Node *> member, Node loc) {
   kind = "StructDecl";
+  name = name;
+  member(member);
+  setLocation(loc);
 }
 
 void StructDeclation::printAST() {
