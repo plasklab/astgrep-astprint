@@ -2671,6 +2671,7 @@ public:
 
   // LabelStmt
   bool VisitLabelStmt(LabelStmt *Label) {
+    /*
     os << "{:kind \"Label\"";
     PrintSourceRange(Label->getSourceRange());
     os  << " :name " << "\"" << Label->getName() << "\"}";
@@ -2678,6 +2679,13 @@ public:
     os.str("");
     os.clear();
     labelflag = 0;
+    */
+    std::string name = Label->getName();
+    Node t = PrintSourceRange(Label->getSourceRange());
+
+    LabelStatement *LS = new LabelStatement(name, t);
+    Node *np = LS;
+    prog.push_back(np);
     return true;
   }
 
