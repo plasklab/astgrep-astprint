@@ -1769,9 +1769,8 @@ public:
     }
   }
 
-  //void PrintTypedefTypeInfo(QualType typeInfo) {
   RenameType *PrintTypedefTypeInfo(QualType typeInfo) {
-    TypedefNameDecl *TDtype = dyn_cast<TypedefType>(typeInfo)->getDecl();
+    /*TypedefNameDecl *TDtype = dyn_cast<TypedefType>(typeInfo)->getDecl();
     assert(labelflag == 0);
     if (castflag != 0) {
       cast << "{:kind \"Typedef-type\""
@@ -1793,6 +1792,8 @@ public:
     }
 
     //DataType *tp = PrintQualifier(typeInfo);
+    */
+    TypedefNameDecl *TDtype = dyn_cast<TypedefType>(typeInfo)->getDecl();
     std::string typeName = (std::string)TDtype->getName();
     DataType *typedefType = PrintTypeInfo(TDtype->getUnderlyingType());
 
@@ -1997,8 +1998,9 @@ public:
     DataType *t;
     //if (dyn_cast<AutoType>(typeInfo))
     //  t = PrintAutoTypeInfo(typeInfo);
-    //else if (dyn_cast<TypedefType>(typeInfo))
     if (dyn_cast<TypedefType>(typeInfo)) {
+      return PrintTypedefTypeInfo(typeInfo);
+    } else if (dyn_cast<TypedefType>(typeInfo)) {
       return PrintTypedefTypeInfo(typeInfo);
     } else if (dyn_cast<BuiltinType>(typeInfo)) {
       return PrintBuiltinTypeInfo(typeInfo);
