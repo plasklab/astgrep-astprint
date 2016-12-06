@@ -738,12 +738,21 @@ public:
   Node *condition;
   Node *then;
   Node *denial;
-  ConditionalOp();
+  ConditionalOp(DataType *dt, std::vector<DataType *> dts, Node *condition, Node *then, Node *denial, Node loc);
   void printAST();
 };
 
-ConditionalOp::ConditionalOp() {
+ConditionalOp::ConditionalOp(DataType *dt, std::vector<DataType *> dts, Node *condition, Node *then, Node *denial, Node loc) {
   kind = "ConditionalOp";
+  type.push_back(dt);
+  while(0 != (int)dts.size()) {
+    type.push_back(dts[0]);
+    dts.erase(dts.begin());
+  }
+  condition = condtion;
+  then = then;
+  denial = denial;
+  setLocation(loc);
 }
 
 void ConditionalOp::printAST() {
@@ -751,11 +760,12 @@ void ConditionalOp::printAST() {
   for (int i = 0; i < (int)type.size(); i++) {
     type[i]->printType();
   }
-  llvm::outs() << " :condition ";
+  PrintLocation();
+  llvm::outs() << "\n :condition ";
   condition->printAST();
-  llvm::outs() << " :then ";
+  llvm::outs() << "\n :then ";
   then->printAST();
-  llvm::outs() << " :else ";
+  llvm::outs() << "\n :else ";
   denial->printAST();
   llvm::outs() << "}";
 }
