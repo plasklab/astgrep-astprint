@@ -409,14 +409,14 @@ class FuncType : public DataType {
 public:
   std::vector<DataType*> parmType;
   DataType *retType;
-  FuncType(std::vector<DataType *> parmType, DataType *retType);
+  FuncType(std::vector<DataType *> pt, DataType *rt);
   void printType();
 };
 
-FuncType::FuncType(std::vector<DataType *> parmType, DataType *retType) {
+FuncType::FuncType(std::vector<DataType *> pt, DataType *rt) {
   kind = "FuncType";
-  parmType = parmType;
-  retType = retType;
+  parmType = pt;
+  retType = rt;
 }
 
 void FuncType::printType() {
@@ -440,14 +440,14 @@ class ArrayDataType : public DataType {
 public:
   std::string arraySize;
   DataType *type;
-  ArrayDataType(std::string size, DataType *type);
+  ArrayDataType(std::string size, DataType *dt);
   void printType();
 };
 
-ArrayDataType::ArrayDataType(std::string size, DataType *type) {
+ArrayDataType::ArrayDataType(std::string size, DataType *dt) {
   kind = "ArrayType";
   arraySize = size;
-  type = type;
+  type = dt;
 }
 
 void ArrayDataType::printType() {
@@ -459,13 +459,13 @@ void ArrayDataType::printType() {
 class StructureType : public DataType {
 public:
   std::string name;
-  StructureType(std::string name);
+  StructureType(std::string n);
   void printType();
 };
 
-StructureType::StructureType(std::string name) {
+StructureType::StructureType(std::string n) {
   kind = "StructureType";
-  name = name;
+  name = n;
 }
 
 void StructureType::printType() {
@@ -475,13 +475,13 @@ void StructureType::printType() {
 class UnionType : public DataType {
 public:
   std::string name;
-  UnionType(std::string name);
+  UnionType(std::string n);
   void printType();
 };
 
-UnionType::UnionType(std::string name) {
+UnionType::UnionType(std::string n) {
   kind = "UnionType";
-  name = name;
+  name = n;
 }
 
 void UnionType::printType() {
@@ -493,13 +493,13 @@ class RenameType : public DataType {
 public:
   std::string typeName;
   DataType *typedefType;
-  RenameType(std::string typeName, DataType *defType);
+  RenameType(std::string tn, DataType *defType);
   void printType();
 };
 
-RenameType::RenameType(std::string typeName, DataType *defType) {
+RenameType::RenameType(std::string tn, DataType *defType) {
   kind = "TypedefType";
-  typeName = typeName;
+  typeName = tn;
   typedefType = defType;
 }
 
@@ -590,15 +590,15 @@ Reference::Reference(std::string name) {
 class DeclationReferenceExpression : public Reference {
 public:
   std::string scope;
-  DeclationReferenceExpression(std::string name, std::string scope, std::vector<DataType *> dts, Node loc);
+  DeclationReferenceExpression(std::string n, std::string s, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-DeclationReferenceExpression::DeclationReferenceExpression(std::string name, std::string scope,
+DeclationReferenceExpression::DeclationReferenceExpression(std::string n, std::string s,
   std::vector<DataType *> dts, Node loc) {
   kind = "DRE";
-  name = name;
-  scope = scope;
+  name = n;
+  scope = s;
   type = dts;
   setLocation(loc);
 }
@@ -617,14 +617,14 @@ void DeclationReferenceExpression::printAST() {
 class MemberReference : public Reference {
 public:
   std::string scope;
-  MemberReference(std::string name, std::vector<DataType *> dts, Node loc);
+  MemberReference(std::string n, std::vector<DataType *> dts, Node loc);
   void printAST();  
 };
 
-MemberReference::MemberReference(std::string name, std::vector<DataType *> dts, Node loc) {
+MemberReference::MemberReference(std::string n, std::vector<DataType *> dts, Node loc) {
   kind = "Field";
   scope = "Member";
-  name = name;
+  name = n;
   type = dts;
   setLocation(loc);
 }
@@ -643,15 +643,15 @@ class StructReference : public Reference {
 public:
   Node *structs;
   Node *structMember;
-  StructReference(Node *str, Node *strMem, std::vector<DataType *> type, Node loc);
+  StructReference(Node *str, Node *strMem, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-StructReference::StructReference(Node *str, Node *strMem, std::vector<DataType *> type, Node loc) {
+StructReference::StructReference(Node *str, Node *strMem, std::vector<DataType *> dts, Node loc) {
   kind = "Struct";
   structs = str;
   structMember = strMem;
-  type = type;
+  type = dts;
   setLocation(loc);
 }
 
@@ -672,16 +672,16 @@ public:
   std::string op;
   Node *left;
   Node *right;
-  BinOp(std::string op, std::vector<DataType *> dts, Node *left, Node *right, Node loc);
+  BinOp(std::string o, std::vector<DataType *> dts, Node *l, Node *r, Node loc);
   void printAST();
 };
 
-BinOp::BinOp(std::string op, std::vector<DataType *> dts, Node *left, Node *right, Node loc) {
+BinOp::BinOp(std::string o, std::vector<DataType *> dts, Node *l, Node *r, Node loc) {
   kind = "BinOp";
-  op = op;
+  op = o;
   type = dts;
-  left = left;
-  right = right;
+  left = l;
+  right = r;
   setLocation(loc);
 }
 
@@ -703,15 +703,15 @@ class UnOp : public Operator {
 public:
   std::string op;
   Node *operand;
-  UnOp(std::string op, std::vector<DataType *> dts, Node *operand, Node loc);
+  UnOp(std::string o, std::vector<DataType *> dts, Node *oper, Node loc);
   void printAST();
 };
 
-UnOp::UnOp(std::string op, std::vector<DataType *> dts, Node *operand, Node loc) {
+UnOp::UnOp(std::string o, std::vector<DataType *> dts, Node *oper, Node loc) {
   kind = "UnOp";
-  op = op;
-  type = type;
-  operand = operand;
+  op = o;
+  type = dts;
+  operand = oper;
   setLocation(loc);
 }
 
@@ -732,16 +732,16 @@ public:
   Node *condition;
   Node *then;
   Node *denial;
-  ConditionalOp(std::vector<DataType *> dts, Node *condition, Node *then, Node *denial, Node loc);
+  ConditionalOp(std::vector<DataType *> dts, Node *cond, Node *t, Node *d, Node loc);
   void printAST();
 };
 
-ConditionalOp::ConditionalOp(std::vector<DataType *> dts, Node *condition, Node *then, Node *denial, Node loc) {
+ConditionalOp::ConditionalOp(std::vector<DataType *> dts, Node *cond, Node *t, Node *d, Node loc) {
   kind = "ConditionalOp";
   type = dts;
-  condition = condition;
-  then = then;
-  denial = denial;
+  condition = cond;
+  then = t;
+  denial = d;
   setLocation(loc);
 }
 
@@ -773,13 +773,13 @@ void Literal::printAST() {
 class IntLiteral : public Literal {
 public:
   std::string value;
-  IntLiteral(std::string value, std::vector<DataType *> dts, Node loc);
+  IntLiteral(std::string v, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-IntLiteral::IntLiteral(std::string value, std::vector<DataType *> dts, Node loc) {
+IntLiteral::IntLiteral(std::string v, std::vector<DataType *> dts, Node loc) {
   kind = "IntegerLiteral";
-  value = value;
+  value = v;
   type = dts;
   setLocation(loc);
 }
@@ -797,13 +797,13 @@ void IntLiteral::printAST() {
 class CharLiteral : public Literal {
 public:
   char value;
-  CharLiteral(char value, std::vector<DataType *> dts, Node loc);
+  CharLiteral(char v, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-CharLiteral::CharLiteral(char value, std::vector<DataType *> dts, Node loc) {
+CharLiteral::CharLiteral(char v, std::vector<DataType *> dts, Node loc) {
   kind = "CharacterLiteral";
-  value = value;
+  value = v;
   type = dts;
   setLocation(loc);
 }
@@ -821,13 +821,13 @@ void CharLiteral::printAST() {
 class FloatLiteral : public Literal {
 public:
   float value;
-  FloatLiteral(float value, std::vector<DataType *> dts, Node loc);
+  FloatLiteral(float v, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-FloatLiteral::FloatLiteral(float value, std::vector<DataType *> dts, Node loc) {
+FloatLiteral::FloatLiteral(float v, std::vector<DataType *> dts, Node loc) {
   kind = "FloatingLiteral";
-  value = value;
+  value = v;
   type = dts;
   setLocation(loc);
 }
@@ -846,14 +846,14 @@ class ArrayReference : public Reference {
 public:
   Node *array;
   Node *index;
-  ArrayReference(Node *array, Node *index, Node loc);
+  ArrayReference(Node *arr, Node *i, Node loc);
   void printAST();
 };
 
-ArrayReference::ArrayReference(Node *array, Node *index, Node loc) {
+ArrayReference::ArrayReference(Node *arr, Node *i, Node loc) {
   kind = "ArrayRef";
-  array = array;
-  index = index;
+  array = arr;
+  index = i;
   setLocation(loc);
 }
 
@@ -873,15 +873,15 @@ class FunctionCall : public Expression {
 public:
   Node *func;
   std::vector<Node *> parm;
-  FunctionCall(DataType *dt, Node *func, std::vector<Node *> parm, Node loc);
+  FunctionCall(DataType *dt, Node *f, std::vector<Node *> p, Node loc);
   void printAST();
 };
 
-FunctionCall::FunctionCall(DataType *dt, Node *func, std::vector<Node *> parm, Node loc) {
+FunctionCall::FunctionCall(DataType *dt, Node *f, std::vector<Node *> p, Node loc) {
   kind = "FuncCall";
   type.push_back(dt);
-  func = func;
-  parm = parm;
+  func = f;
+  parm = p;
   setLocation(loc);
 }
 
@@ -908,14 +908,14 @@ class FieldDeclation : public Declation {
 public:
   std::string scope;
   DataType *type;
-  FieldDeclation(std::string name, DataType *dt, Node loc);
+  FieldDeclation(std::string n, DataType *dt, Node loc);
   void printAST();
 };
 
-FieldDeclation::FieldDeclation(std::string name, DataType *dt, Node loc) {
+FieldDeclation::FieldDeclation(std::string n, DataType *dt, Node loc) {
   kind = "FieldDecl";
   scope = "Member";
-  name = name;
+  name = n;
   type = dt;
   setLocation(loc);
 }
@@ -943,14 +943,14 @@ public:
 
 class ParameterDeclation : public DeclationOfVariables {
 public:
-  ParameterDeclation(std::string name, std::string dispType, DataType *dt, Node loc, bool au, bool sta);
+  ParameterDeclation(std::string n, std::string display, DataType *dt, Node loc, bool au, bool sta);
   void printAST();
 };
 
-ParameterDeclation::ParameterDeclation(std::string name, std::string dispType, DataType *dt, Node loc, bool au, bool sta) {
+ParameterDeclation::ParameterDeclation(std::string n, std::string display, DataType *dt, Node loc, bool au, bool sta) {
   kind = "ParmDecl";
-  name = name;
-  displayType = dispType;
+  name = n;
+  displayType = display;
   type = dt;
   setLocation(loc);
   autoBool = au;
@@ -968,17 +968,21 @@ void ParameterDeclation::printAST() {
 class VariableDeclation : public DeclationOfVariables {
 public:
   Node *init;
-  VariableDeclation(std::string name, std::string scope, std::string dispType, DataType *dt, Node *init, Node loc, bool au, bool sta);
+  VariableDeclation(std::string n, std::string s, std::string display, DataType *dt, Node *i, Node loc, bool au, bool sta);
   void printAST();
 };
 
-VariableDeclation::VariableDeclation(std::string name, std::string scope, std::string dispType, DataType *dt, Node *init, Node loc, bool au, bool sta) {
+VariableDeclation::VariableDeclation(std::string n, std::string s, std::string display, DataType *dt, Node *i, Node loc, bool au, bool sta) {
   kind = "VarDecl";
-  name = name;
-  scope = scope;
-  displayType = dispType;
+  name = n;
+  scope = s;
+  displayType = display;
   type = dt;
-  init = init;
+  if (init == NULL) {
+    init = NULL;
+  } else {
+    init = i;
+  }
   setLocation(loc);
   autoBool = au;
   staticBool = sta;
@@ -1007,16 +1011,16 @@ public:
   DataType *type;
   std::vector<Node *> parm;
   std::vector<Node *> body;
-  FunctionDeclation(std::string name, DataType *dt, std::vector<Node *> parm, std::vector<Node *> body, Node loc);
+  FunctionDeclation(std::string n, DataType *dt, std::vector<Node *> p, std::vector<Node *> b, Node loc);
   void printAST();
 };
 
-FunctionDeclation::FunctionDeclation(std::string name, DataType *dt, std::vector<Node *> parm, std::vector<Node *> body, Node loc) {
+FunctionDeclation::FunctionDeclation(std::string n, DataType *dt, std::vector<Node *> p, std::vector<Node *> b, Node loc) {
   kind = "FuncDecl";
-  name = name;
+  name = n;
   type = dt;
-  parm = parm;
-  body = body;
+  parm = p;
+  body = b;
   setLocation(loc);
 }
 
@@ -1046,14 +1050,14 @@ public:
 
 class StructDeclation : public TypeDeclation {
 public:
-  StructDeclation(std::string name, std::vector<Node *> member, Node loc);
+  StructDeclation(std::string n, std::vector<Node *> m, Node loc);
   void printAST();
 };
 
-StructDeclation::StructDeclation(std::string name, std::vector<Node *> member, Node loc) {
+StructDeclation::StructDeclation(std::string n, std::vector<Node *> m, Node loc) {
   kind = "StructDecl";
-  name = name;
-  member = member;
+  name = n;
+  member = m;
   setLocation(loc);
 }
 
@@ -1069,14 +1073,14 @@ void StructDeclation::printAST() {
 
 class UnionDeclation : public TypeDeclation {
 public:
-  UnionDeclation(std::string name, std::vector<Node *> member, Node loc);
+  UnionDeclation(std::string n, std::vector<Node *> m, Node loc);
   void printAST();
 };
 
-UnionDeclation::UnionDeclation(std::string name, std::vector<Node *> member, Node loc) {
+UnionDeclation::UnionDeclation(std::string n, std::vector<Node *> m, Node loc) {
   kind = "UnionDecl";
-  name = name;
-  member = member;
+  name = n;
+  member = m;
   setLocation(loc);
 }
 
@@ -1101,14 +1105,14 @@ public:
 
 class WhileStatement : public RepetitionStatement {
 public:
-  WhileStatement(Node *cond, std::vector<Node *> body, Node loc);
+  WhileStatement(Node *cond, std::vector<Node *> b, Node loc);
   void printAST();
 };
 
-WhileStatement::WhileStatement(Node *cond, std::vector<Node *> body, Node loc) {
+WhileStatement::WhileStatement(Node *cond, std::vector<Node *> b, Node loc) {
   kind = "While";
   condition = cond;
-  body = body;
+  body = b;
   setLocation(loc);
 }
 
@@ -1126,14 +1130,14 @@ void WhileStatement::printAST() {
 
 class DoStatement : public RepetitionStatement {
 public:
-  DoStatement(Node *cond, std::vector<Node *> body, Node loc);
+  DoStatement(Node *cond, std::vector<Node *> b, Node loc);
   void printAST();
 };
 
-DoStatement::DoStatement(Node *cond, std::vector<Node *> body, Node loc) {
+DoStatement::DoStatement(Node *cond, std::vector<Node *> b, Node loc) {
   kind = "Do";
   condition = cond;
-  body = body;
+  body = b;
   setLocation(loc);
 }
 
@@ -1153,16 +1157,16 @@ class ForStatement : public RepetitionStatement {
 public:
   Node *init;
   Node *update;
-  ForStatement(Node *cond, std::vector<Node *> body, Node *init, Node *update, Node loc);
+  ForStatement(Node *cond, std::vector<Node *> b, Node *ini, Node *up, Node loc);
   void printAST();
 };
 
-ForStatement::ForStatement(Node *cond, std::vector<Node *> body, Node *init, Node *update, Node loc) {
+ForStatement::ForStatement(Node *cond, std::vector<Node *> b, Node *ini, Node *up, Node loc) {
   kind = "For";
   condition = cond;
-  body = body;
-  init = init;
-  update = update;
+  body = b;
+  init = ini;
+  update = up;
   setLocation(loc);
 }
 
@@ -1191,15 +1195,15 @@ class IfStatement : public BranchStatement {
 public:
   std::vector<Node *> then;
   std::vector<Node *> denial;
-  IfStatement(Node *cond, std::vector<Node *> then, std::vector<Node *> denial, Node loc);
+  IfStatement(Node *cond, std::vector<Node *> t, std::vector<Node *> d, Node loc);
   void printAST();
 };
 
-IfStatement::IfStatement(Node *cond, std::vector<Node *> then, std::vector<Node *> denial, Node loc) {
+IfStatement::IfStatement(Node *cond, std::vector<Node *> t, std::vector<Node *> d, Node loc) {
   kind = "If";
   condition = cond;
-  then = then;
-  denial = denial;
+  then = t;
+  denial = d;
   setLocation(loc);
 }
 
@@ -1226,14 +1230,14 @@ void IfStatement::printAST() {
 class SwitchStatement : public BranchStatement {
 public:
   std::vector<Node *> body;
-  SwitchStatement(Node *cond, std::vector<Node *> body, Node loc);
+  SwitchStatement(Node *cond, std::vector<Node *> b, Node loc);
   void printAST();
 };
 
-SwitchStatement::SwitchStatement(Node *cond, std::vector<Node *> body, Node loc) {
+SwitchStatement::SwitchStatement(Node *cond, std::vector<Node *> b, Node loc) {
   kind = "Switch";
   condition = cond;
-  body = body;
+  body = b;
   setLocation(loc);
 }
 
@@ -1252,13 +1256,13 @@ void SwitchStatement::printAST() {
 class LabelStatement : public Statement {
 public:
   std::string name;
-  LabelStatement(std::string name, Node loc);
+  LabelStatement(std::string n, Node loc);
   void printAST();
 };
 
-LabelStatement::LabelStatement(std::string name, Node loc) {
+LabelStatement::LabelStatement(std::string n, Node loc) {
   kind = "Label";
-  name = name;
+  name = n;
   setLocation(loc);
 }
 
@@ -1309,13 +1313,13 @@ void DefaultStatement::printAST() {
 class GotoStatement : public Statement {
 public:
   std::string jump;
-  GotoStatement(std::string jump, Node loc);
+  GotoStatement(std::string j, Node loc);
   void printAST();
 };
 
-GotoStatement::GotoStatement(std::string jump, Node loc) {
+GotoStatement::GotoStatement(std::string j, Node loc) {
   kind = "Goto";
-  jump = jump;
+  jump = j;
   setLocation(loc);
 }
 
@@ -1683,6 +1687,7 @@ public:
         init = prog[i];
         prog.pop_back();
       }
+      //init->printAST();
     }
     Node t = PrintSourceRange(Decl->getSourceRange());
 
@@ -1799,8 +1804,6 @@ public:
 
   //void PrintTypedefTypeInfo(QualType typeInfo) {
   RenameType *PrintTypedefTypeInfo(QualType typeInfo) {
-    //RenameType *TDF = new RenameType();
-    RenameType *TDF;
     TypedefNameDecl *TDtype = dyn_cast<TypedefType>(typeInfo)->getDecl();
     assert(labelflag == 0);
     if (castflag != 0) {
@@ -1822,12 +1825,13 @@ public:
       llvm::outs() << "}";
     }
 
-    DataType *tp = PrintQualifier(typeInfo);
-    TDF->typeName = (std::string)TDtype->getName();
-    TDF->constBool = tp->constBool;
-    TDF->volatileBool = tp->volatileBool;
-    TDF->typedefType = PrintTypeInfo(TDtype->getUnderlyingType());
+    //DataType *tp = PrintQualifier(typeInfo);
+    std::string typeName = (std::string)TDtype->getName();
+    //bool constBool = tp->constBool;
+    //bool volatileBool = tp->volatileBool;
+    DataType *typedefType = PrintTypeInfo(TDtype->getUnderlyingType());
 
+    RenameType *TDF = new RenameType(typeName, typedefType);
     return TDF;
   }
 
@@ -1984,7 +1988,7 @@ public:
 
   //void PrintStructureTypeInfo(QualType typeInfo) {
   StructureType *PrintStructureTypeInfo(QualType typeInfo) {
-    StructureType *t;// = new StructureType();
+    StructureType *t = new StructureType("tameshi");
     assert(labelflag == 0);
     if (castflag != 0) {
       if (dyn_cast<ElaboratedType>(typeInfo)) {
@@ -2047,7 +2051,7 @@ public:
 
   //void PrintUnionTypeInfo(QualType typeInfo) {
   UnionType *PrintUnionTypeInfo(QualType typeInfo) {
-    UnionType *t;// = new UnionType();
+    UnionType *t = new UnionType("tameshi");
     if (castflag != 0) {
       if (dyn_cast<ElaboratedType>(typeInfo)) {
 	QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
@@ -3361,7 +3365,7 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    llvm::outs() << "\n----------------------------------------------------------------------\n";
+    //llvm::outs() << "\n----------------------------------------------------------------------\n";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
