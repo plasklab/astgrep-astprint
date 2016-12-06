@@ -2745,21 +2745,6 @@ public:
   //
   // ArraySubscriptExpr
   bool VisitArraySubscriptExpr(ArraySubscriptExpr *arrsub) {
-    /*
-    llvm::outs() << "{:kind \"ArrayRef\"";
-    checkLabel(); 
-    llvm::outs() << " :type [";
-    PrintTypeInfo(arrsub->getType());
-    checkCast();
-    llvm::outs() << "]";
-    PrintSourceRange(arrsub->getSourceRange());
-    llvm::outs() << "\n :Array [";
-    TraverseStmt(arrsub->getLHS());
-    llvm::outs() << "]\n :Index ";
-    linefeedflag = 0;
-    TraverseStmt(arrsub->getRHS()); 
-    llvm::outs() << "}";
-    */
     int i = prog.size();
     TraverseStmt(arrsub->getLHS());
     Node *array = prog[i];
