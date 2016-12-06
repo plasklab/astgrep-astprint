@@ -1349,12 +1349,13 @@ void GotoStatement::printAST() {
 
 class ContinueStatement : public Statement {
 public:
-  ContinueStatement();
+  ContinueStatement(Node loc);
   void printAST();
 };
 
-ContinueStatement::ContinueStatement() {
+ContinueStatement::ContinueStatement(Node loc) {
   kind = "Continue";
+  setLocation(loc);
 }
 
 void ContinueStatement::printAST() {
