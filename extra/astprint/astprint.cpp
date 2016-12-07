@@ -619,31 +619,6 @@ void DeclationReferenceExpression::printAST() {
   llvm::outs() << "]}";
 }
 
-class MemberReference : public Reference {
-public:
-  std::string scope;
-  MemberReference(std::string n, std::vector<DataType *> dts, Node loc);
-  void printAST();  
-};
-
-MemberReference::MemberReference(std::string n, std::vector<DataType *> dts, Node loc) {
-  kind = "Field";
-  scope = "Member";
-  name = n;
-  type = dts;
-  setLocation(loc);
-}
-
-void MemberReference::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name 
-               << "\" :scope \"" << scope << "\" :type [";
-  for (int i = 0; i < (int)type.size(); i++) {
-    type[i]->printType();
-  }
-  PrintLocation();
-  llvm::outs() << "}";
-}
-
 class StructReference : public Reference {
 public:
   Node *structs;
@@ -2694,8 +2669,6 @@ public:
     VarDecl *vardecl = dyn_cast<VarDecl>(valuedecl);
     FunctionDecl *funcdecl = dyn_cast<FunctionDecl>(valuedecl);
     std::string scope = "";
-
-    // 修正版
     DeclationReferenceExpression *DRE;
     if (vardecl) {
       QualType vartype = vardecl->getType();
