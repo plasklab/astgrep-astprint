@@ -2748,7 +2748,7 @@ public:
       return false;
     }
     if(mem->isArrow()) {
-      llvm::outs() << "{:kind \"Binop\" :op \"->\"";
+      /*llvm::outs() << "{:kind \"Binop\" :op \"->\"";
       checkLabel(); 
       llvm::outs() << " :type [";
       PrintTypeInfo(mem->getType());
@@ -2759,7 +2759,30 @@ public:
       getlhsArrow(base);
       llvm::outs() << "\n :RHS ";
       getrhsArrow(vdecl);
-      llvm::outs() << "}"; 
+      llvm::outs() << "}"; */
+      std::string op = "->";
+      std::vector<DataType *> type;
+      type.push_back(PrintTypeInfo(mem->getType()));
+      if (castType.size() != 0) {
+        while (castType.size() != 0) {
+          type.push_back(castType[0]);
+          castType.erase(castType.begin());
+        }
+      }
+      Node *left, *right;
+      int i = prog.size();
+      getlhsArrow(base);
+      left = prog[i];
+      prog.pop_back();
+      i = prog.size();
+      getrhsArrow(vdecl);
+      right = prog[i];
+      prog.pop_back();
+      Node t = PrintSourceRange(mem->getSourceRange());
+
+      BinOp *BO = new BinOp(op, type, left, right, t);
+      Node *np = BO;
+      prog.push_back(np);
       return false;
     } 
     return false;
@@ -2770,7 +2793,7 @@ public:
       Expr *sub = imp->getSubExpr();
       DeclRefExpr *def = dyn_cast<DeclRefExpr>(sub);
       if (def) {
-	linefeedflag = 0;
+	//linefeedflag = 0;
 	TraverseStmt(def);
       }
     }
@@ -2778,7 +2801,7 @@ public:
   }
   bool getrhsArrow(ValueDecl *vdecl) {
     QualType vartype = vdecl->getType();
-    llvm::outs() << "{:kind \"DRE\""
+    /*llvm::outs() << "{:kind \"DRE\""
 		 << " :name " << "\"" << vdecl->getName() << "\"" 
 		 << " :scope \"member\"";
     llvm::outs() << " :type [";
@@ -2786,7 +2809,23 @@ public:
     checkCast();
     llvm::outs() << "]";
     PrintSourceRange(vdecl->getSourceRange());
-    llvm::outs() << "}";
+    llvm::outs() << "}";*/
+    std::string name = vdecl->getName();
+    std::string scope = "Member";
+    std::vector<DataType *> type;
+    type.push_back(PrintTypeInfo(vartype));
+    if (castType.size() != 0) {
+      while (castType.size() != 0) {
+        type.push_back(castType[0]);
+        castType.erase(castType.begin());
+      }
+    }
+    Node t = PrintSourceRange(vdecl->getSourceRange());
+    Speci *sp = new Speci(false, false, false, false);
+
+    DeclationReferenceExpression *DRE = new DeclationReferenceExpression (name, scope, type, t, sp);
+    Node *np = DRE;
+    prog.push_back(np);
     return true;
   }
   
