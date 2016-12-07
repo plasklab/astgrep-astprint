@@ -1933,7 +1933,6 @@ public:
     return t;
   }
 
-  //void PrintArrayTypeInfo(QualType typeInfo) {
   ArrayDataType *PrintArrayTypeInfo(QualType typeInfo) {
     QualType elmtype = dyn_cast<ArrayType>(typeInfo)->getElementType();
     std::string arraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
@@ -1943,7 +1942,6 @@ public:
     return t;
   }
 
-  //void PrintPointerTypeInfo(QualType typeInfo) {
   PointeeType *PrintPointerTypeInfo(QualType typeInfo) {
     DataType *pointee;
     if (dyn_cast<PointerType>(typeInfo)) {
