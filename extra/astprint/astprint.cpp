@@ -3033,17 +3033,6 @@ public:
   // StringLiteral
   bool VisitStringLiteral(StringLiteral *String) {
     QualType vartype = String->getType();
-    /*
-    llvm::outs() << "{:kind \"StringLiteral\""
-		 << " :value " << "\""
-		 << EscapeString(String->getString().str()) << "\"";
-    llvm::outs() << " :type [";
-    PrintTypeInfo(vartype);
-    checkCast();
-    llvm::outs() << "]";
-    PrintSourceRange(String->getSourceRange());
-    llvm::outs() << "}";
-    */
     std::string value = EscapeString(String->getString().str());
     std::vector<DataType *> type;
     type.push_back(PrintTypeInfo(vartype));
