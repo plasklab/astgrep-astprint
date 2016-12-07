@@ -823,6 +823,30 @@ void FloatLiteral::printAST() {
   llvm::outs() << "}";
 }
 
+class StringsLiteral : public Literal {
+public:
+  std::string value;
+  StringsLiteral(std::string v, std::vector<DataType *> dts, Node loc);
+  void printAST();
+};
+
+StringsLiteral::StringsLiteral(std::string v, std::vector<DataType *> dts, Node loc) {
+  kind = "StringLiteral";
+  value = v;
+  type = dts;
+  setLocation(loc);
+}
+
+void StringsLiteral::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :value \"" << value << "\" :type [";
+  for (int i = 0; i < (int)type.size(); i++) {
+    type[i]->printType();
+  }
+  llvm::outs() << "]";
+  PrintLocation();
+  llvm::outs() << "}";
+}
+
 class ArrayReference : public Reference {
 public:
   Node *array;
@@ -3009,6 +3033,7 @@ public:
   // StringLiteral
   bool VisitStringLiteral(StringLiteral *String) {
     QualType vartype = String->getType();
+    /*
     llvm::outs() << "{:kind \"StringLiteral\""
 		 << " :value " << "\""
 		 << EscapeString(String->getString().str()) << "\"";
@@ -3018,6 +3043,21 @@ public:
     llvm::outs() << "]";
     PrintSourceRange(String->getSourceRange());
     llvm::outs() << "}";
+    */
+    std::string value = EscapeString(String->getString().str());
+    std::vector<DataType *> type;
+    type.push_back(PrintTypeInfo(vartype));
+    if (castType.size() != 0) {
+      while (castType.size() != 0) {
+        type.push_back(castType[0]);
+        castType.erase(castType.begin());
+      }
+    }
+    Node t = PrintSourceRange(String->getSourceRange());
+
+    StringsLiteral *SL = new StringsLiteral(value, type, t);
+    Node *np = SL;
+    prog.push_back(np);
     return true;
   }
 
