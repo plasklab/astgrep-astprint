@@ -2748,18 +2748,6 @@ public:
       return false;
     }
     if(mem->isArrow()) {
-      /*llvm::outs() << "{:kind \"Binop\" :op \"->\"";
-      checkLabel(); 
-      llvm::outs() << " :type [";
-      PrintTypeInfo(mem->getType());
-      checkCast();
-      llvm::outs() << "]";
-      PrintSourceRange(mem->getSourceRange());
-      llvm::outs() << "\n :LHS ";
-      getlhsArrow(base);
-      llvm::outs() << "\n :RHS ";
-      getrhsArrow(vdecl);
-      llvm::outs() << "}"; */
       std::string op = "->";
       std::vector<DataType *> type;
       type.push_back(PrintTypeInfo(mem->getType()));
@@ -2793,7 +2781,6 @@ public:
       Expr *sub = imp->getSubExpr();
       DeclRefExpr *def = dyn_cast<DeclRefExpr>(sub);
       if (def) {
-	//linefeedflag = 0;
 	TraverseStmt(def);
       }
     }
@@ -2801,15 +2788,6 @@ public:
   }
   bool getrhsArrow(ValueDecl *vdecl) {
     QualType vartype = vdecl->getType();
-    /*llvm::outs() << "{:kind \"DRE\""
-		 << " :name " << "\"" << vdecl->getName() << "\"" 
-		 << " :scope \"member\"";
-    llvm::outs() << " :type [";
-    PrintTypeInfo(vartype);
-    checkCast();
-    llvm::outs() << "]";
-    PrintSourceRange(vdecl->getSourceRange());
-    llvm::outs() << "}";*/
     std::string name = vdecl->getName();
     std::string scope = "Member";
     std::vector<DataType *> type;
