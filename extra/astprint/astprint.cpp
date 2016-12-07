@@ -1548,19 +1548,7 @@ public:
 
   // ParmVarDecl
   bool VisitParmVarDecl(ParmVarDecl *Decl) {
-    //std::string varname = Decl->getNameAsString();
     QualType vartype = Decl->getType();
-    /*
-    llvm::outs() << "{:kind \"Parm\"" 
-		 << " :name " << "\"" << varname  << "\"";
-    llvm::outs() << " :type [";
-    PrintTypeInfo(vartype);
-    checkCast();
-    llvm::outs() << "]";
-    PrintSourceRange(Decl->getSourceRange());
-    llvm::outs() << "}";
-    */
-    // 修正版
     std::string name = Decl->getNameAsString();
     DataType *type = PrintTypeInfo(vartype);
     std::string disp = PrintDisplayType(vartype);
