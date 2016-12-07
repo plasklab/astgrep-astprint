@@ -1770,29 +1770,6 @@ public:
   }
 
   RenameType *PrintTypedefTypeInfo(QualType typeInfo) {
-    /*TypedefNameDecl *TDtype = dyn_cast<TypedefType>(typeInfo)->getDecl();
-    assert(labelflag == 0);
-    if (castflag != 0) {
-      cast << "{:kind \"Typedef-type\""
-	   << " :typename " << "\"" << (std::string)TDtype->getName() << "\""
-	   << " :typedeftype ";
-      PrintTypeInfo(TDtype->getUnderlyingType());
-      PrintQualifier(typeInfo);
-      cast << "}";
-      castlabel += cast.str();
-      cast.str("");
-      cast.clear();
-    } else {
-      llvm::outs() << "{:kind \"Typedef-type\""
-		   << " :typename " << "\"" << TDtype->getName() << "\""
-		   << " :typedeftype ";
-      PrintTypeInfo(TDtype->getUnderlyingType());
-      PrintQualifier(typeInfo);
-      llvm::outs() << "}";
-    }
-
-    //DataType *tp = PrintQualifier(typeInfo);
-    */
     TypedefNameDecl *TDtype = dyn_cast<TypedefType>(typeInfo)->getDecl();
     std::string typeName = (std::string)TDtype->getName();
     DataType *typedefType = PrintTypeInfo(TDtype->getUnderlyingType());
@@ -1979,7 +1956,7 @@ public:
       if (dyn_cast<RecordType>(etype)) {
         //RecordDecl *rdecl = dyn_cast<RecordType>(typeInfo)->getDecl();
         //name = rdecl->getName();
-        name = "tameshi";
+        name = "core dump";
       } else {
         PrintTypeInfo(etype);
       }
