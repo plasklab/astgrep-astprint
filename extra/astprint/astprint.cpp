@@ -2345,11 +2345,6 @@ public:
   }
   // ContinueStmt
   bool VisitContinueStmt(ContinueStmt *Continue) {
-    /*llvm::outs() << "{:kind \"Continue\"";
-    checkLabel(); 
-    PrintSourceRange(Continue->getSourceRange());
-    llvm::outs() << "}";
-    */
     Node t = PrintSourceRange(Continue->getSourceRange());
     ContinueStatement *CS = new ContinueStatement(t);
     Node *np = CS;
