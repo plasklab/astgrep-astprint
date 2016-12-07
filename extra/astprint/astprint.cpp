@@ -1562,50 +1562,6 @@ public:
 
   // RecordDecl (Structure?)
   bool VisitRecordDecl(RecordDecl *record) {
-    /*
-    std::string recordkind;
-    if (record->isStruct()) {
-      recordkind = "\"Structdef\"";
-    } else if (record->isUnion()) {
-      recordkind = "\"Uniondef\"";
-    } else if (record->isClass()) {//C++
-      CXXRecordDecl *cxxrecord = dyn_cast<CXXRecordDecl>(record);
-      llvm::outs() << "{:name " << "\"" << (std::string)record->getName() << "\"";
-      PrintSourceRange(record->getSourceRange()); 
-      llvm::outs() << "\n :Member [";
-      linefeedflag = 0;
-      if (!(record->field_empty())) {
-	RecordDecl::field_iterator itr = record->field_begin();
-	while (itr != record->field_end()) {
-	  TraverseDecl(itr->getCanonicalDecl());
-	  itr++;
-	} 
-      }
-      if (cxxrecord->method_begin() != cxxrecord->method_end()) {
-	CXXRecordDecl::method_iterator mitr = cxxrecord->method_begin();
-	while (mitr != cxxrecord->method_end()) {
-	  TraverseDecl(mitr->getCanonicalDecl());
-	  mitr++;
-	}
-      }
-      llvm::outs() << "]}";
-    }
-    if (!(record->isClass())) {
-      llvm::outs() << "{:kind " << recordkind
-		   << " :name " << "\"" << (std::string)record->getName() << "\"";
-      PrintSourceRange(record->getSourceRange()); 
-      llvm::outs() << "\n :Member [";
-      linefeedflag = 0;
-      if (!(record->field_empty())) {
-	RecordDecl::field_iterator itr = record->field_begin();
-	while (itr != record->field_end()) {
-	  TraverseDecl(itr->getCanonicalDecl());
-	  itr++;
-	} 
-      }
-    llvm::outs() << "]}";
-    }
-    */
     if (record->isStruct()) {
       std::string name = (std::string)record->getName();
       std::vector<Node *> member;
