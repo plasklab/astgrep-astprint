@@ -522,19 +522,20 @@ public:
 Speci::Speci(bool e, bool s, bool a, bool r) {
   Extern = e;
   Static = s;
-  Extern = a;
+  Auto = a;
   Register = r;
 }
 
 void Speci::printSpecifier() {
-  if (Auto == true)
-    llvm::outs() << " :auto \"true\"";
   if (Static == true)
     llvm::outs() << " :static \"true\"";
   if (Extern == true)
     llvm::outs() << " :extern \"true\"";
   if (Register == true)
     llvm::outs() << " :register \"true\"";
+  if (Auto == true)
+    llvm::outs() << " :auto \"true\"";
+
 }
 
 class Node {
@@ -1714,7 +1715,6 @@ public:
   }
   
   // 指定子:specifire::=(register, static, extern)
-  //void checkSpecifier(StorageClass SC) {
   Speci *checkSpecifier(StorageClass SC) {
     bool Extern = false;
     bool Static = false;
