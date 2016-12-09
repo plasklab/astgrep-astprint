@@ -1654,12 +1654,10 @@ public:
     std::vector<Node *> init;
     if (Decl->hasInit()) {
       int i = prog.size();
-      llvm::outs() << i << "\n";
       TraverseStmt(Decl->getInit());
-      llvm::outs() << prog.size() << "\n";
-      if (i < (int)prog.size()) {
+      while (i != (int)prog.size()) {
         init.push_back(prog[i]);
-        prog.pop_back();
+        prog.erase(prog.begin() + i);
       }
     } 
     Node t = PrintSourceRange(Decl->getSourceRange());
