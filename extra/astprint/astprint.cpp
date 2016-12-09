@@ -1375,8 +1375,10 @@ ReturnStatement::ReturnStatement(Node *val, Node loc) {
 void ReturnStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
-  llvm::outs() << "\n :value ";
-  value->printAST();
+  if (value != NULL) {
+    llvm::outs() << "\n :value ";
+    value->printAST();
+  }
   llvm::outs() << "}";
 }
 
@@ -2561,6 +2563,8 @@ public:
       TraverseStmt(Ret->getRetValue());
       value = prog[i];
       prog.pop_back();
+    } else {
+      value = NULL;
     }
     Node t = PrintSourceRange(Ret->getSourceRange());
 
