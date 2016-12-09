@@ -977,13 +977,13 @@ void ParameterDeclation::printAST() {
 
 class VariableDeclation : public DeclationOfVariables {
 public:
-  Node *init;
+  std::vector<Node *> init;
   Speci *spe;
-  VariableDeclation(std::string n, std::string s, std::string display, DataType *dt, Node *i, Node loc, Speci *sp);
+  VariableDeclation(std::string n, std::string s, std::string display, DataType *dt, std::vector<Node *>i, Node loc, Speci *sp);
   void printAST();
 };
 
-VariableDeclation::VariableDeclation(std::string n, std::string s, std::string display, DataType *dt, Node *i, Node loc, Speci *sp) {
+VariableDeclation::VariableDeclation(std::string n, std::string s, std::string display, DataType *dt, std::vector<Node *>i, Node loc, Speci *sp) {
   kind = "VarDecl";
   name = n;
   scope = s;
@@ -1000,9 +1000,11 @@ void VariableDeclation::printAST() {
   llvm::outs() << " :display-type \"" << displayType << "\" :type ";
   type->printType();
   PrintLocation();
-  if (init != NULL) {
+  if (init.size() != 0) {
     llvm::outs() << "\n :init ";
-    init->printAST();
+    for (int i = 0; i < (int)init.size(); i++) {
+      init[i]->printAST();
+    }
   }
   llvm::outs() << "}\n";
 }
@@ -1649,16 +1651,17 @@ public:
     DataType *type = PrintTypeInfo(vartype);
     Speci *sp = checkSpecifier(Decl->getStorageClass());
     std::string displayType = PrintDisplayType(vartype);
-    Node *init;
+    std::vector<Node *> init;
     if (Decl->hasInit()) {
       int i = prog.size();
+      llvm::outs() << i << "\n";
       TraverseStmt(Decl->getInit());
+      llvm::outs() << prog.size() << "\n";
       if (i < (int)prog.size()) {
-        init = prog[i];
+        init.push_back(prog[i]);
         prog.pop_back();
       }
-    } else 
-      init = NULL;
+    } 
     Node t = PrintSourceRange(Decl->getSourceRange());
 
     VariableDeclation *VD = new VariableDeclation(name, scope, displayType, type, init, t, sp);
