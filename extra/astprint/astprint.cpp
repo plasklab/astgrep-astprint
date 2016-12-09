@@ -23,6 +23,40 @@ using namespace clang::tooling;
 using namespace llvm;
 using namespace llvm::opt;
 
+class Node {
+public:
+  std::string kind;
+  std::string beginFile;
+  int beginLine;
+  int beginColumn;
+  std::string endFile;
+  int endLine;
+  int endColumn;
+  void PrintLocation();
+  void setLocation(Node loc);
+  virtual void printAST();
+  virtual ~Node() {};
+};
+
+void Node::setLocation(Node loc) {
+  beginFile = loc.beginFile;
+  beginLine = loc.beginLine;
+  beginColumn = loc.beginColumn;
+  endFile = loc.endFile;
+  endLine = loc.endLine;
+  endColumn = loc.endColumn;
+}
+
+void Node::PrintLocation() {
+  llvm::outs() << " :loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
+  	   << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]";
+}
+
+void Node::printAST() {
+  llvm::outs() << "{:No Kind}";
+}
+
+
 class DataType {
 public:
   std::string kind;
@@ -438,20 +472,29 @@ void FuncType::printType() {
 
 class ArrayDataType : public DataType {
 public:
-  std::string arraySize;
+  std::string ConstArraySize;
+  Node *VarArraysize;
   DataType *type;
-  ArrayDataType(std::string size, DataType *dt);
+  ArrayDataType(std::string size, Node *VarSize, DataType *dt);
   void printType();
 };
 
-ArrayDataType::ArrayDataType(std::string size, DataType *dt) {
+ArrayDataType::ArrayDataType(std::string ConstSize, Node *VarSize, DataType *dt) {
   kind = "ArrayType";
-  arraySize = size;
+  ConstArraySize = ConstSize;
+  VarArraysize = VarSize;
   type = dt;
 }
 
 void ArrayDataType::printType() {
-  llvm::outs() << "{:kind \"" << kind << "\" :array-size \"" << arraySize << "\" :type ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (ConstArraySize != "") {
+    llvm::outs() << " :array-size \"" << ConstArraySize << "\"";
+  } else if (VarArraysize != NULL) {
+    llvm::outs() << " :array-size ";
+    VarArraysize->printAST();
+  }
+  llvm::outs() << " :type ";
   type->printType();
   llvm::outs() << "}";
 }
@@ -536,40 +579,6 @@ void Speci::printSpecifier() {
   if (Auto == true)
     llvm::outs() << " :auto \"true\"";
 
-}
-
-class Node {
-public:
-  std::string kind;
-  std::string beginFile;
-  int beginLine;
-  int beginColumn;
-  std::string endFile;
-  int endLine;
-  int endColumn;
-  void PrintLocation();
-  void setLocation(Node loc);
-  virtual void printAST();
-  virtual ~Node() {};
-};
-
-
-void Node::setLocation(Node loc) {
-  beginFile = loc.beginFile;
-  beginLine = loc.beginLine;
-  beginColumn = loc.beginColumn;
-  endFile = loc.endFile;
-  endLine = loc.endLine;
-  endColumn = loc.endColumn;
-}
-
-void Node::PrintLocation() {
-  llvm::outs() << " :loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
-  	   << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]";
-}
-
-void Node::printAST() {
-  llvm::outs() << "{:No Kind}";
 }
 
 class Expression : public Node {
@@ -1857,10 +1866,21 @@ public:
 
   ArrayDataType *PrintArrayTypeInfo(QualType typeInfo) {
     QualType elmtype = dyn_cast<ArrayType>(typeInfo)->getElementType();
-    std::string arraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
+    std::string ConstArraySize = "";
+    Node *VarArraySize = NULL;
+    if (dyn_cast<ConstantArrayType>(typeInfo)) {
+      ConstArraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
+    }
+    if (dyn_cast<VariableArrayType>(typeInfo)) {
+      Expr *vaexpr = dyn_cast<VariableArrayType>(typeInfo)->getSizeExpr();
+      int i = prog.size();
+      TraverseStmt(vaexpr);
+      VarArraySize = prog[i];
+      prog.pop_back();
+    }
     DataType *type = PrintTypeInfo(elmtype);
 
-    ArrayDataType *t = new ArrayDataType(arraySize, type);
+    ArrayDataType *t = new ArrayDataType(ConstArraySize, VarArraySize, type);
     return t;
   }
 
@@ -2116,9 +2136,9 @@ public:
 	  linefeedflag = 1;
 	  linefeedbody = 1;
 	}
-	llvm::outs() << "[";	
+	//llvm::outs() << "[";	
 	RecursiveASTVisitor::TraverseStmt(stmt);
-	llvm::outs() << "]";
+	//llvm::outs() << "]";
 	break;
       case Stmt::MemberExprClass: 
         //llvm::outs() << "stmt:21";
