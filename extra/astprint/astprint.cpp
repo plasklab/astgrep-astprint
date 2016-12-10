@@ -1182,12 +1182,18 @@ ForStatement::ForStatement(Node *cond, std::vector<Node *> b, Node *ini, Node *u
 void ForStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
-  llvm::outs() << "\n :init ";
-  init->printAST();
-  llvm::outs() << " :condition ";
-  condition->printAST();
-  llvm::outs() << " :update ";
-  update->printAST();
+  if (init != NULL) {
+    llvm::outs() << "\n :init ";
+    init->printAST();
+  }
+  if (condition != NULL) {
+    llvm::outs() << " :condition ";
+    condition->printAST();
+  }
+  if (update != NULL) {
+    llvm::outs() << " :update ";
+    update->printAST();
+  }
   llvm::outs() << "\n :body [";
   for (int i = 0; i < (int)body.size(); i++) {
     body[i]->printAST();
@@ -2445,6 +2451,8 @@ public:
       TraverseStmt(For->getInit());
       init = prog[i];
       prog.pop_back();
+    } else {
+      init = NULL;
     }
     i = prog.size();
     Node *condition;
@@ -2452,6 +2460,8 @@ public:
       TraverseStmt(For->getCond());
       condition = prog[i];
       prog.pop_back();
+    } else {
+      condition = NULL;
     }
     i = prog.size();
     Node *update;
@@ -2459,6 +2469,8 @@ public:
       TraverseStmt(For->getInc());
       update = prog[i];
       prog.pop_back();
+    } else {
+      update = NULL;
     }
     i = prog.size();
     TraverseStmt(For->getBody());
