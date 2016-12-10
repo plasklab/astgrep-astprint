@@ -465,8 +465,10 @@ void FuncType::printType() {
     parmType[(int)parmType.size() - 1]->printType();
     llvm::outs() << "]";
   }
-  llvm::outs() << " :ret-type ";
-  retType->printType();
+  if (retType != NULL) {
+    llvm::outs() << " :ret-type ";
+    retType->printType();
+  }
   llvm::outs() << "}";
 }
 
@@ -685,7 +687,7 @@ void BinOp::printAST() {
   left->printAST();
   llvm::outs() << "\n :right ";
   right->printAST();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
  
 class UnOp : public Operator {
@@ -1859,7 +1861,9 @@ public:
     if (dyn_cast<FunctionType>(typeInfo)) {
       QualType rettype = dyn_cast<FunctionType>(typeInfo)->getResultType();
       retType = PrintTypeInfo(rettype);
-    } 
+    } else {
+      retType = NULL;
+    }
 
     FuncType *t = new FuncType(parmType, retType);
     return t;
