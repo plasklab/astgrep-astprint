@@ -53,21 +53,27 @@ void Node::PrintLocation() {
 }
 
 void Node::printAST() {
-  llvm::outs() << "{:No Kind}";
+  llvm::outs() << "{:kind \"Unknown-kind\"}";
 }
 
 
 class DataType {
 public:
   std::string kind;
+  std::string typedefString;
   bool constBool;
   bool volatileBool;
+  void setTypedefString(std::string ts);
   virtual void printType();
   virtual ~DataType() {};
 };
 
+void DataType::setTypedefString(std::string ts) {
+  typedefString = ts;
+}
+
 void DataType::printType() {
-  llvm::outs() << "No Type";
+  llvm::outs() << "{:type \"Unknown-type\" :typedef-string \"" << typedefString << "\"}";
 }
 
 class VoidType : public DataType {
@@ -1966,6 +1972,7 @@ public:
     } else if (typeInfo->isUnionType()) {
       return PrintUnionTypeInfo(typeInfo);
     } else {
+      /*
       assert(labelflag == 0);
       if (castflag != 0) {
 	cast << "{:kind \"Unknown-type\""
@@ -1977,6 +1984,10 @@ public:
 	llvm::outs() << "{:kind \"Unknown-type\""
 		     << " :typeString " << "\"" << typeInfo.getAsString() << "\"}";
       }
+      */
+      std::string typeString = typeInfo.getAsString();
+      t = new DataType();
+      t->setTypedefString(typeString);
     }
 
     return t;
