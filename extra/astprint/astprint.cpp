@@ -1972,19 +1972,6 @@ public:
     } else if (typeInfo->isUnionType()) {
       return PrintUnionTypeInfo(typeInfo);
     } else {
-      /*
-      assert(labelflag == 0);
-      if (castflag != 0) {
-	cast << "{:kind \"Unknown-type\""
-	     << " :typeString " << "\"" << typeInfo.getAsString() << "\"}";
-	castlabel += cast.str();
-	cast.str("");
-	cast.clear();
-      } else {
-	llvm::outs() << "{:kind \"Unknown-type\""
-		     << " :typeString " << "\"" << typeInfo.getAsString() << "\"}";
-      }
-      */
       std::string typeString = typeInfo.getAsString();
       t = new DataType();
       t->setTypedefString(typeString);
