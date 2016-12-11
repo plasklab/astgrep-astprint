@@ -1887,23 +1887,30 @@ public:
     return t;
   }
 
-  ArrayDataType *PrintArrayTypeInfo(QualType typeInfo) {
-    QualType elmtype = dyn_cast<ArrayType>(typeInfo)->getElementType();
-    std::string ConstArraySize = "";
-    Node *VarArraySize = NULL;
-    if (dyn_cast<ConstantArrayType>(typeInfo)) {
-      ConstArraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
-    }
-    if (dyn_cast<VariableArrayType>(typeInfo)) {
-      Expr *vaexpr = dyn_cast<VariableArrayType>(typeInfo)->getSizeExpr();
-      int i = prog.size();
-      TraverseStmt(vaexpr);
-      VarArraySize = prog[i];
-      prog.pop_back();
-    }
-    DataType *type = PrintTypeInfo(elmtype);
+  DataType *PrintArrayTypeInfo(QualType typeInfo) {
+    QualType elmtype;
+    DataType *t;
+    if (dyn_cast<ArrayType>(typeInfo)) {
+      std::string ConstArraySize = "";
+      Node *VarArraySize = NULL;
+      elmtype = dyn_cast<ArrayType>(typeInfo)->getElementType();
+      if (dyn_cast<ConstantArrayType>(typeInfo)) {
+        ConstArraySize = dyn_cast<ConstantArrayType>(typeInfo)->getSize().toString(10, true);
+      }
+      if (dyn_cast<VariableArrayType>(typeInfo)) {
+        Expr *vaexpr = dyn_cast<VariableArrayType>(typeInfo)->getSizeExpr();
+        int i = prog.size();
+        TraverseStmt(vaexpr);
+        VarArraySize = prog[i];
+        prog.pop_back();
+      } 
+      DataType *type = PrintTypeInfo(elmtype);
 
-    ArrayDataType *t = new ArrayDataType(ConstArraySize, VarArraySize, type);
+      t = new ArrayDataType(ConstArraySize, VarArraySize, type);
+    } else if (dyn_cast<ParenType>(typeInfo)) {
+      elmtype = dyn_cast<ParenType>(typeInfo)->getInnerType();
+      t = PrintTypeInfo(elmtype);
+    }
     return t;
   }
 
