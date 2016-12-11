@@ -1942,9 +1942,8 @@ public:
     if (dyn_cast<ElaboratedType>(typeInfo)) {
         QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
       if (dyn_cast<RecordType>(etype)) {
-        //RecordDecl *rdecl = dyn_cast<RecordType>(typeInfo)->getDecl();
-        //name = rdecl->getName();
-        name = "core dump";
+        RecordDecl *rdecl = dyn_cast<RecordType>(etype)->getDecl();
+        name = rdecl->getName();
       } else {
         PrintTypeInfo(etype);
       }
