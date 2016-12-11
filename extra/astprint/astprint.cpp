@@ -53,7 +53,7 @@ void Node::PrintLocation() {
 }
 
 void Node::printAST() {
-  llvm::outs() << "{:kind \"Unknown-kind\"}";
+  llvm::outs() << "{:kind \"Unsupported\"}";
 }
 
 
@@ -1313,7 +1313,7 @@ CaseStatement::CaseStatement(Node *val, Node loc) {
 void CaseStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
-  if (value == NULL) {
+  if (value != NULL) {
     llvm::outs() << "\n :value ";
     value->printAST();
   }
@@ -2382,7 +2382,7 @@ public:
       value = prog[i];
       prog.pop_back();
     } else {
-      value = NULL;
+      value = new Node();
     }
     Node t = PrintSourceRange(Case->getSourceRange());
 
