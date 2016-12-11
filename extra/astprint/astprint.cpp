@@ -693,7 +693,7 @@ void BinOp::printAST() {
   PrintLocation();
   llvm::outs() << "\n :left ";
   left->printAST();
-  if (right == NULL) {
+  if (right != NULL) {
     llvm::outs() << "\n :right ";
     right->printAST();
   }
@@ -704,13 +704,26 @@ class UnOp : public Operator {
 public:
   std::string op;
   Node *operand;
+  // sizeOf用
+  DataType *argumentType;
   UnOp(std::string o, std::vector<DataType *> dts, Node *oper, Node loc);
+  // sizeOf用
+  UnOp(std::string o, DataType *argument, std::vector<DataType *> dts, Node *oper, Node loc);
   void printAST();
 };
 
 UnOp::UnOp(std::string o, std::vector<DataType *> dts, Node *oper, Node loc) {
   kind = "UnOp";
   op = o;
+  type = dts;
+  operand = oper;
+  setLocation(loc);
+}
+
+UnOp::UnOp(std::string o, DataType *argument, std::vector<DataType *> dts, Node *oper, Node loc) {
+  kind = "UnOp";
+  op = o;
+  argumentType = argument;
   type = dts;
   operand = oper;
   setLocation(loc);
@@ -723,8 +736,13 @@ void UnOp::printAST() {
   }
   llvm::outs() << "]";
   PrintLocation();
-  llvm::outs() << "\n :operand ";
-  operand->printAST();
+  if (operand != NULL) {
+    llvm::outs() << "\n :operand ";
+    operand->printAST();
+  } else if (argumentType != NULL) {
+    llvm::outs() << "\n :argument-type ";
+    argumentType->printType();
+  }
   llvm::outs() << "}";
 }
 
@@ -2851,16 +2869,22 @@ public:
       if (castType.size() != 0) {
         while (castType.size() != 0) {
           type.push_back(castType[0]);
-          castType.pop_back();
+          castType.erase(castType.begin());
         }
       }
       int i = prog.size();
-      TraverseStmt(expr->getArgumentExpr());
-      Node *operand = prog[i];
-      prog.pop_back();
+      Node *operand = NULL;
+      DataType *argumentType = NULL;
+      if (expr->isArgumentType()) {
+        argumentType = PrintTypeInfo(expr->getArgumentType());
+      } else {
+        TraverseStmt(expr->getArgumentExpr());
+        operand = prog[i];
+        prog.erase(prog.begin() + i);
+      }
       Node t = PrintSourceRange(expr->getSourceRange());
 
-      UnOp *UO = new UnOp(op, type, operand, t);
+      UnOp *UO = new UnOp(op, argumentType, type, operand, t);
       Node *np = UO;
       prog.push_back(np);
       return false;
