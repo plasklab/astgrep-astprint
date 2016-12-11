@@ -685,8 +685,10 @@ void BinOp::printAST() {
   PrintLocation();
   llvm::outs() << "\n :left ";
   left->printAST();
-  llvm::outs() << "\n :right ";
-  right->printAST();
+  if (right == NULL) {
+    llvm::outs() << "\n :right ";
+    right->printAST();
+  }
   llvm::outs() << "}\n";
 }
  
@@ -1303,8 +1305,10 @@ CaseStatement::CaseStatement(Node *val, Node loc) {
 void CaseStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
-  llvm::outs() << "\n :value ";
-  value->printAST();
+  if (value == NULL) {
+    llvm::outs() << "\n :value ";
+    value->printAST();
+  }
   llvm::outs() << "}\n";
 }
 
@@ -1943,12 +1947,8 @@ public:
   }
 
   // :typeの情報を出力
-  //void PrintTypeInfo(QualType typeInfo) {
   DataType *PrintTypeInfo(QualType typeInfo) {
-    //llvm::outs() << "(";
     DataType *t;
-    //if (dyn_cast<AutoType>(typeInfo))
-    //  t = PrintAutoTypeInfo(typeInfo);
     if (dyn_cast<TypedefType>(typeInfo)) {
       return PrintTypedefTypeInfo(typeInfo);
     } else if (dyn_cast<TypedefType>(typeInfo)) {
@@ -1980,8 +1980,6 @@ public:
     }
 
     return t;
-    //llvm::outs() << "\"" << typeInfo.getAsString() << "\")";
-    //llvm::outs()  << " " << typeInfo->getTypeClassName();
   }
   
   DataType *PrintQualifier(QualType Qual) {
@@ -2379,9 +2377,13 @@ public:
   bool VisitCaseStmt(CaseStmt *Case) {
     int i = prog.size();
     Node *value;
-    TraverseStmt(Case->getLHS());
-    value = prog[i];
-    prog.pop_back();
+    if (Case->getLHS()) {
+      TraverseStmt(Case->getLHS());
+      value = prog[i];
+      prog.pop_back();
+    } else {
+      value = NULL;
+    }
     Node t = PrintSourceRange(Case->getSourceRange());
 
     CaseStatement *CS = new CaseStatement(value, t);
@@ -2893,10 +2895,15 @@ public:
     TraverseStmt(Binop->getLHS());
     Node *left = prog[i];
     prog.pop_back();
-    i = prog.size();
-    TraverseStmt(Binop->getRHS());
-    Node *right = prog[i];
-    prog.pop_back();
+    Node *right;
+    if (Binop->getRHS()) {
+      i = prog.size();
+      TraverseStmt(Binop->getRHS());
+      right = prog[i];
+      prog.pop_back();
+    } else {
+      right = NULL;
+    }
     Node t = PrintSourceRange(Binop->getSourceRange());
 
     BinOp *BO = new BinOp(op, type, left, right, t);
