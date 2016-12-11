@@ -624,7 +624,9 @@ DeclationReferenceExpression::DeclationReferenceExpression(std::string n, std::s
 
 void DeclationReferenceExpression::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
-  spe->printSpecifier();
+  if (spe != NULL) {
+    spe->printSpecifier();
+  }
   if (scope != "") {
     llvm::outs() << " :scope \"" << scope << "\"";
   }
@@ -2710,7 +2712,23 @@ public:
       Node t = PrintSourceRange(Declref->getSourceRange());
 
       DRE = new DeclationReferenceExpression(name, scope, type, t, sp);
+    } else {
+      QualType Declreftype = Declref->getType();
+      std::string name = Declref->getNameInfo().getAsString();
+      std::string scope = "";
+      std::vector<DataType *> type;
+      type.push_back(PrintTypeInfo(Declreftype));
+      if (castType.size() != 0) {
+        for (int i = 0; i < (int)castType.size(); i++) {
+          type.push_back(castType[0]);
+          castType.erase(castType.begin());
+        }
+      }
+      Node t = PrintSourceRange(Declref->getSourceRange());
+
+      DRE = new DeclationReferenceExpression(name, scope, type, t, NULL);
     }
+
     Node *np = DRE;
     prog.push_back(np);
 
