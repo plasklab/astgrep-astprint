@@ -57,7 +57,7 @@ void Node::printAST() {
 }
 
 
-class DataType {
+class DataType : public Node {
 public:
   std::string kind;
   std::string typedefString;
