@@ -560,7 +560,7 @@ void RenameType::printType() {
   llvm::outs() << "}";
 }
 
-class Speci {
+class Speci : public Node {
 public:
   bool Static;
   bool Auto;
