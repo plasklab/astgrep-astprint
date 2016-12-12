@@ -2281,6 +2281,7 @@ public:
   // ContinueStmt
   bool VisitContinueStmt(ContinueStmt *Continue) {
     Node t = PrintSourceRange(Continue->getSourceRange());
+
     ContinueStatement *CS = new ContinueStatement(t);
     Node *np = CS;
     prog.push_back(np);
