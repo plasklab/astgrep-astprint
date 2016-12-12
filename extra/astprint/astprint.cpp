@@ -1433,7 +1433,9 @@ void ReturnStatement::printAST() {
 
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
 private:
+  // 完成した木を保存するvector
   std::vector<Node *> prog;
+  // castの遷移を保存するvector
   std::vector<DataType *> castType;
 
 public:
@@ -1445,37 +1447,18 @@ public:
       switch (decl->getKind()) {
       case Decl::Field:
         //llvm::outs() << "decl:1";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::Function: 
         //llvm::outs() << "decl:2";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::ParmVar: 
         //llvm::outs() << "decl:3";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::TranslationUnit: 
         //llvm::outs() << "decl:4";
-	linefeedflag = 0;
-	linefeedbody = 0;
-	caseflag = 0;
-	casetoji = 0;
-	castflag = 0;
-	labelflag = 0;
-	caselabel = "";
 	skipcount = 0;
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
@@ -1485,18 +1468,10 @@ public:
 	break;
       case Decl::Record: 
         //llvm::outs() << "decl:6";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::Var: 
         //llvm::outs() << "decl:7";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::Enum: 
@@ -1514,10 +1489,6 @@ public:
         //llvm::outs() << "decl:11";
       case Decl::CXXMethod: 
         //llvm::outs() << "decl:12";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseDecl(decl);
 	break;
       case Decl::ClassTemplateSpecialization: 
@@ -1742,26 +1713,6 @@ public:
     return typeInfo.getAsString();
   }
  
-  
-  void PrintAutoTypeInfo(QualType typeInfo) {
-  //bool PrintAutoTypeInfo(QualType typeInfo) {
-    assert(labelflag == 0);
-    if (castflag != 0) {
-      //cast << " :Auto \"true\"";
-      PrintQualifier(typeInfo);
-      PrintTypeInfo(dyn_cast<AutoType>(typeInfo)->getDeducedType());
-      //castlabel += cast.str();
-      //cast.str("");
-      //cast.clear();
-     // return true;
-    } else {
-      //llvm::outs() << " :Auto \"true\"";
-      PrintQualifier(typeInfo);
-      PrintTypeInfo(dyn_cast<AutoType>(typeInfo)->getDeducedType());
-     // return true;
-    }
-  }
-
   RenameType *PrintTypedefTypeInfo(QualType typeInfo) {
     TypedefNameDecl *TDtype = dyn_cast<TypedefType>(typeInfo)->getDecl();
     std::string typeName = (std::string)TDtype->getName();
@@ -2031,9 +1982,6 @@ public:
 	break;
       case Stmt::CaseStmtClass:
         //llvm::outs() << "stmt:2";
-	caseflag = 1;
-	casetoji = 1;
-	labelflag++;
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CompoundStmtClass: 
@@ -2050,113 +1998,58 @@ public:
 	break;
       case Stmt::DefaultStmtClass: 
         //llvm::outs() << "stmt:6";
-	caseflag = 1;
-	labelflag++;
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::DoStmtClass: 
         //llvm::outs() << "stmt:7";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ForStmtClass: 
         //llvm::outs() << "stmt:8";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::GotoStmtClass: 
         //llvm::outs() << "stmt:9";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::IfStmtClass: 
         //llvm::outs() << "stmt:10";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::LabelStmtClass: 
         //llvm::outs() << "stmt:11";
-	caseflag = 1;
-	labelflag++;
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::SwitchStmtClass: 
         //llvm::outs() << "stmt:12";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::WhileStmtClass: 
         //llvm::outs() << "stmt:13";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ReturnStmtClass: 
         //llvm::outs() << "stmt:14";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ArraySubscriptExprClass: 
         //llvm::outs() << "stmt:15";
-	if (FuncCall == 1) {
-	  FuncCall = 0;
-	} else if (ArraySub == 1) {
-	  RecursiveASTVisitor::TraverseStmt(stmt);
-	  break;
-	} else if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
-	ArraySub = 1;
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CallExprClass: 
         //llvm::outs() << "stmt:16";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
-	FuncCall = 1;
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CStyleCastExprClass: 
         //llvm::outs() << "stmt:17";
-	castflag = 1;
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::DeclRefExprClass: 
         //llvm::outs() << "stmt:18";
-	if (FuncCall == 1 || ArraySub == 1 || linefeedflag == 0 || linefeedbody == 0) {
-	  FuncCall = 0;
-	  ArraySub = 0;
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ImplicitCastExprClass: 
         //llvm::outs() << "stmt:19";
-	castflag = 1;
 	if (dyn_cast<ImplicitCastExpr>(stmt)->getSubExpr()->getStmtClass() == 68) {
 	  llvm::outs() << "{:kind \"NULL\" :value \"Null\"}";
 	  break;
@@ -2165,20 +2058,10 @@ public:
 	break;
       case Stmt::InitListExprClass: 
         //llvm::outs() << "stmt:20";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
-	//llvm::outs() << "[";	
 	RecursiveASTVisitor::TraverseStmt(stmt);
-	//llvm::outs() << "]";
 	break;
       case Stmt::MemberExprClass: 
         //llvm::outs() << "stmt:21";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ParenExprClass: 
@@ -2190,18 +2073,10 @@ public:
 	break;
       case Stmt::BinaryOperatorClass: 
         //llvm::outs() << "stmt:23";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::ConditionalOperatorClass: 
         //llvm::outs() << "stmt:24";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CompoundAssignOperatorClass: 
@@ -2210,40 +2085,22 @@ public:
 	break;
       case Stmt::UnaryOperatorClass: 
         //llvm::outs() << "stmt:26";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::CharacterLiteralClass: 
         //llvm::outs() << "stmt:27";
-	if (linefeedflag == 0) {
-	  linefeedflag = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::FloatingLiteralClass: 
         //llvm::outs() << "stmt:28";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::IntegerLiteralClass: 
         //llvm::outs() << "stmt:29";
-	if (linefeedflag == 0) {
-	  linefeedflag = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
       case Stmt::StringLiteralClass: 
         //llvm::outs() << "stmt:30";
-	if (linefeedflag == 0 || linefeedbody == 0) {
-	  linefeedflag = 1;
-	  linefeedbody = 1;
-	}
 	RecursiveASTVisitor::TraverseStmt(stmt);
 	break;
 	//以下C++に関係
@@ -2253,9 +2110,7 @@ public:
         //llvm::outs() << "stmt:32";
       case Stmt::ParenListExprClass: 
         //llvm::outs() << "stmt:33";
-	llvm::outs() << "[";
 	RecursiveASTVisitor::TraverseStmt(stmt);
-	llvm::outs() << "]";
 	break;
       case Stmt::CXXCatchStmtClass: 
         //llvm::outs() << "stmt:34";
@@ -2420,12 +2275,9 @@ public:
   
   // CompoundStmt
   bool VisitCompoundStmt(CompoundStmt *compound) {
-    if (compound->body_empty()) {
-      linefeedflag = 1;
-      linefeedbody = 1;
-    }
     return true;
   }
+
   // ContinueStmt
   bool VisitContinueStmt(ContinueStmt *Continue) {
     Node t = PrintSourceRange(Continue->getSourceRange());
@@ -2638,7 +2490,6 @@ public:
     return false;
   }
 
-  //
   // ArraySubscriptExpr
   bool VisitArraySubscriptExpr(ArraySubscriptExpr *arrsub) {
     int i = prog.size();
@@ -2693,7 +2544,6 @@ public:
       QualType casttype = cscast->getType();
       castType.push_back(PrintTypeInfo(casttype)); 
     }
-    castflag = 0;
     TraverseStmt(cscast->getSubExpr());
     return false;
   }
@@ -2765,7 +2615,6 @@ public:
       QualType casttype = icast->getType();
       castType.push_back(PrintTypeInfo(casttype)); 
     }
-    castflag = 0;
     return true;
   }
 
@@ -2991,45 +2840,6 @@ public:
     
   }
     
-  // LabelValue
-  void getLabelValue(Expr *literal){
-    std::string literalname;
-    std::string literalvalue;
-    //    QualType literaltype = literal->getType();
-    assert(labelflag != 0);
-    if (dyn_cast<IntegerLiteral>(literal)) {
-      literalname = "IntegerLabel";
-      IntegerLiteral* intL = dyn_cast<IntegerLiteral>(literal);
-      os << "{:kind \"" << literalname << "\""
-	 << " :value " << "\"" << intL->getValue().toString(10, true) << "\"";
-    } else if (dyn_cast<CharacterLiteral>(literal)) {
-      literalname = "CharacterLabel";
-      CharacterLiteral* charL = dyn_cast<CharacterLiteral>(literal);
-      os << "{:kind \"" << literalname << "\""
-	 << " :value " << "\"" << charL->getValue() << "\""
-	 << " :character " << "\"" << char(charL->getValue()) << "\"";
-    }
-    /* FIXME: print :type
-       os << " :type [";
-       PrintTypeInfo(literaltype);
-       checkCast();
-       os << "]";
-    */
-    if (dyn_cast<IntegerLiteral>(literal))
-      os << " :type [{:kind \"Int-type\"}]";
-    else if (dyn_cast<CharacterLiteral>(literal))
-      os << " :type [{:kind \"Char-type\"}]";
-
-    PrintSourceRange(literal->getSourceRange());
-    os << "}}";
-    casetoji = 0;
-    caselabel += os.str();
-    os.str("");
-    os.clear();
-    labelflag = 0;
-    return;
-  }
-
   // IntegerLiteral
   bool VisitIntegerLiteral(IntegerLiteral *Int) {
     QualType vartype = Int->getType();
@@ -3160,25 +2970,6 @@ public:
     return t;
   }
 
-  // ラベルの有無
-  void checkLabel() {
-    if (caseflag != 0) {
-      llvm::outs() << " :label [" << caselabel << "]";
-      caselabel = "";
-      caseflag = 0;
-    }
-  }
-
-  // ImplicitCastの有無
-  void checkCast() {
-    //if (labelflag != 0)
-    //  llvm::outs() << "labelflag != 0 in checkCast";
-    while (!ct.empty()) {
-      llvm::outs() << " " << ct.top();
-      ct.pop();
-    }
-  }
-  
   // ASTの出力
   void printAST() {
     for (int i = 0; i != (int)prog.size(); i++) {
@@ -3188,21 +2979,7 @@ public:
 
 private:
   ASTContext *Context;
-  std::string last_func;
   std::string source_file;
-  std::string caselabel; // 出力したいラベルの属性
-  std::string castlabel;
-  std::ostringstream os;
-  std::ostringstream cast;
-  std::stack<std::string> ct; // cast_type (ImplicitCast, CStyleCastのみ)
-  int ArraySub;
-  int casetoji;
-  int caseflag; // ラベルが付いている証
-  int castflag; // ImplicitCastExpr が出現したか
-  int FuncCall;
-  int labelflag; // ラベル(case, default, label)が出現した印
-  int linefeedbody;
-  int linefeedflag;
   int skipcount; // skip processing a node while this count is positive
 };
 
