@@ -2895,15 +2895,7 @@ public:
   // CharacterLiteral
   bool VisitCharacterLiteral(CharacterLiteral *Char) {
     QualType vartype = Char->getType();
-    char value = Char->getValue();
-    std::string values;
-    switch (value) {
-    case '\"':
-    case '\\':
-      values.push_back('\\');
-    default:
-      values.push_back(value);
-    }
+    std::string value = EscapeChar(Char->getValue());
     std::vector<DataType *> type;
     type.push_back(PrintTypeInfo(vartype));
     if (castType.size() != 0) {
@@ -2914,7 +2906,7 @@ public:
     }
     Node t = PrintSourceRange(Char->getSourceRange());
 
-    CharLiteral *CL = new CharLiteral(values, type, t);
+    CharLiteral *CL = new CharLiteral(value, type, t);
     Node *np = CL;
     prog.push_back(np);
 
