@@ -814,12 +814,12 @@ void IntLiteral::printAST() {
 
 class CharLiteral : public Literal {
 public:
-  char value;
-  CharLiteral(char v, std::vector<DataType *> dts, Node loc);
+  std::string value;
+  CharLiteral(std::string v, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-CharLiteral::CharLiteral(char v, std::vector<DataType *> dts, Node loc) {
+CharLiteral::CharLiteral(std::string v, std::vector<DataType *> dts, Node loc) {
   kind = "CharacterLiteral";
   value = v;
   type = dts;
@@ -1029,10 +1029,11 @@ void VariableDeclation::printAST() {
   type->printType();
   PrintLocation();
   if (init.size() != 0) {
-    llvm::outs() << "\n :init ";
+    llvm::outs() << "\n :init [";
     for (int i = 0; i < (int)init.size(); i++) {
       init[i]->printAST();
     }
+    llvm::outs() << "]";
   }
   llvm::outs() << "}\n";
 }
@@ -2895,6 +2896,14 @@ public:
   bool VisitCharacterLiteral(CharacterLiteral *Char) {
     QualType vartype = Char->getType();
     char value = Char->getValue();
+    std::string values;
+    switch (value) {
+    case '\"':
+    case '\\':
+      values.push_back('\\');
+    default:
+      values.push_back(value);
+    }
     std::vector<DataType *> type;
     type.push_back(PrintTypeInfo(vartype));
     if (castType.size() != 0) {
@@ -2905,7 +2914,7 @@ public:
     }
     Node t = PrintSourceRange(Char->getSourceRange());
 
-    CharLiteral *CL = new CharLiteral(value, type, t);
+    CharLiteral *CL = new CharLiteral(values, type, t);
     Node *np = CL;
     prog.push_back(np);
 
