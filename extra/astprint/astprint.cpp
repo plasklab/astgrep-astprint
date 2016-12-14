@@ -633,7 +633,7 @@ void DeclationReferenceExpression::printAST() {
   for (int i = 0; i < (int)type.size(); i++) {
     type[i]->printType();
   }
-  llvm::outs() << "]"
+  llvm::outs() << "]";
   PrintLocation();
   llvm::outs() << "}";
 }
