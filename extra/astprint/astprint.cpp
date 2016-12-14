@@ -59,7 +59,6 @@ void Node::printAST() {
 
 class DataType : public Node {
 public:
-  std::string kind;
   std::string typedefString;
   bool constBool;
   bool volatileBool;
@@ -83,7 +82,7 @@ public:
 };
 
 VoidType::VoidType() {
-  kind = "Void";
+  kind = "VoidType";
 }
 
 void VoidType::printType() {
@@ -97,7 +96,7 @@ public:
 };
 
 BoolType::BoolType() {
-  kind = "Bool";
+  kind = "BoolType";
 }
 
 void BoolType::printType() {
@@ -462,20 +461,20 @@ FuncType::FuncType(std::vector<DataType *> pt, DataType *rt) {
 void FuncType::printType() {
   int i;
   llvm::outs() << "{:kind \"" << kind << "\"";
+  llvm::outs() << " :parms-type [";
   if (parmType.size() != 0 ) {
-    llvm::outs() << " :parms-type [";
     for (i = 0; i < (int)parmType.size() - 1; i++) {
       parmType[i]->printType();
       llvm::outs() << " ";
     }
     parmType[(int)parmType.size() - 1]->printType();
-    llvm::outs() << "]";
   }
+  llvm::outs() << "]";
+  llvm::outs() << " :ret-type [";
   if (retType != NULL) {
-    llvm::outs() << " :ret-type ";
     retType->printType();
   }
-  llvm::outs() << "}";
+  llvm::outs() << "]}";
 }
 
 class ArrayDataType : public DataType {
@@ -496,10 +495,10 @@ ArrayDataType::ArrayDataType(std::string ConstSize, Node *VarSize, DataType *dt)
 
 void ArrayDataType::printType() {
   llvm::outs() << "{:kind \"" << kind << "\"";
+  llvm::outs() << " :array-size ";
   if (ConstArraySize != "") {
-    llvm::outs() << " :array-size \"" << ConstArraySize << "\"";
+    llvm::outs() << "\"" << ConstArraySize << "\"";
   } else if (VarArraysize != NULL) {
-    llvm::outs() << " :array-size ";
     VarArraysize->printAST();
   }
   llvm::outs() << " :type ";
@@ -693,10 +692,8 @@ void BinOp::printAST() {
   PrintLocation();
   llvm::outs() << "\n :left ";
   left->printAST();
-  if (right != NULL) {
-    llvm::outs() << "\n :right ";
-    right->printAST();
-  }
+  llvm::outs() << "\n :right ";
+  right->printAST();
   llvm::outs() << "}\n";
 }
  
@@ -940,7 +937,7 @@ void FunctionCall::printAST() {
   }
   llvm::outs() << "] ";
   PrintLocation();
-  llvm::outs() << "}";
+  llvm::outs() << "}\n";
 }
 
 class Declation : public Node {
@@ -1210,19 +1207,19 @@ ForStatement::ForStatement(Node *cond, std::vector<Node *> b, Node *ini, Node *u
 void ForStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
+  llvm::outs() << "\n :init [";
   if (init != NULL) {
-    llvm::outs() << "\n :init ";
     init->printAST();
   }
+  llvm::outs() << "]\n :condition [";
   if (condition != NULL) {
-    llvm::outs() << " :condition ";
     condition->printAST();
   }
+  llvm::outs() << "]\n :update [";
   if (update != NULL) {
-    llvm::outs() << " :update ";
     update->printAST();
   }
-  llvm::outs() << "\n :body [";
+  llvm::outs() << "]\n :body [";
   for (int i = 0; i < (int)body.size(); i++) {
     body[i]->printAST();
   }
@@ -1331,11 +1328,11 @@ CaseStatement::CaseStatement(Node *val, Node loc) {
 void CaseStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
+  llvm::outs() << "\n :value [";
   if (value != NULL) {
-    llvm::outs() << "\n :value ";
     value->printAST();
   }
-  llvm::outs() << "}\n";
+  llvm::outs() << "]}\n";
 }
 
 class DefaultStatement : public Statement {
@@ -1424,11 +1421,11 @@ ReturnStatement::ReturnStatement(Node *val, Node loc) {
 void ReturnStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
+  llvm::outs() << "\n :value [";
   if (value != NULL) {
-    llvm::outs() << "\n :value ";
     value->printAST();
   }
-  llvm::outs() << "}";
+  llvm::outs() << "]}";
 }
 
 class MyAstVisitor : public RecursiveASTVisitor<MyAstVisitor> {
@@ -2792,14 +2789,10 @@ public:
     Node *left = prog[i];
     prog.pop_back();
     Node *right;
-    if (Binop->getRHS()) {
-      i = prog.size();
-      TraverseStmt(Binop->getRHS());
-      right = prog[i];
-      prog.pop_back();
-    } else {
-      right = NULL;
-    }
+    i = prog.size();
+    TraverseStmt(Binop->getRHS());
+    right = prog[i];
+    prog.pop_back();
     Node t = PrintSourceRange(Binop->getSourceRange());
 
     BinOp *BO = new BinOp(op, type, left, right, t);
