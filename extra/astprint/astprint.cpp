@@ -500,6 +500,8 @@ void ArrayDataType::printType() {
     llvm::outs() << "\"" << ConstArraySize << "\"";
   } else if (VarArraysize != NULL) {
     VarArraysize->printAST();
+  } else {
+    llvm::outs() << "[]";
   }
   llvm::outs() << " :type ";
   type->printType();
