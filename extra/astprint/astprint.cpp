@@ -595,7 +595,7 @@ public:
 };
 
 void Expression::printAST() {
-  llvm::outs() << "No Expression";
+  llvm::outs() << "{:kind \"No Expression\"}";
 }
 
 class Reference : public Expression {
@@ -785,7 +785,7 @@ public:
 };
 
 void Literal::printAST() {
-  llvm::outs() << "No Literal";
+  llvm::outs() << "{:kind \"No Literal\"}";
 }
 
 class IntLiteral : public Literal {
