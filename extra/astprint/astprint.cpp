@@ -633,8 +633,9 @@ void DeclationReferenceExpression::printAST() {
   for (int i = 0; i < (int)type.size(); i++) {
     type[i]->printType();
   }
+  llvm::outs() << "]"
   PrintLocation();
-  llvm::outs() << "]}";
+  llvm::outs() << "}";
 }
 
 class StructReference : public Reference {
@@ -1383,7 +1384,7 @@ ContinueStatement::ContinueStatement(Node loc) {
 }
 
 void ContinueStatement::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
   llvm::outs() << "}\n";
 }
@@ -1400,7 +1401,7 @@ BreakStatement::BreakStatement(Node loc) {
 }
 
 void BreakStatement::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
   llvm::outs() << "}\n";
 }
