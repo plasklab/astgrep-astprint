@@ -439,7 +439,7 @@ PointeeType::PointeeType(DataType *point) {
 }
 
 void PointeeType::printType() {
-  llvm::outs() << "{:kind \"" << kind << "\" :Pointee ";
+  llvm::outs() << "{:kind \"" << kind << "\" :pointee ";
   pointee->printType();
   llvm::outs() << "}";
 }
@@ -605,17 +605,17 @@ public:
   std::string name;
 };
 
-class DeclationReferenceExpression : public Reference {
+class DeclarationReferenceExpression : public Reference {
 public:
   std::string scope;
   Speci *spe;
-  DeclationReferenceExpression(std::string n, std::string s, std::vector<DataType *> dts, Node loc, Speci *sp);
+  DeclarationReferenceExpression(std::string n, std::string s, std::vector<DataType *> dts, Node loc, Speci *sp);
   void printAST();
 };
 
-DeclationReferenceExpression::DeclationReferenceExpression(std::string n, std::string s,
+DeclarationReferenceExpression::DeclarationReferenceExpression(std::string n, std::string s,
   std::vector<DataType *> dts, Node loc, Speci *sp) {
-  kind = "DRE";
+  kind = "DeclRef";
   name = n;
   scope = s;
   type = dts;
@@ -623,7 +623,7 @@ DeclationReferenceExpression::DeclationReferenceExpression(std::string n, std::s
   spe = sp;
 }
 
-void DeclationReferenceExpression::printAST() {
+void DeclarationReferenceExpression::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
   if (spe != NULL) {
     spe->printSpecifier();
@@ -642,14 +642,16 @@ void DeclationReferenceExpression::printAST() {
 
 class StructReference : public Reference {
 public:
+  std::string op;
   Node *structs;
   Node *structMember;
-  StructReference(Node *str, Node *strMem, std::vector<DataType *> dts, Node loc);
+  StructReference(std::string o, Node *str, Node *strMem, std::vector<DataType *> dts, Node loc);
   void printAST();
 };
 
-StructReference::StructReference(Node *str, Node *strMem, std::vector<DataType *> dts, Node loc) {
+StructReference::StructReference(std::string o, Node *str, Node *strMem, std::vector<DataType *> dts, Node loc) {
   kind = "Struct";
+  op = o;
   structs = str;
   structMember = strMem;
   type = dts;
@@ -657,7 +659,11 @@ StructReference::StructReference(Node *str, Node *strMem, std::vector<DataType *
 }
 
 void StructReference::printAST() {
-  llvm::outs() << "{:kind \"" << kind << "\" :struct ";
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (op != "") {
+  llvm::outs() << " :op \"" << op <<"\"";
+  }
+  llvm::outs() << " :struct ";
   structs->printAST();
   llvm::outs() << " :struct-member ";
   structMember->printAST();
@@ -943,20 +949,20 @@ void FunctionCall::printAST() {
   llvm::outs() << "}\n";
 }
 
-class Declation : public Node {
+class Declaration : public Node {
 public:
   std::string name;
 };
 
-class FieldDeclation : public Declation {
+class FieldDeclaration : public Declaration {
 public:
   std::string scope;
   DataType *type;
-  FieldDeclation(std::string n, DataType *dt, Node loc);
+  FieldDeclaration(std::string n, DataType *dt, Node loc);
   void printAST();
 };
 
-FieldDeclation::FieldDeclation(std::string n, DataType *dt, Node loc) {
+FieldDeclaration::FieldDeclaration(std::string n, DataType *dt, Node loc) {
   kind = "FieldDecl";
   scope = "Member";
   name = n;
@@ -964,7 +970,7 @@ FieldDeclation::FieldDeclation(std::string n, DataType *dt, Node loc) {
   setLocation(loc);
 }
 
-void FieldDeclation::printAST() {
+void FieldDeclaration::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name 
                << "\" :scope \"" << scope << "\" :type ";
   type->printType();
@@ -972,24 +978,24 @@ void FieldDeclation::printAST() {
   llvm::outs() << "}\n";
 }
 
-class ObjectDeclation : public Declation {
+class ObjectDeclaration : public Declaration {
 public:
   DataType *type;
   std::string displayType;
 };
 
-class DeclationOfVariables : public ObjectDeclation {
+class DeclarationOfVariables : public ObjectDeclaration {
 public:
   std::string scope;
 };
 
-class ParameterDeclation : public DeclationOfVariables {
+class ParameterDeclaration : public DeclarationOfVariables {
 public:
-  ParameterDeclation(std::string n, std::string display, DataType *dt, Node loc);
+  ParameterDeclaration(std::string n, std::string display, DataType *dt, Node loc);
   void printAST();
 };
 
-ParameterDeclation::ParameterDeclation(std::string n, std::string display, DataType *dt, Node loc) {
+ParameterDeclaration::ParameterDeclaration(std::string n, std::string display, DataType *dt, Node loc) {
   kind = "ParmDecl";
   name = n;
   displayType = display;
@@ -997,7 +1003,7 @@ ParameterDeclation::ParameterDeclation(std::string n, std::string display, DataT
   setLocation(loc);
 }
 
-void ParameterDeclation::printAST() {
+void ParameterDeclaration::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :display-type \"" 
                << displayType << "\" :type ";
   type->printType();
@@ -1005,15 +1011,15 @@ void ParameterDeclation::printAST() {
   llvm::outs() << "}";
 }
 
-class VariableDeclation : public DeclationOfVariables {
+class VariableDeclaration : public DeclarationOfVariables {
 public:
   std::vector<Node *> init;
   Speci *spe;
-  VariableDeclation(std::string n, std::string s, std::string display, DataType *dt, std::vector<Node *>i, Node loc, Speci *sp);
+  VariableDeclaration(std::string n, std::string s, std::string display, DataType *dt, std::vector<Node *>i, Node loc, Speci *sp);
   void printAST();
 };
 
-VariableDeclation::VariableDeclation(std::string n, std::string s, std::string display, DataType *dt, std::vector<Node *>i, Node loc, Speci *sp) {
+VariableDeclaration::VariableDeclaration(std::string n, std::string s, std::string display, DataType *dt, std::vector<Node *>i, Node loc, Speci *sp) {
   kind = "VarDecl";
   name = n;
   scope = s;
@@ -1024,7 +1030,7 @@ VariableDeclation::VariableDeclation(std::string n, std::string s, std::string d
   spe = sp;
 }
 
-void VariableDeclation::printAST() {
+void VariableDeclaration::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :scope \"" << scope << "\"";
   spe->printSpecifier();
   llvm::outs() << " :display-type \"" << displayType << "\" :type ";
@@ -1040,17 +1046,16 @@ void VariableDeclation::printAST() {
   llvm::outs() << "}\n";
 }
 
-class FunctionDeclation : public Declation {
+class FunctionDeclaration : public ObjectDeclaration {
 public:
-  DataType *type;
   std::vector<Node *> parm;
   std::vector<Node *> body;
   Speci *spe;
-  FunctionDeclation(std::string n, DataType *dt, std::vector<Node *> p, std::vector<Node *> b, Node loc, Speci *sp);
+  FunctionDeclaration(std::string n, DataType *dt, std::vector<Node *> p, std::vector<Node *> b, Node loc, Speci *sp);
   void printAST();
 };
 
-FunctionDeclation::FunctionDeclation(std::string n, DataType *dt, std::vector<Node *> p, std::vector<Node *> b, Node loc, Speci *sp) {
+FunctionDeclaration::FunctionDeclaration(std::string n, DataType *dt, std::vector<Node *> p, std::vector<Node *> b, Node loc, Speci *sp) {
   kind = "FuncDecl";
   name = n;
   type = dt;
@@ -1060,13 +1065,13 @@ FunctionDeclation::FunctionDeclation(std::string n, DataType *dt, std::vector<No
   spe = sp;
 }
 
-void FunctionDeclation::printAST() {
+void FunctionDeclaration::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
   spe->printSpecifier();
   llvm::outs() << " :type ";
   type->printType();
   PrintLocation();
-  llvm::outs() << "\n :Parm [";
+  llvm::outs() << "\n :parm [";
   if (parm.size() != 0) {
     for (int i = 0; i < (int)parm.size(); i++) {
       parm[i]->printAST();
@@ -1081,25 +1086,25 @@ void FunctionDeclation::printAST() {
   llvm::outs() << "]}\n";
 }
 
-class TypeDeclation : public Declation {
+class TypeDeclaration : public Declaration {
 public:
   std::vector<Node *> member;
 };
 
-class StructDeclation : public TypeDeclation {
+class StructDeclaration : public TypeDeclaration {
 public:
-  StructDeclation(std::string n, std::vector<Node *> m, Node loc);
+  StructDeclaration(std::string n, std::vector<Node *> m, Node loc);
   void printAST();
 };
 
-StructDeclation::StructDeclation(std::string n, std::vector<Node *> m, Node loc) {
+StructDeclaration::StructDeclaration(std::string n, std::vector<Node *> m, Node loc) {
   kind = "StructDecl";
   name = n;
   member = m;
   setLocation(loc);
 }
 
-void StructDeclation::printAST() {
+void StructDeclaration::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
   PrintLocation();
   llvm::outs() << "\n :member [";
@@ -1109,20 +1114,20 @@ void StructDeclation::printAST() {
   llvm::outs() << "]}\n";
 }
 
-class UnionDeclation : public TypeDeclation {
+class UnionDeclaration : public TypeDeclaration {
 public:
-  UnionDeclation(std::string n, std::vector<Node *> m, Node loc);
+  UnionDeclaration(std::string n, std::vector<Node *> m, Node loc);
   void printAST();
 };
 
-UnionDeclation::UnionDeclation(std::string n, std::vector<Node *> m, Node loc) {
+UnionDeclaration::UnionDeclaration(std::string n, std::vector<Node *> m, Node loc) {
   kind = "UnionDecl";
   name = n;
   member = m;
   setLocation(loc);
 }
 
-void UnionDeclation::printAST() {
+void UnionDeclaration::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
   PrintLocation();
   llvm::outs() << "\n :member [";
@@ -1552,7 +1557,7 @@ public:
     DataType *type = PrintTypeInfo(fieldtype);
     Node t = PrintSourceRange(field->getSourceRange());
 
-    FieldDeclation *FD = new FieldDeclation(name, type, t);
+    FieldDeclaration *FD = new FieldDeclaration(name, type, t);
     Node *np = FD;
     prog.push_back(np);
 
@@ -1587,7 +1592,7 @@ public:
     }
     Node t = PrintSourceRange(Decl->getSourceRange());
 
-    FunctionDeclation *FD = new FunctionDeclation(name, type, parm, body, t, sp);
+    FunctionDeclaration *FD = new FunctionDeclaration(name, type, parm, body, t, sp);
     Node *np = FD;
     prog.push_back(np);
     return false;
@@ -1601,7 +1606,7 @@ public:
     std::string disp = PrintDisplayType(vartype);
     Node t = PrintSourceRange(Decl->getSourceRange());
 
-    ParameterDeclation *PD = new ParameterDeclation(name, disp, type, t);
+    ParameterDeclaration *PD = new ParameterDeclaration(name, disp, type, t);
     Node *np = PD;
     prog.push_back(np);
     return true;
@@ -1624,7 +1629,7 @@ public:
       }
       Node t = PrintSourceRange(record->getSourceRange());
 
-      StructDeclation *SD = new StructDeclation(name, member, t);
+      StructDeclaration *SD = new StructDeclaration(name, member, t);
       Node *np = SD;
       prog.push_back(np);
     } else if (record->isUnion()) {
@@ -1642,7 +1647,7 @@ public:
       }
       Node t = PrintSourceRange(record->getSourceRange());
 
-      UnionDeclation *UD = new UnionDeclation(name, member, t);
+      UnionDeclaration *UD = new UnionDeclaration(name, member, t);
       Node *np = UD;
       prog.push_back(np);
 
@@ -1672,7 +1677,7 @@ public:
     } 
     Node t = PrintSourceRange(Decl->getSourceRange());
 
-    VariableDeclation *VD = new VariableDeclation(name, scope, displayType, type, init, t, sp);
+    VariableDeclaration *VD = new VariableDeclaration(name, scope, displayType, type, init, t, sp);
     Node *np = VD;
     prog.push_back(np);
 
@@ -2556,7 +2561,7 @@ public:
     VarDecl *vardecl = dyn_cast<VarDecl>(valuedecl);
     FunctionDecl *funcdecl = dyn_cast<FunctionDecl>(valuedecl);
     std::string scope = "";
-    DeclationReferenceExpression *DRE;
+    DeclarationReferenceExpression *DRE;
     if (vardecl) {
       QualType vartype = vardecl->getType();
       std::string name = Declref->getNameInfo().getAsString();
@@ -2572,7 +2577,7 @@ public:
       Speci *sp = checkSpecifier(vardecl->getStorageClass());
       Node t = PrintSourceRange(Declref->getSourceRange());
 
-      DRE = new DeclationReferenceExpression(name, scope, type, t, sp);
+      DRE = new DeclarationReferenceExpression(name, scope, type, t, sp);
     } else if (funcdecl) {
       QualType funcType = funcdecl->getType();
       std::string name = Declref->getNameInfo().getAsString();
@@ -2587,7 +2592,7 @@ public:
       }
       Node t = PrintSourceRange(Declref->getSourceRange());
 
-      DRE = new DeclationReferenceExpression(name, scope, type, t, sp);
+      DRE = new DeclarationReferenceExpression(name, scope, type, t, sp);
     } else {
       QualType Declreftype = Declref->getType();
       std::string name = Declref->getNameInfo().getAsString();
@@ -2602,7 +2607,7 @@ public:
       }
       Node t = PrintSourceRange(Declref->getSourceRange());
 
-      DRE = new DeclationReferenceExpression(name, scope, type, t, NULL);
+      DRE = new DeclarationReferenceExpression(name, scope, type, t, NULL);
     }
 
     Node *np = DRE;
@@ -2644,7 +2649,7 @@ public:
       }
       Node t = PrintSourceRange(mem->getSourceRange());
 
-      StructReference *SR = new StructReference(structs, structMember, type, t);
+      StructReference *SR = new StructReference("", structs, structMember, type, t);
       Node *np = SR;
       prog.push_back(np);
       return false;
@@ -2659,19 +2664,19 @@ public:
           castType.erase(castType.begin());
         }
       }
-      Node *left, *right;
+      Node *structs, *structMember;
       int i = prog.size();
       getlhsArrow(base);
-      left = prog[i];
+      structs = prog[i];
       prog.pop_back();
       i = prog.size();
       getrhsArrow(vdecl);
-      right = prog[i];
+      structMember = prog[i];
       prog.pop_back();
       Node t = PrintSourceRange(mem->getSourceRange());
 
-      BinOp *BO = new BinOp(op, type, left, right, t);
-      Node *np = BO;
+      StructReference *SR = new StructReference(op, structs, structMember, type, t);
+      Node *np = SR;
       prog.push_back(np);
       return false;
     } 
@@ -2703,7 +2708,7 @@ public:
     Node t = PrintSourceRange(vdecl->getSourceRange());
     Speci *sp = new Speci(false, false, false, false);
 
-    DeclationReferenceExpression *DRE = new DeclationReferenceExpression (name, scope, type, t, sp);
+    DeclarationReferenceExpression *DRE = new DeclarationReferenceExpression (name, scope, type, t, sp);
     Node *np = DRE;
     prog.push_back(np);
     return true;
