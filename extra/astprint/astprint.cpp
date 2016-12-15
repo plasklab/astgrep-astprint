@@ -470,11 +470,11 @@ void FuncType::printType() {
     parmType[(int)parmType.size() - 1]->printType();
   }
   llvm::outs() << "]";
-  llvm::outs() << " :ret-type [";
+  llvm::outs() << " :ret-type ";
   if (retType != NULL) {
     retType->printType();
   }
-  llvm::outs() << "]}";
+  llvm::outs() << "}";
 }
 
 class ArrayDataType : public DataType {
@@ -1855,7 +1855,7 @@ public:
       QualType rettype = dyn_cast<FunctionType>(typeInfo)->getResultType();
       retType = PrintTypeInfo(rettype);
     } else {
-      retType = NULL;
+      retType = new VoidType();
     }
 
     FuncType *t = new FuncType(parmType, retType);
