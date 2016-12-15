@@ -1037,11 +1037,11 @@ void VariableDeclaration::printAST() {
   type->printType();
   PrintLocation();
   if (init.size() != 0) {
-    llvm::outs() << "\n :init [";
+    llvm::outs() << "\n :init ";
     for (int i = 0; i < (int)init.size(); i++) {
       init[i]->printAST();
     }
-    llvm::outs() << "]";
+    llvm::outs() << "";
   }
   llvm::outs() << "}\n";
 }
@@ -1216,19 +1216,25 @@ ForStatement::ForStatement(Node *cond, std::vector<Node *> b, Node *ini, Node *u
 void ForStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
-  llvm::outs() << "\n :init [";
+  llvm::outs() << "\n :init ";
   if (init != NULL) {
     init->printAST();
+  } else {
+    llvm::outs() << "[]";
   }
-  llvm::outs() << "]\n :condition [";
+  llvm::outs() << "\n :condition ";
   if (condition != NULL) {
     condition->printAST();
+  } else {
+    llvm::outs() << "[]";
   }
-  llvm::outs() << "]\n :update [";
+  llvm::outs() << "\n :update ";
   if (update != NULL) {
     update->printAST();
+  } else {
+    llvm::outs() << "[]";
   }
-  llvm::outs() << "]\n :body [";
+  llvm::outs() << "\n :body [";
   for (int i = 0; i < (int)body.size(); i++) {
     body[i]->printAST();
   }
