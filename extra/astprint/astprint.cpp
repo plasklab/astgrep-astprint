@@ -537,17 +537,27 @@ void StructureType::printType() {
 class UnionType : public DataType {
 public:
   std::string name;
-  UnionType(std::string n);
+  std::vector<Node *> member;
+  UnionType(std::string n, std::vector<Node *> mem);
   void printType();
 };
 
-UnionType::UnionType(std::string n) {
+UnionType::UnionType(std::string n, std::vector<Node *> mem) {
   kind = "UnionType";
   name = n;
+  member = mem;
 }
 
 void UnionType::printType() {
-  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"}";
+  llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
+  if (member.size() != 0) {
+    llvm::outs() << " :member [";
+    for (int i = 0; i < (int)member.size(); i++) {
+      member[i]->printAST();
+    }
+    llvm::outs() << "]";
+  }
+  llvm::outs() << "}";
 }
 
 // typedefType
@@ -1988,17 +1998,28 @@ public:
 
   UnionType *PrintUnionTypeInfo(QualType typeInfo) {
     std::string name = "";
+    std::vector<Node *> member;
     if (dyn_cast<ElaboratedType>(typeInfo)) {
         QualType etype = dyn_cast<ElaboratedType>(typeInfo)->getNamedType();
       if (dyn_cast<RecordType>(etype)) {
         RecordDecl *rdecl = dyn_cast<RecordType>(etype)->getDecl();
         name = rdecl->getName();
+        if (name == "" && !(rdecl->field_empty())) {
+          RecordDecl::field_iterator itr = rdecl->field_begin();
+          int i = prog.size();
+          while (itr != rdecl->field_end()) {
+            TraverseDecl(itr->getCanonicalDecl());
+            member.push_back(prog[i]);
+            prog.erase(prog.begin() + i);
+            itr++;
+          }
+        }
       } else {
         PrintTypeInfo(etype);
       }
     }
 
-    UnionType *t = new UnionType(name);
+    UnionType *t = new UnionType(name, member);
     return t;
   }
 
