@@ -1147,6 +1147,27 @@ void UnionDeclaration::printAST() {
   llvm::outs() << "]}\n";
 }
 
+class TypedefDeclaration : public TypeDeclaration {
+public:
+  DataType *typedefType;
+  TypedefDeclaration(std::string n, DataType *type, Node loc);
+  void printAST();
+};
+
+TypedefDeclaration::TypedefDeclaration(std::string n, DataType *type, Node loc) {
+  kind = "TypedefDecl";
+  name = n;
+  typedefType = type;
+  setLocation(loc);
+}
+
+void TypedefDeclaration::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\" :typedef-name \"" << name << "\" :typedef-type ";
+  typedefType->printType();
+  PrintLocation();
+  llvm::outs() << "}\n";
+}
+
 class Statement : public Node {
 };
 
@@ -1549,7 +1570,9 @@ public:
 	break;
       default : 
         //llvm::outs() << "decl:27";
-	llvm::outs() << " ?Decl? " << decl->getDeclKindName();
+	//llvm::outs() << " ?Decl? " << decl->getDeclKindName();
+        Node *np = new Node();
+        prog.push_back(np);
 	RecursiveASTVisitor::TraverseDecl(decl);
       }
     }
@@ -1626,6 +1649,19 @@ public:
     Node *np = PD;
     prog.push_back(np);
     return true;
+  }
+
+  // TypedefDecl
+  bool VisitTypedefDecl(TypedefDecl *Typedef) {
+    //llvm::outs() << "VisitTypeDefType()";
+    std::string name = Typedef->getNameAsString();
+    DataType *typedefType = PrintTypeInfo(Typedef->getUnderlyingType());
+    Node t = PrintSourceRange(Typedef->getSourceRange());
+
+    TypedefDeclaration *TD = new TypedefDeclaration(name, typedefType, t);
+    Node *np = TD;
+    prog.push_back(np);
+    return false;
   }
 
   // RecordDecl (Structure?)
@@ -1845,8 +1881,10 @@ public:
       }
       default:
       {
-	llvm::outs() << "\n \""<< typeInfo.getAsString() << "\"は, 初出です."
-		     << " astprint.cppのPrintTypeInfoにcaseを追加して下さい.";
+	//llvm::outs() << "\n \""<< typeInfo.getAsString() << "\"は, 初出です."
+	//	     << " astprint.cppのPrintTypeInfoにcaseを追加して下さい.";
+        t = new DataType();
+        t->setTypedefString(typeInfo.getAsString());
 	break;
       }
     }
@@ -2206,7 +2244,9 @@ public:
 	break;
       default: 
         //llvm::outs() << "stmt:61";
-	llvm::outs() << "?Stmt? " << stmt->getStmtClassName();	
+	//llvm::outs() << "?Stmt? " << stmt->getStmtClassName();	
+        Node *np = new Node();
+        prog.push_back(np);
 	RecursiveASTVisitor::TraverseStmt(stmt);
       }
       //llvm::outs() << "\nleave " << stmt->getStmtClassName() << "\n";
