@@ -34,6 +34,7 @@ public:
   int endColumn;
   void PrintLocation();
   void setLocation(Node loc);
+  std::string getBeginFile();
   virtual void printAST();
   virtual ~Node() {};
 };
@@ -45,6 +46,10 @@ void Node::setLocation(Node loc) {
   endFile = loc.endFile;
   endLine = loc.endLine;
   endColumn = loc.endColumn;
+}
+
+std::string Node::getBeginFile() {
+  return beginFile;
 }
 
 void Node::PrintLocation() {
@@ -3070,6 +3075,18 @@ public:
     }
   }
 
+  // includeファイルの削除(オプション)
+  void clearIncludeFile(std::string analysisFile) {
+    int i = 0;
+    while (i != (int)prog.size()) {
+      if (prog[i]->getBeginFile() != analysisFile) {
+        prog.erase(prog.begin() + i);
+      } else {
+        i++;
+      }
+    }
+  }
+
 private:
   ASTContext *Context;
   std::string source_file;
@@ -3079,17 +3096,21 @@ private:
 
 class MyAstConsumer : public clang::ASTConsumer {
 public:
-  explicit MyAstConsumer(ASTContext *Context, llvm::StringRef InFile) : Visitor(Context, InFile) {}
+  explicit MyAstConsumer(ASTContext *Context, llvm::StringRef InFile) : Visitor(Context, InFile) {
+    analysisFile = InFile;
+}
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
     //llvm::outs() << "\n----------------------------------------------------------------------\n";
+    //Visitor.clearIncludeFile(analysisFile);
     Visitor.printAST();
     llvm::outs() << "] \n\n";
   }
 
 private:
   MyAstVisitor Visitor;
+  llvm::StringRef analysisFile;
 };
 
 class MyAnalysisAction : public clang::ASTFrontendAction {
