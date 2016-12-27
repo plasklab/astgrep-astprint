@@ -3100,18 +3100,27 @@ public:
     analysisFile = InFile;
 }
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
-    llvm::outs() << "\n[";
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
     //llvm::outs() << "\n----------------------------------------------------------------------\n";
-    //Visitor.clearIncludeFile(analysisFile);
+    if (dIncFile) {
+      Visitor.clearIncludeFile(analysisFile);
+    }
+    llvm::outs() << "\n[";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
+  }
+
+  static void setDIncFile(bool opt) {
+    dIncFile = opt;
   }
 
 private:
   MyAstVisitor Visitor;
   llvm::StringRef analysisFile;
+  static bool dIncFile;
 };
+
+bool MyAstConsumer::dIncFile;
 
 class MyAnalysisAction : public clang::ASTFrontendAction {
 public:
@@ -3121,10 +3130,18 @@ public:
   }
 };
 
-int main(int argc, const char **argv) {
+static OwningPtr<OptTable> Options(createDriverOptTable());
+
+static cl::opt<bool> Dincfile("d-incfile", cl::desc("Delete the include file"));
+
+int main(int argc, const char *argv[]) {
   CommonOptionsParser OptionsParser(argc, argv);
   ClangTool Tool(OptionsParser.getCompilations(),
                  OptionsParser.getSourcePathList());
+
+  if (Dincfile) {
+    MyAstConsumer::setDIncFile(Dincfile);
+  }
 
   return Tool.run(newFrontendActionFactory<MyAnalysisAction>());
 }
