@@ -3189,6 +3189,10 @@ public:
     }
   }
 
+  std::vector<Node *> getNode () {
+    return prog;
+  }
+
 private:
   ASTContext *Context;
   std::string source_file;
@@ -3206,6 +3210,9 @@ public:
     //llvm::outs() << "\n----------------------------------------------------------------------\n";
     if (dIncFile) {
       Visitor.clearIncludeFile(analysisFile);
+    }
+    if (cLabel) {
+      Visitor.changeLabel(Visitor.getNode());
     }
     llvm::outs() << "\n[";
     Visitor.printAST();
