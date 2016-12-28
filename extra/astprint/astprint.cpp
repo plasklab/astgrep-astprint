@@ -26,6 +26,7 @@ using namespace llvm::opt;
 class Node {
 public:
   std::string kind;
+  std::vector<Node *> label;
   std::string beginFile;
   int beginLine;
   int beginColumn;
@@ -33,7 +34,10 @@ public:
   int endLine;
   int endColumn;
   void PrintLocation();
+  void printLabel();
   void setLocation(Node loc);
+  void setLabel(Node *l);
+  std::string getKind();
   std::string getBeginFile();
   virtual void printAST();
   virtual ~Node() {};
@@ -48,6 +52,14 @@ void Node::setLocation(Node loc) {
   endColumn = loc.endColumn;
 }
 
+void Node::setLabel(Node *l) {
+  label.push_back(l);
+}
+
+std::string Node::getKind() {
+  return kind;
+}
+
 std::string Node::getBeginFile() {
   return beginFile;
 }
@@ -55,6 +67,14 @@ std::string Node::getBeginFile() {
 void Node::PrintLocation() {
   llvm::outs() << " :loc-begin [\"" << beginFile << "\" " << beginLine << " " << beginColumn 
   	   << "] :loc-end [\"" << endFile << "\" " << endLine << " " << endColumn << "]";
+}
+
+void Node::printLabel() {
+  llvm::outs() << " :label [";
+  for (int i = 0; i < (int)label.size(); i++) {
+    label[i]->printAST();
+  }
+  llvm::outs() << "]";
 }
 
 void Node::printAST() {
@@ -628,22 +648,7 @@ void Expression::printAST() {
 class Reference : public Expression {
 public:
   std::string name;
-  std::vector<Node *> label;
-  void setLabel(Node *l);
-  void printLabel();
 };
-
-void Reference::setLabel(Node *l) {
-  label.push_back(l);
-}
-
-void Reference::printLabel() {
-  llvm::outs() << " :label [";
-  for (int i = 0; i < (int)label.size(); i++) {
-    label[i]->printAST();
-  }
-  llvm::outs() << "]";
-}
 
 class DeclarationReferenceExpression : public Reference {
 public:
@@ -718,23 +723,7 @@ void StructReference::printAST() {
 }
 
 class Operator : public Expression {
-public:
-  std::vector<Node *> label;
-  void setLabel(Node *l);
-  void printLabel();
 };
-
-void Operator::setLabel(Node *l) {
-  label.push_back(l);
-}
-
-void Operator::printLabel() {
-  llvm::outs() << " :label [";
-  for (int i = 0; i < (int)label.size(); i++) {
-    label[i]->printAST();
-  }
-  llvm::outs() << "]";
-}
 
 class BinOp : public Operator {
 public:
@@ -1250,23 +1239,7 @@ void TypedefDeclaration::printAST() {
 }
 
 class Statement : public Node {
-public:
-  std::vector<Node *> label;
-  void setLabel(Node *l);
-  void printLabel();
 };
-
-void Statement::setLabel(Node *l) {
-  label.push_back(l);
-}
-
-void Statement::printLabel() {
-  llvm::outs() << " :label [";
-  for (int i = 0; i < (int)label.size(); i++) {
-    label[i]->printAST();
-  }
-  llvm::outs() << "]";
-}
 
 class RepetitionStatement : public Statement {
 public:
@@ -3197,6 +3170,25 @@ public:
     }
   }
 
+  // labelの出力位置を変更する
+  void changeLabel(std::vector<Node *> nodes) {
+    for (int i = 0; i < (int)nodes.size(); i++) {
+      std::string kind = nodes[i]->getKind();
+      if (kind == "Case") {
+        nodes[i + 1]->setLabel(nodes[i]);
+        nodes.erase(nodes.begin() + i);
+      } else if (kind == "Label") {
+        nodes[i + 1]->setLabel(nodes[i]);
+        nodes.erase(nodes.begin() + i);
+      } else if (kind == "Default") {
+        nodes[i + 1]->setLabel(nodes[i]);
+        nodes.erase(nodes.begin() + i);
+      } else {
+        return;
+      }
+    }
+  }
+
 private:
   ASTContext *Context;
   std::string source_file;
@@ -3224,13 +3216,19 @@ public:
     dIncFile = opt;
   }
 
+  static void setCLabel(bool opt) {
+    cLabel = opt;
+  }
+
 private:
   MyAstVisitor Visitor;
   llvm::StringRef analysisFile;
   static bool dIncFile;
+  static bool cLabel;
 };
 
 bool MyAstConsumer::dIncFile;
+bool MyAstConsumer::cLabel;
 
 class MyAnalysisAction : public clang::ASTFrontendAction {
 public:
@@ -3253,6 +3251,7 @@ int main(int argc, const char *argv[]) {
   if (Dincfile) {
     MyAstConsumer::setDIncFile(Dincfile);
   } else if (Clabel) {
+    MyAstConsumer::setCLabel(Clabel);
   }
 
   return Tool.run(newFrontendActionFactory<MyAnalysisAction>());
