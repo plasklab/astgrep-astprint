@@ -38,6 +38,12 @@ public:
   void setLocation(Node loc);
   void setLabel(Node *l);
   std::string getKind();
+  virtual std::vector<Node *> getBody();
+  virtual std::vector<Node *> getThen();
+  virtual std::vector<Node *> getElse();
+  virtual void setBody(std::vector<Node *> b);
+  virtual void setThen(std::vector<Node *> t);
+  virtual void setElse(std::vector<Node *> e);
   std::string getBeginFile();
   virtual void printAST();
   virtual ~Node() {};
@@ -59,6 +65,25 @@ void Node::setLabel(Node *l) {
 std::string Node::getKind() {
   return kind;
 }
+
+std::vector<Node *> Node::getBody() {
+  std::vector<Node *> dummy;
+  return dummy;
+}
+
+std::vector<Node *> Node::getThen() {
+  std::vector<Node *> dummy;
+  return dummy;
+}
+
+std::vector<Node *> Node::getElse() {
+  std::vector<Node *> dummy;
+  return dummy;
+}
+
+void Node::setBody(std::vector<Node *> b) {}
+void Node::setThen(std::vector<Node *> t) {}
+void Node::setElse(std::vector<Node *> e) {}
 
 std::string Node::getBeginFile() {
   return beginFile;
@@ -1131,6 +1156,8 @@ public:
   std::vector<Node *> parm;
   std::vector<Node *> body;
   Speci *spe;
+  std::vector<Node *> getBody();
+  void setBody(std::vector<Node *> b);
   FunctionDeclaration(std::string n, DataType *dt, std::vector<Node *> p, std::vector<Node *> b, Node loc, Speci *sp);
   void printAST();
 };
@@ -1143,6 +1170,14 @@ FunctionDeclaration::FunctionDeclaration(std::string n, DataType *dt, std::vecto
   body = b;
   setLocation(loc);
   spe = sp;
+}
+
+std::vector<Node *> FunctionDeclaration::getBody() {
+  return body;
+}
+
+void FunctionDeclaration::setBody(std::vector<Node *> b) {
+  body = b;
 }
 
 void FunctionDeclaration::printAST() {
@@ -1250,6 +1285,8 @@ public:
 class WhileStatement : public RepetitionStatement {
 public:
   WhileStatement(Node *cond, std::vector<Node *> b, Node loc);
+  std::vector<Node *> getBody();
+  void setBody(std::vector<Node *> b);
   void printAST();
 };
 
@@ -1258,6 +1295,14 @@ WhileStatement::WhileStatement(Node *cond, std::vector<Node *> b, Node loc) {
   condition = cond;
   body = b;
   setLocation(loc);
+}
+
+std::vector<Node *> WhileStatement::getBody() {
+  return body;
+}
+
+void WhileStatement::setBody(std::vector<Node *> b) {
+  body = b;
 }
 
 void WhileStatement::printAST() {
@@ -1278,6 +1323,8 @@ void WhileStatement::printAST() {
 class DoStatement : public RepetitionStatement {
 public:
   DoStatement(Node *cond, std::vector<Node *> b, Node loc);
+  std::vector<Node *> getBody();
+  void setBody(std::vector<Node *> b);
   void printAST();
 };
 
@@ -1286,6 +1333,14 @@ DoStatement::DoStatement(Node *cond, std::vector<Node *> b, Node loc) {
   condition = cond;
   body = b;
   setLocation(loc);
+}
+
+std::vector<Node *> DoStatement::getBody() {
+  return body;
+}
+
+void DoStatement::setBody(std::vector<Node *> b) {
+  body = b;
 }
 
 void DoStatement::printAST() {
@@ -1308,6 +1363,8 @@ public:
   Node *init;
   Node *update;
   ForStatement(Node *cond, std::vector<Node *> b, Node *ini, Node *up, Node loc);
+  std::vector<Node *> getBody();
+  void setBody(std::vector<Node *> b);
   void printAST();
 };
 
@@ -1318,6 +1375,14 @@ ForStatement::ForStatement(Node *cond, std::vector<Node *> b, Node *ini, Node *u
   init = ini;
   update = up;
   setLocation(loc);
+}
+
+std::vector<Node *> ForStatement::getBody() {
+  return body;
+}
+
+void ForStatement::setBody(std::vector<Node *> b) {
+  body = b;
 }
 
 void ForStatement::printAST() {
@@ -1361,6 +1426,10 @@ public:
   std::vector<Node *> then;
   std::vector<Node *> denial;
   IfStatement(Node *cond, std::vector<Node *> t, std::vector<Node *> d, Node loc);
+  std::vector<Node *> getThen();
+  std::vector<Node *> getElse();
+  void setThen(std::vector<Node *> t);
+  void setElse(std::vector<Node *> e);
   void printAST();
 };
 
@@ -1370,6 +1439,22 @@ IfStatement::IfStatement(Node *cond, std::vector<Node *> t, std::vector<Node *> 
   then = t;
   denial = d;
   setLocation(loc);
+}
+
+std::vector<Node *> IfStatement::getThen() {
+  return then;
+}
+
+std::vector<Node *> IfStatement::getElse() {
+  return denial;
+}
+
+void IfStatement::setThen(std::vector<Node *> t) {
+  then = t;
+}
+
+void IfStatement::setElse(std::vector<Node *> e) {
+  denial = e;
 }
 
 void IfStatement::printAST() {
@@ -1399,6 +1484,8 @@ class SwitchStatement : public BranchStatement {
 public:
   std::vector<Node *> body;
   SwitchStatement(Node *cond, std::vector<Node *> b, Node loc);
+  std::vector<Node *> getBody();
+  void setBody(std::vector<Node *> b);
   void printAST();
 };
 
@@ -1407,6 +1494,14 @@ SwitchStatement::SwitchStatement(Node *cond, std::vector<Node *> b, Node loc) {
   condition = cond;
   body = b;
   setLocation(loc);
+}
+
+std::vector<Node *> SwitchStatement::getBody() {
+  return body;
+}
+
+void SwitchStatement::setBody(std::vector<Node *> b) {
+  body = b;
 }
 
 void SwitchStatement::printAST() {
@@ -3171,26 +3266,49 @@ public:
   }
 
   // labelの出力位置を変更する
-  void changeLabel(std::vector<Node *> nodes) {
+  std::vector<Node *> changeLabel(std::vector<Node *> nodes) {
+    if (nodes.size() == 0) {
+      return nodes;
+    }
     for (int i = 0; i < (int)nodes.size(); i++) {
       std::string kind = nodes[i]->getKind();
       if (kind == "Case") {
         nodes[i + 1]->setLabel(nodes[i]);
+        //llvm::outs() << "aftter setLabel()\n";
         nodes.erase(nodes.begin() + i);
+        //llvm::outs() << "erase nodes";
+        //nodes[i]->printAST();
+        //llvm::outs() << "\n";
       } else if (kind == "Label") {
         nodes[i + 1]->setLabel(nodes[i]);
         nodes.erase(nodes.begin() + i);
       } else if (kind == "Default") {
         nodes[i + 1]->setLabel(nodes[i]);
         nodes.erase(nodes.begin() + i);
-      } else {
-        return;
+      } else if (kind == "FuncDecl") {
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
+      } else if (kind == "While") {
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
+      } else if (kind == "Do") {
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
+      } else if (kind == "For") {
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
+      } else if (kind == "If") {
+        nodes[i]->setThen(changeLabel(nodes[i]->getThen()));
+        nodes[i]->setElse(changeLabel(nodes[i]->getElse()));
+      } else if (kind == "Switch") {
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
       }
     }
+    return nodes;
   }
 
   std::vector<Node *> getNode () {
     return prog;
+  }
+
+  void setNode(std::vector<Node *> n) {
+    prog = n;
   }
 
 private:
@@ -3212,7 +3330,7 @@ public:
       Visitor.clearIncludeFile(analysisFile);
     }
     if (cLabel) {
-      Visitor.changeLabel(Visitor.getNode());
+      Visitor.setNode(Visitor.changeLabel(Visitor.getNode()));
     }
     llvm::outs() << "\n[";
     Visitor.printAST();
@@ -3257,7 +3375,8 @@ int main(int argc, const char *argv[]) {
 
   if (Dincfile) {
     MyAstConsumer::setDIncFile(Dincfile);
-  } else if (Clabel) {
+  }
+  if (Clabel) {
     MyAstConsumer::setCLabel(Clabel);
   }
 
