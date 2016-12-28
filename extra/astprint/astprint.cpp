@@ -3274,11 +3274,7 @@ public:
       std::string kind = nodes[i]->getKind();
       if (kind == "Case") {
         nodes[i + 1]->setLabel(nodes[i]);
-        //llvm::outs() << "aftter setLabel()\n";
         nodes.erase(nodes.begin() + i);
-        //llvm::outs() << "erase nodes";
-        //nodes[i]->printAST();
-        //llvm::outs() << "\n";
       } else if (kind == "Label") {
         nodes[i + 1]->setLabel(nodes[i]);
         nodes.erase(nodes.begin() + i);
