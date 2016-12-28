@@ -48,7 +48,7 @@
 <FunctionDeclaration> ::= extends <ObjectDeclaration>
     {:kind "FuncDecl"
      :parm [] of <ParameterDeclaration>
-     :body [] of <Declaration> | <Expression> | <Statment>
+     :body [] of <Declaration> | <Expression> | <Statement>
      opt:static "true"
      opt:auto "true"
      opt:extern "true"
@@ -116,6 +116,7 @@
 ```
 <FunctionCall> ::= extends <Expression>
     {:kind "FuncCall
+     :label [] of <LabelStatement> | <CaseStatement> | <DefaultStatement>
      :func <DeclarationReferenceExpression>
      :parm [] of <DeclarationReferenceExpression>
     }
@@ -126,7 +127,9 @@
 ## 参照
 ```
 <Reference> ::= extends <Expression>
-    {:name String}
+    {:name String
+     :label [] of <LabelStatement> | <CaseStatement> | <DefaultStatement>
+    }
 ```
 - nameのStringは参照するオブジェクトの名前を出力する
 
@@ -172,6 +175,7 @@
 ## 演算
 ```
 <Operator> ::= extends <Expression>
+    {:label [] of <LabelStatement> | <CaseStatement> | <DefaultStatement>}
 ```  
 
 ## 三項演算式
@@ -260,6 +264,7 @@
 # 状態文
 ```
 <Statement> ::= extends <Node>
+    {:label [] of <LabelStatement> | <CaseStatement> | <DefaultStatement>}
 ```
 
 ## 繰り返し
