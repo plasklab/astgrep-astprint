@@ -628,7 +628,22 @@ void Expression::printAST() {
 class Reference : public Expression {
 public:
   std::string name;
+  std::vector<Node *> label;
+  void setLabel(Node *l);
+  void printLabel();
 };
+
+void Reference::setLabel(Node *l) {
+  label.push_back(l);
+}
+
+void Reference::printLabel() {
+  llvm::outs() << ":label [";
+  for (int i = 0; i < (int)label.size(); i++) {
+    label[i]->printAST();
+  }
+  llvm::outs() << "]";
+}
 
 class DeclarationReferenceExpression : public Reference {
 public:
@@ -697,7 +712,22 @@ void StructReference::printAST() {
 }
 
 class Operator : public Expression {
+  std::vector<Node *> label;
+  void setLabel(Node *l);
+  void printLabel();
 };
+
+void Operator::setLabel(Node *l) {
+  label.push_back(l);
+}
+
+void Operator::printLabel() {
+  llvm::outs() << ":label [";
+  for (int i = 0; i < (int)label.size(); i++) {
+    label[i]->printAST();
+  }
+  llvm::outs() << "]";
+}
 
 class BinOp : public Operator {
 public:
@@ -947,8 +977,10 @@ void ArrayReference::printAST() {
 class FunctionCall : public Expression {
 public:
   Node *func;
+  std::vector<Node *> label;
   std::vector<Node *> parm;
   FunctionCall(DataType *dt, Node *f, std::vector<Node *> p, Node loc);
+  void setLabel(Node *l);
   void printAST();
 };
 
@@ -960,9 +992,20 @@ FunctionCall::FunctionCall(DataType *dt, Node *f, std::vector<Node *> p, Node lo
   setLocation(loc);
 }
 
+void setLabel(Node *l) {
+  label.push_back(l);
+}
+
 void FunctionCall::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :type ";
   type[0]->printType();
+  if ((int)label.size() != 0) {
+    llvm::outs() << ":label [";
+    for (int i = 0; i < (int)label.size(); i++) {
+      label[i]->printAST();
+    }
+    llvm::outs() << "]";
+  }
   llvm::outs() << "\n :func ";
   func->printAST();
   llvm::outs() << "\n :parm [";
@@ -1184,7 +1227,21 @@ void TypedefDeclaration::printAST() {
 }
 
 class Statement : public Node {
+  std::vector<Node *> label;
+  void setLabel(Node *l);
 };
+
+void Statement::setLabel(Node *l) {
+  label.push_back(l);
+}
+
+void printLabel() {
+  llvm::outs() << ":label [";
+  for (int i = 0; i < (int)label.size(); i++) {
+    label[i]->printAST();
+  }
+  llvm::outs() << "]";
+}
 
 class RepetitionStatement : public Statement {
 public:
@@ -3133,6 +3190,7 @@ public:
 static OwningPtr<OptTable> Options(createDriverOptTable());
 
 static cl::opt<bool> Dincfile("d-incfile", cl::desc("Delete the include file"));
+static cl::opt<bool> Clabel("change-label", cl::desc("Change label AST"));
 
 int main(int argc, const char *argv[]) {
   CommonOptionsParser OptionsParser(argc, argv);
@@ -3141,6 +3199,7 @@ int main(int argc, const char *argv[]) {
 
   if (Dincfile) {
     MyAstConsumer::setDIncFile(Dincfile);
+  } else if (Clabel) {
   }
 
   return Tool.run(newFrontendActionFactory<MyAnalysisAction>());
