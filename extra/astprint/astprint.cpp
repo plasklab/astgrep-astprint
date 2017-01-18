@@ -1497,7 +1497,6 @@ SwitchStatement::SwitchStatement(Node *cond, std::vector<Node *> b, Node loc) {
 }
 
 std::vector<Node *> SwitchStatement::getBody() {
-  llvm::outs() << "getbody call\n";
   return body;
 }
 
