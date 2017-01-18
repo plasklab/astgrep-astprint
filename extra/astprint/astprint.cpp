@@ -1497,6 +1497,7 @@ SwitchStatement::SwitchStatement(Node *cond, std::vector<Node *> b, Node loc) {
 }
 
 std::vector<Node *> SwitchStatement::getBody() {
+  llvm::outs() << "getbody call\n";
   return body;
 }
 
@@ -3275,12 +3276,15 @@ public:
       if (kind == "Case") {
         nodes[i + 1]->setLabel(nodes[i]);
         nodes.erase(nodes.begin() + i);
+        i--;
       } else if (kind == "Label") {
         nodes[i + 1]->setLabel(nodes[i]);
         nodes.erase(nodes.begin() + i);
+        i--;
       } else if (kind == "Default") {
         nodes[i + 1]->setLabel(nodes[i]);
         nodes.erase(nodes.begin() + i);
+        i--;
       } else if (kind == "FuncDecl") {
         nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
       } else if (kind == "While") {
