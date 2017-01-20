@@ -33,11 +33,16 @@ public:
   std::string endFile;
   int endLine;
   int endColumn;
+  bool addlabel;
   void PrintLocation();
   void printLabel();
+  void printEmptyLabel();
   void setLocation(Node loc);
   void setLabel(Node *l);
   std::string getKind();
+  int getLabelSize();
+  void setAddLabel(bool opt);
+  bool getAddLabel();
   virtual std::vector<Node *> getBody();
   virtual std::vector<Node *> getThen();
   virtual std::vector<Node *> getElse();
@@ -64,6 +69,18 @@ void Node::setLabel(Node *l) {
 
 std::string Node::getKind() {
   return kind;
+}
+
+int Node::getLabelSize() {
+  return label.size();
+}
+
+void Node::setAddLabel(bool opt) {
+  addlabel = opt;
+}
+
+bool Node::getAddLabel() {
+  return addlabel;
 }
 
 std::vector<Node *> Node::getBody() {
@@ -100,6 +117,10 @@ void Node::printLabel() {
     label[i]->printAST();
   }
   llvm::outs() << "]";
+}
+
+void Node::printEmptyLabel() {
+  llvm::outs() << " :label []";
 }
 
 void Node::printAST() {
@@ -701,8 +722,10 @@ void DeclarationReferenceExpression::printAST() {
   if (scope != "") {
     llvm::outs() << " :scope \"" << scope << "\"";
   }
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   llvm::outs() << " :type [";
   for (int i = 0; i < (int)type.size(); i++) {
@@ -733,8 +756,10 @@ StructReference::StructReference(std::string o, Node *str, Node *strMem, std::ve
 
 void StructReference::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   if (op != "") {
   llvm::outs() << " :op \"" << op <<"\"";
@@ -770,8 +795,10 @@ BinOp::BinOp(std::string o, std::vector<DataType *> dts, Node *l, Node *r, Node 
 
 void BinOp::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   llvm::outs() << " :op \"" << op << "\" :type [";
   for (int i = 0; i < (int)type.size(); i++) {
@@ -817,8 +844,10 @@ UnOp::UnOp(std::string o, DataType *argument, std::vector<DataType *> dts, Node 
 
 void UnOp::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   llvm::outs() << " :op \"" << op << "\" :type [";
   for (int i = 0; i < (int)type.size(); i++) {
@@ -856,8 +885,10 @@ ConditionalOp::ConditionalOp(std::vector<DataType *> dts, Node *cond, Node *t, N
 
 void ConditionalOp::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   llvm::outs() << " :type [";
   for (int i = 0; i < (int)type.size(); i++) {
@@ -998,8 +1029,10 @@ ArrayReference::ArrayReference(Node *arr, Node *i, DataType *dt, Node loc) {
 
 void ArrayReference::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   llvm::outs() << " :type ";
   type[0]->printType();
@@ -1036,12 +1069,10 @@ void FunctionCall::setLabel(Node *l) {
 void FunctionCall::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :type ";
   type[0]->printType();
-  if ((int)label.size() != 0) {
-    llvm::outs() << " :label [";
-    for (int i = 0; i < (int)label.size(); i++) {
-      label[i]->printAST();
-    }
-    llvm::outs() << "]";
+  if (getLabelSize() != 0) {
+    printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   llvm::outs() << "\n :func ";
   func->printAST();
@@ -1138,6 +1169,11 @@ VariableDeclaration::VariableDeclaration(std::string n, std::string s, std::stri
 void VariableDeclaration::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\" :scope \"" << scope << "\"";
   spe->printSpecifier();
+  if (getLabelSize() != 0) {
+    printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
+  }
   llvm::outs() << " :display-type \"" << displayType << "\" :type ";
   type->printType();
   PrintLocation();
@@ -1182,6 +1218,11 @@ void FunctionDeclaration::setBody(std::vector<Node *> b) {
 
 void FunctionDeclaration::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\" :name \"" << name << "\"";
+  if (getLabelSize() != 0) {
+    printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
+  }
   spe->printSpecifier();
   llvm::outs() << " :type ";
   type->printType();
@@ -1307,8 +1348,10 @@ void WhileStatement::setBody(std::vector<Node *> b) {
 
 void WhileStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   PrintLocation();
   llvm::outs() << "\n :condition ";
@@ -1345,8 +1388,10 @@ void DoStatement::setBody(std::vector<Node *> b) {
 
 void DoStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   PrintLocation();
   llvm::outs() << "\n :condition ";
@@ -1387,8 +1432,10 @@ void ForStatement::setBody(std::vector<Node *> b) {
 
 void ForStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   PrintLocation();
   llvm::outs() << "\n :init ";
@@ -1459,8 +1506,10 @@ void IfStatement::setElse(std::vector<Node *> e) {
 
 void IfStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   PrintLocation();
   llvm::outs() << "\n :condition ";
@@ -1506,8 +1555,10 @@ void SwitchStatement::setBody(std::vector<Node *> b) {
 
 void SwitchStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   PrintLocation();
   llvm::outs() << "\n :condition ";
@@ -1593,8 +1644,10 @@ GotoStatement::GotoStatement(std::string j, Node loc) {
 
 void GotoStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   llvm::outs() << " :goto \"" << jump << "\" ";
   PrintLocation();
@@ -1614,8 +1667,10 @@ ContinueStatement::ContinueStatement(Node loc) {
 
 void ContinueStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   PrintLocation();
   llvm::outs() << "}\n";
@@ -1634,8 +1689,10 @@ BreakStatement::BreakStatement(Node loc) {
 
 void BreakStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   PrintLocation();
   llvm::outs() << "}\n";
@@ -1656,8 +1713,10 @@ ReturnStatement::ReturnStatement(Node *val, Node loc) {
 
 void ReturnStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
-  if ((int)label.size() != 0) {
+  if (getLabelSize() != 0) {
     printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
   }
   PrintLocation();
   llvm::outs() << "\n :value [";
@@ -3265,13 +3324,16 @@ public:
     }
   }
 
-  // labelの出力位置を変更する
-  std::vector<Node *> changeLabel(std::vector<Node *> nodes) {
+  // labelの出力を変更する
+  std::vector<Node *> changeLabel(std::vector<Node *> nodes, bool addlabel) {
     if (nodes.size() == 0) {
       return nodes;
     }
     for (int i = 0; i < (int)nodes.size(); i++) {
       std::string kind = nodes[i]->getKind();
+      if (addlabel) {
+        nodes[i]->setAddLabel(addlabel);
+      }
       if (kind == "Case") {
         nodes[i + 1]->setLabel(nodes[i]);
         nodes.erase(nodes.begin() + i);
@@ -3285,18 +3347,18 @@ public:
         nodes.erase(nodes.begin() + i);
         i--;
       } else if (kind == "FuncDecl") {
-        nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody(), addlabel));
       } else if (kind == "While") {
-        nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody(), addlabel));
       } else if (kind == "Do") {
-        nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody(), addlabel));
       } else if (kind == "For") {
-        nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody(), addlabel));
       } else if (kind == "If") {
-        nodes[i]->setThen(changeLabel(nodes[i]->getThen()));
-        nodes[i]->setElse(changeLabel(nodes[i]->getElse()));
+        nodes[i]->setThen(changeLabel(nodes[i]->getThen(), addlabel));
+        nodes[i]->setElse(changeLabel(nodes[i]->getElse(), addlabel));
       } else if (kind == "Switch") {
-        nodes[i]->setBody(changeLabel(nodes[i]->getBody()));
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody(), addlabel));
       }
     }
     return nodes;
@@ -3329,7 +3391,10 @@ public:
       Visitor.clearIncludeFile(analysisFile);
     }
     if (cLabel) {
-      Visitor.setNode(Visitor.changeLabel(Visitor.getNode()));
+      Visitor.setNode(Visitor.changeLabel(Visitor.getNode(), false));
+    }
+    if (alladdlabel) {
+      Visitor.setNode(Visitor.changeLabel(Visitor.getNode(), alladdlabel));
     }
     llvm::outs() << "\n[";
     Visitor.printAST();
@@ -3344,15 +3409,21 @@ public:
     cLabel = opt;
   }
 
+  static void setAllAddLabel(bool opt) {
+    alladdlabel = opt;
+  }
+
 private:
   MyAstVisitor Visitor;
   llvm::StringRef analysisFile;
   static bool dIncFile;
   static bool cLabel;
+  static bool alladdlabel;
 };
 
 bool MyAstConsumer::dIncFile;
 bool MyAstConsumer::cLabel;
+bool MyAstConsumer::alladdlabel;
 
 class MyAnalysisAction : public clang::ASTFrontendAction {
 public:
@@ -3366,6 +3437,7 @@ static OwningPtr<OptTable> Options(createDriverOptTable());
 
 static cl::opt<bool> Dincfile("d-incfile", cl::desc("Delete the include file"));
 static cl::opt<bool> Clabel("change-label", cl::desc("Change label AST"));
+static cl::opt<bool> AllAddLabel("all-add-label", cl::desc("Add label to all nodes"));
 
 int main(int argc, const char *argv[]) {
   CommonOptionsParser OptionsParser(argc, argv);
@@ -3377,6 +3449,9 @@ int main(int argc, const char *argv[]) {
   }
   if (Clabel) {
     MyAstConsumer::setCLabel(Clabel);
+  }
+  if (AllAddLabel) {
+    MyAstConsumer::setAllAddLabel(AllAddLabel);
   }
 
   return Tool.run(newFrontendActionFactory<MyAnalysisAction>());
