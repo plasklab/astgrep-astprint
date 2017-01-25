@@ -1570,6 +1570,44 @@ void SwitchStatement::printAST() {
   llvm::outs() << "]}\n";
 }
 
+class CompoundStatement : public Statement {
+public:
+  CompoundStatement(std::vector<Node *> b, Node loc);
+  std::vector<Node *> body;
+  std::vector<Node *> getBody();
+  void setBody(std::vector<Node *> b);
+  void printAST();
+};
+
+CompoundStatement::CompoundStatement(std::vector<Node *> b, Node loc) {
+  kind = "CompoundStatement";
+  body = b;
+  setLocation(loc);
+}
+
+std::vector<Node *> CompoundStatement::getBody() {
+  return body;
+}
+
+void CompoundStatement::setBody(std::vector<Node *> b) {
+  body = b;
+}
+
+void CompoundStatement::printAST() {
+  llvm::outs() << "{:kind \"" << kind << "\"";
+  if (getLabelSize() != 0) {
+    printLabel();
+  } else if (getAddLabel()) {
+    printEmptyLabel();
+  }
+  PrintLocation();
+  llvm::outs() << "\n :body [";
+  for (int i = 0; i < (int)body.size(); i++) {
+    body[i]->printAST();
+  }
+  llvm::outs() <<"]}\n";
+}
+
 class LabelStatement : public Statement {
 public:
   std::string name;
@@ -2613,6 +2651,26 @@ public:
   
   // CompoundStmt
   bool VisitCompoundStmt(CompoundStmt *compound) {
+    bool opt = false;
+    if (!opt)
+      return true;
+    int i = prog.size();
+    Stmt** b = compound->body_begin();
+    int size = (int)compound->size();
+    for (int j = 0; j < size; j++) {
+      TraverseStmt(b[j]);
+    }
+    std::vector<Node *> body;
+    while (i != (int)prog.size()) {
+      body.push_back(prog[i]);
+      prog.erase(prog.begin() + i);
+    }
+    Node t = PrintSourceRange(compound->getSourceRange());
+    CompoundStatement *CS = new CompoundStatement(body, t);
+    Node *np = CS;
+    prog.push_back(np);
+    skipcount = size;
+
     return true;
   }
 
