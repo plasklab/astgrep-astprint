@@ -3470,17 +3470,27 @@ public:
     alladdlabel = opt;
   }
 
+  static void setCcompound(bool opt) {
+    cCompaund = opt;
+  }
+
+  static bool getCcompound() {
+    return cCompaund;
+  }
+
 private:
   MyAstVisitor Visitor;
   llvm::StringRef analysisFile;
   static bool dIncFile;
   static bool cLabel;
   static bool alladdlabel;
+  static bool cCompaund;
 };
 
 bool MyAstConsumer::dIncFile;
 bool MyAstConsumer::cLabel;
 bool MyAstConsumer::alladdlabel;
+bool MyAstConsumer::cCompaund;
 
 class MyAnalysisAction : public clang::ASTFrontendAction {
 public:
@@ -3495,6 +3505,7 @@ static OwningPtr<OptTable> Options(createDriverOptTable());
 static cl::opt<bool> Dincfile("d-incfile", cl::desc("Delete the include file"));
 static cl::opt<bool> Clabel("change-label", cl::desc("Change label AST"));
 static cl::opt<bool> AllAddLabel("all-add-label", cl::desc("Add label to all nodes"));
+static cl::opt<bool> Ccompound("change-compound", cl::desc("Change output to compound statement"));
 
 int main(int argc, const char *argv[]) {
   CommonOptionsParser OptionsParser(argc, argv);
@@ -3509,6 +3520,9 @@ int main(int argc, const char *argv[]) {
   }
   if (AllAddLabel) {
     MyAstConsumer::setAllAddLabel(AllAddLabel);
+  }
+  if (Ccompound) {
+    MyAstConsumer::setCcompound(Ccompound);
   }
 
   return Tool.run(newFrontendActionFactory<MyAnalysisAction>());
