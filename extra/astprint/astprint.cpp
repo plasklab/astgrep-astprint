@@ -457,12 +457,12 @@ void UnsignedShortType::printType() {
 
 class CharType : public SignedType {
 public:
-  CharType(bool cons, bool vol);
+  CharType(std::string k, bool cons, bool vol);
   void printType();
 };
 
-CharType::CharType(bool cons, bool vol) {
-  kind = "CharType";
+CharType::CharType(std::string k, bool cons, bool vol) {
+  kind = k;
   constBool = cons;
   volatileBool = vol;
 }
@@ -2076,12 +2076,12 @@ public:
       }
       case BuiltinType::Char_S:
       {
-	t = new CharType(constBool, volatileBool);
+	t = new CharType("CharType", constBool, volatileBool);
         break;
       }
       case BuiltinType::SChar:
       {
-	t = new CharType(constBool, volatileBool);
+	t = new CharType("SignedCharType", constBool, volatileBool);
         break;
       }
       case BuiltinType::Short:
@@ -3289,7 +3289,6 @@ public:
     return true;
   }
 
-  //// 出力関係
   // 行数 
   Node PrintSourceRange(SourceRange range) {
     Node t;
