@@ -2651,7 +2651,7 @@ public:
   
   // CompoundStmt
   bool VisitCompoundStmt(CompoundStmt *compound) {
-    bool opt = false;
+    bool opt = getChangeCompound();
     if (!opt)
       return true;
     int i = prog.size();
@@ -3416,9 +3416,19 @@ public:
         nodes[i]->setElse(changeLabel(nodes[i]->getElse(), addlabel));
       } else if (kind == "Switch") {
         nodes[i]->setBody(changeLabel(nodes[i]->getBody(), addlabel));
+      } else if (kind == "Compaund") {
+        nodes[i]->setBody(changeLabel(nodes[i]->getBody(), addlabel));
       }
     }
     return nodes;
+  }
+
+  void setChangeCompound(bool opt) {
+    changeCompound = opt;
+  }
+
+  bool getChangeCompound() {
+    return changeCompound;
   }
 
   std::vector<Node *> getNode () {
@@ -3432,6 +3442,7 @@ public:
 private:
   ASTContext *Context;
   std::string source_file;
+  bool changeCompound;
   int skipcount; // skip processing a node while this count is positive
 };
 
@@ -3442,8 +3453,13 @@ public:
     analysisFile = InFile;
 }
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
+    if (cCompaund) {
+      Visitor.setChangeCompound(cCompaund);
+    } else {
+      Visitor.setChangeCompound(false);
+    }
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-    //llvm::outs() << "\n----------------------------------------------------------------------\n";
+    //llvm::outs() << "\n--------------------------------------------------------------------\n";
     if (dIncFile) {
       Visitor.clearIncludeFile(analysisFile);
     }
