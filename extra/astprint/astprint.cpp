@@ -34,6 +34,7 @@ public:
   int endLine;
   int endColumn;
   bool addlabel;
+  bool deleateCompound;
   void PrintLocation();
   void printLabel();
   void printEmptyLabel();
@@ -42,7 +43,9 @@ public:
   std::string getKind();
   int getLabelSize();
   void setAddLabel(bool opt);
+  void setDeleateComp(bool opt);
   bool getAddLabel();
+  bool getDeleateComp();
   virtual std::vector<Node *> getBody();
   virtual std::vector<Node *> getThen();
   virtual std::vector<Node *> getElse();
@@ -79,8 +82,16 @@ void Node::setAddLabel(bool opt) {
   addlabel = opt;
 }
 
+void Node::setDeleateComp(bool opt) {
+  deleateCompound = opt;
+}
+
 bool Node::getAddLabel() {
   return addlabel;
+}
+
+bool Node::getDeleateComp() {
+  return deleateCompound;
 }
 
 std::vector<Node *> Node::getBody() {
@@ -1233,13 +1244,23 @@ void FunctionDeclaration::printAST() {
       parm[i]->printAST();
     }
   }
-  llvm::outs() << "]\n :body [";
-  if (body.size() != 0) {
-    for (int i = 0; i < (int)body.size(); i++) {
-      body[i]->printAST();
+  llvm::outs() << "]\n :body ";
+  if (getDeleateComp()) {
+    llvm::outs() << "[";
+    if (body.size() != 0) {
+      for (int i = 0; i < (int)body.size(); i++) {
+        body[i]->printAST();
+      }
+    }
+    llvm::outs() << "]";
+  } else {
+    if ((int)body.size() != 0) {
+      body[0]->printAST();
+    } else {
+      llvm::outs() << "[]";
     }
   }
-  llvm::outs() << "]}\n";
+  llvm::outs() << "}\n";
 }
 
 class TypeDeclaration : public Declaration {
@@ -1356,11 +1377,21 @@ void WhileStatement::printAST() {
   PrintLocation();
   llvm::outs() << "\n :condition ";
   condition->printAST();
-  llvm::outs() << "\n :body [";
-  for (int i = 0; i < (int)body.size(); i++) {
-    body[i]->printAST();
+  llvm::outs() << "\n :body ";
+  if (getDeleateComp()) {
+    llvm::outs() << "[";
+    for (int i = 0; i < (int)body.size(); i++) {
+      body[i]->printAST();
+    }
+    llvm::outs() << "]";
+  } else {
+    if ((int)body.size() != 0) {
+      body[0]->printAST();
+    } else {
+      llvm::outs() << "[]";
+    }
   }
-  llvm::outs() << "]}\n";
+  llvm::outs() << "}\n";
 }
 
 class DoStatement : public RepetitionStatement {
@@ -1396,11 +1427,21 @@ void DoStatement::printAST() {
   PrintLocation();
   llvm::outs() << "\n :condition ";
   condition->printAST();
-  llvm::outs() << "\n :body [";
-  for (int i = 0; i < (int)body.size(); i++) {
-    body[i]->printAST();
+  llvm::outs() << "\n :body ";
+  if (getDeleateComp()) {
+    llvm::outs() << "[";
+    for (int i = 0; i < (int)body.size(); i++) {
+      body[i]->printAST();
+    }
+    llvm::outs() << "]";
+  } else {
+    if ((int)body.size() != 0) {
+      body[0]->printAST();
+    } else {
+      llvm::outs() << "[]";
+    }
   }
-  llvm::outs() << "]}\n";
+  llvm::outs() << "}\n";
 }
 
 class ForStatement : public RepetitionStatement {
@@ -1456,11 +1497,21 @@ void ForStatement::printAST() {
   } else {
     llvm::outs() << "[]";
   }
-  llvm::outs() << "\n :body [";
-  for (int i = 0; i < (int)body.size(); i++) {
-    body[i]->printAST();
+  llvm::outs() << "\n :body ";
+  if (getDeleateComp()) {
+    llvm::outs() << "[";
+    for (int i = 0; i < (int)body.size(); i++) {
+      body[i]->printAST();
+    }
+    llvm::outs() << "]";
+  } else {
+    if ((int)body.size() != 0) {
+      body[0]->printAST();
+    } else {
+      llvm::outs() << "[]";
+    }
   }
-  llvm::outs() << "]}\n";
+  llvm::outs() << "}\n";
 }
 
 class BranchStatement : public Statement {
@@ -1514,17 +1565,31 @@ void IfStatement::printAST() {
   PrintLocation();
   llvm::outs() << "\n :condition ";
   condition->printAST();
-  llvm::outs() << "\n :then [";
-  for (int i = 0; i < (int)then.size(); i++) {
-    then[i]->printAST();
-  }
-  llvm::outs() << "]";
-  if (denial.size() != 0) {
-    llvm::outs() << "\n :else [";
-    for (int i = 0; i < (int)denial.size(); i++) {
-      denial[i]->printAST();
+  llvm::outs() << "\n :then ";
+  if (getDeleateComp()) {
+    llvm::outs() << "[";
+    for (int i = 0; i < (int)then.size(); i++) {
+      then[i]->printAST();
     }
     llvm::outs() << "]";
+  } else {
+    if ((int)then.size() != 0) {
+      then[0]->printAST();
+    } else {
+      llvm::outs() << "[]";
+    }
+  }
+  if (denial.size() != 0) {
+    llvm::outs() << "\n :else ";
+    if (getDeleateComp()) {
+      llvm::outs() << "[";
+      for (int i = 0; i < (int)denial.size(); i++) {
+        denial[i]->printAST();
+      }
+      llvm::outs() << "]";
+    } else {
+      denial[0]->printAST();
+    }
   }
   llvm::outs() << "}\n";
 }
@@ -1563,11 +1628,21 @@ void SwitchStatement::printAST() {
   PrintLocation();
   llvm::outs() << "\n :condition ";
   condition->printAST();
-  llvm::outs() << "\n :body [";
-  for (int i = 0; i < (int)body.size(); i ++) {
-    body[i]->printAST();
+  llvm::outs() << "\n :body ";
+  if (getDeleateComp()) {
+    llvm::outs() << "[";
+    for (int i = 0; i < (int)body.size(); i ++) {
+      body[i]->printAST();
+    }
+    llvm::outs() << "]";
+  } else {
+    if ((int)body.size() != 0) {
+      body[0]->printAST();
+    } else {
+      llvm::outs() << "[]";
+    }
   }
-  llvm::outs() << "]}\n";
+  llvm::outs() << "}\n";
 }
 
 class CompoundStatement : public Statement {
@@ -2651,9 +2726,6 @@ public:
   
   // CompoundStmt
   bool VisitCompoundStmt(CompoundStmt *compound) {
-    bool opt = getChangeCompound();
-    if (!opt)
-      return true;
     int i = prog.size();
     Stmt** b = compound->body_begin();
     int size = (int)compound->size();
@@ -3416,19 +3488,78 @@ public:
         nodes[i]->setElse(changeLabel(nodes[i]->getElse(), addlabel));
       } else if (kind == "Switch") {
         nodes[i]->setBody(changeLabel(nodes[i]->getBody(), addlabel));
-      } else if (kind == "Compaund") {
+      } else if (kind == "CompoundStatement") {
         nodes[i]->setBody(changeLabel(nodes[i]->getBody(), addlabel));
       }
     }
     return nodes;
   }
 
-  void setChangeCompound(bool opt) {
-    changeCompound = opt;
+  // compoundStatementを検索
+  std::vector<Node *> searchCompound(std::vector<Node *> nodes, bool opt) {
+    if (nodes.size() == 0) {
+     return nodes;
+    }
+    for (int i = 0; i < (int)nodes.size(); i++) {
+      std::string kind = nodes[i]->getKind();
+      if (opt) {
+        nodes[i]->setDeleateComp(opt);
+      }
+      if (kind == "FuncDecl") {
+        std::vector<Node *> body = nodes[i]->getBody();
+        if ((int)body.size() != 0 && body[0]->getKind() == "CompoundStatement") {
+          nodes[i]->setBody(changeCompound(body));
+        }
+        nodes[i]->setBody(searchCompound(nodes[i]->getBody(), opt));
+      } else if (kind == "While") {
+        std::vector<Node *> body = nodes[i]->getBody();
+        if ((int)body.size() != 0 && body[0]->getKind() == "CompoundStatement") {
+          nodes[i]->setBody(changeCompound(body));
+        }
+        nodes[i]->setBody(searchCompound(nodes[i]->getBody(), opt));
+      } else if (kind == "Do") {
+        std::vector<Node *> body = nodes[i]->getBody();
+        if ((int)body.size() != 0 && body[0]->getKind() == "CompoundStatement") {
+          nodes[i]->setBody(changeCompound(body));
+        }
+        nodes[i]->setBody(searchCompound(nodes[i]->getBody(), opt));
+      } else if (kind == "For") {
+        std::vector<Node *> body = nodes[i]->getBody();
+        if ((int)body.size() != 0 && body[0]->getKind() == "CompoundStatement") {
+          nodes[i]->setBody(changeCompound(body));
+        }
+        nodes[i]->setBody(searchCompound(nodes[i]->getBody(), opt));
+      } else if (kind == "If") {
+        std::vector<Node *> then = nodes[i]->getThen();
+        std::vector<Node *> denial = nodes[i]->getElse();
+        if ((int)then.size() != 0 && then[0]->getKind() == "CompoundStatement") {
+          nodes[i]->setThen(changeCompound(then));
+        }
+        if ((int)denial.size() != 0 && denial[0]->getKind() == "CompoundStatement") {
+          nodes[i]->setElse(changeCompound(denial));
+        }
+        nodes[i]->setThen(searchCompound(nodes[i]->getThen(), opt));
+        nodes[i]->setElse(searchCompound(nodes[i]->getElse(), opt));
+      } else if (kind == "Switch") {
+        std::vector<Node *> body = nodes[i]->getBody();
+        if ((int)body.size() != 0 && body[0]->getKind() == "CompoundStatement") {
+          nodes[i]->setBody(changeCompound(body));
+        }
+        nodes[i]->setBody(searchCompound(nodes[i]->getBody(), opt));
+      }
+    }
+    return nodes;
   }
 
-  bool getChangeCompound() {
-    return changeCompound;
+  // CompoundStatementを削除
+  std::vector<Node *> changeCompound(std::vector<Node *> body) {
+    std::vector<Node *> compBody = body[0]->getBody();
+    body.erase(body.begin());
+    while ((int)compBody.size() != 0) {
+      body.insert(body.begin(), compBody.back());
+      compBody.pop_back();
+    } 
+    return body;
   }
 
   std::vector<Node *> getNode () {
@@ -3442,7 +3573,6 @@ public:
 private:
   ASTContext *Context;
   std::string source_file;
-  bool changeCompound;
   int skipcount; // skip processing a node while this count is positive
 };
 
@@ -3453,11 +3583,7 @@ public:
     analysisFile = InFile;
 }
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
-    if (cCompaund) {
-      Visitor.setChangeCompound(cCompaund);
-    } else {
-      Visitor.setChangeCompound(false);
-    }
+    
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
     //llvm::outs() << "\n--------------------------------------------------------------------\n";
     if (dIncFile) {
@@ -3468,6 +3594,9 @@ public:
     }
     if (alladdlabel) {
       Visitor.setNode(Visitor.changeLabel(Visitor.getNode(), alladdlabel));
+    }
+    if (dCompaund) {
+      Visitor.setNode(Visitor.searchCompound(Visitor.getNode(), dCompaund));
     }
     llvm::outs() << "\n[";
     Visitor.printAST();
@@ -3486,12 +3615,8 @@ public:
     alladdlabel = opt;
   }
 
-  static void setCcompound(bool opt) {
-    cCompaund = opt;
-  }
-
-  static bool getCcompound() {
-    return cCompaund;
+  static void setDcompound(bool opt) {
+    dCompaund = opt;
   }
 
 private:
@@ -3500,13 +3625,13 @@ private:
   static bool dIncFile;
   static bool cLabel;
   static bool alladdlabel;
-  static bool cCompaund;
+  static bool dCompaund;
 };
 
 bool MyAstConsumer::dIncFile;
 bool MyAstConsumer::cLabel;
 bool MyAstConsumer::alladdlabel;
-bool MyAstConsumer::cCompaund;
+bool MyAstConsumer::dCompaund;
 
 class MyAnalysisAction : public clang::ASTFrontendAction {
 public:
@@ -3521,7 +3646,7 @@ static OwningPtr<OptTable> Options(createDriverOptTable());
 static cl::opt<bool> Dincfile("d-incfile", cl::desc("Delete the include file"));
 static cl::opt<bool> Clabel("change-label", cl::desc("Change label AST"));
 static cl::opt<bool> AllAddLabel("all-add-label", cl::desc("Add label to all nodes"));
-static cl::opt<bool> Ccompound("change-compound", cl::desc("Change output to compound statement"));
+static cl::opt<bool> Dcompound("d-compound", cl::desc("Delete compound statement"));
 
 int main(int argc, const char *argv[]) {
   CommonOptionsParser OptionsParser(argc, argv);
@@ -3537,8 +3662,8 @@ int main(int argc, const char *argv[]) {
   if (AllAddLabel) {
     MyAstConsumer::setAllAddLabel(AllAddLabel);
   }
-  if (Ccompound) {
-    MyAstConsumer::setCcompound(Ccompound);
+  if (Dcompound) {
+    MyAstConsumer::setDcompound(Dcompound);
   }
 
   return Tool.run(newFrontendActionFactory<MyAnalysisAction>());
