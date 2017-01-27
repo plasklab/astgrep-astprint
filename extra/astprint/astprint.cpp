@@ -40,6 +40,7 @@ public:
   void printEmptyLabel();
   void setLocation(Node loc);
   void setLabel(Node *l);
+  std::vector<Node *> getLabel();
   std::string getKind();
   int getLabelSize();
   void setAddLabel(bool opt);
@@ -68,6 +69,10 @@ void Node::setLocation(Node loc) {
 
 void Node::setLabel(Node *l) {
   label.push_back(l);
+}
+
+std::vector<Node *> Node::getLabel() {
+  return label;
 }
 
 std::string Node::getKind() {
@@ -3464,14 +3469,32 @@ public:
         nodes[i]->setAddLabel(addlabel);
       }
       if (kind == "Case") {
+        if(nodes[i]->getLabelSize() != 0) {
+          std::vector<Node *> label = nodes[i]->getLabel();
+          for (int j = 0; j < (int)label.size(); j++) {
+            nodes[i + 1]->setLabel(label[j]);
+          }
+        }
         nodes[i + 1]->setLabel(nodes[i]);
         nodes.erase(nodes.begin() + i);
         i--;
       } else if (kind == "Label") {
+        if(nodes[i]->getLabelSize() != 0) {
+          std::vector<Node *> label = nodes[i]->getLabel();
+          for (int j = 0; j < (int)label.size(); j++) {
+            nodes[i + 1]->setLabel(label[j]);
+          }
+        }
         nodes[i + 1]->setLabel(nodes[i]);
         nodes.erase(nodes.begin() + i);
         i--;
       } else if (kind == "Default") {
+        if(nodes[i]->getLabelSize() != 0) {
+          std::vector<Node *> label = nodes[i]->getLabel();
+          for (int j = 0; j < (int)label.size(); j++) {
+            nodes[i + 1]->setLabel(label[j]);
+          }
+        }
         nodes[i + 1]->setLabel(nodes[i]);
         nodes.erase(nodes.begin() + i);
         i--;
