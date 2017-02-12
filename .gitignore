@@ -1,2 +1,6 @@
 *.sh
 /llvm/
+/extra/clang-apply-replacements/
+/extra/clang-query/
+/extra/clang-tidy/
+/extra/clang-modernize/
