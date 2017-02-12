@@ -2045,7 +2045,9 @@ public:
         while (itr != record->field_end()) {
           TraverseDecl(itr->getCanonicalDecl());
           member.push_back(prog[i]);
-          prog.erase(prog.begin() + i);
+          if ((int)prog.size() != i) {
+            prog.erase(prog.begin() + i);
+          }
           itr++;
         }
       }
