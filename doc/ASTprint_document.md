@@ -160,7 +160,7 @@
 ## 変数，関数の参照
 ```
 <DeclarationReferenceExpression> ::= exntends <Reference>
-    {:kind "DRE"
+    {:kind "DeclRef"
      opt:scope "global" | "local"
      opt:static "true"
      opt:auto "true"
