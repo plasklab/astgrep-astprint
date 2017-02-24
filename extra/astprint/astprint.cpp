@@ -3640,7 +3640,9 @@ public:
       if (kind == "Case") {
         std::vector<Node *> caseBody;
         int j = i + 1;
-        while (body[j]->getKind() != "Case" && body[j]->getKind() != "Default") {
+        while (body[j]->getKind() != "Case" 
+               && body[j]->getKind() != "Default" && j != (int)body.size()) {
+        llvm::outs() << "kind : " << body[i]->getKind() << "\n";
           caseBody.push_back(body[j]);
           body.erase(body.begin() + j);
         }
