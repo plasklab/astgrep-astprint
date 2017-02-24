@@ -35,6 +35,7 @@ public:
   int endColumn;
   bool addlabel;
   bool deleateCompound;
+  bool changeCase;
   void PrintLocation();
   void printLabel();
   void printEmptyLabel();
@@ -45,8 +46,10 @@ public:
   int getLabelSize();
   void setAddLabel(bool opt);
   void setDeleateComp(bool opt);
+  void setChangeCase(bool opt);
   bool getAddLabel();
   bool getDeleateComp();
+  bool getChangeCase();
   virtual std::vector<Node *> getBody();
   virtual std::vector<Node *> getThen();
   virtual std::vector<Node *> getElse();
@@ -91,12 +94,20 @@ void Node::setDeleateComp(bool opt) {
   deleateCompound = opt;
 }
 
+void Node::setChangeCase(bool opt) {
+  changeCase = opt;
+}
+
 bool Node::getAddLabel() {
   return addlabel;
 }
 
 bool Node::getDeleateComp() {
   return deleateCompound;
+}
+
+bool Node::getChangeCase() {
+  return changeCase;
 }
 
 std::vector<Node *> Node::getBody() {
@@ -1710,7 +1721,9 @@ void LabelStatement::printAST() {
 class CaseStatement : public Statement {
 public:
   Node *value;
+  std::vector<Node *> body;
   CaseStatement(Node *val, Node loc);
+  void setBody(std::vector<Node *> b);
   void printAST();
 };
 
@@ -1720,6 +1733,10 @@ CaseStatement::CaseStatement(Node *val, Node loc) {
   setLocation(loc);
 }
 
+void CaseStatement::setBody(std::vector<Node *> b) {
+  body = b;
+}
+
 void CaseStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
@@ -1727,12 +1744,24 @@ void CaseStatement::printAST() {
   if (value != NULL) {
     value->printAST();
   }
-  llvm::outs() << "]}\n";
+  llvm::outs() << "]";
+  if (getChangeCase()) {
+    llvm::outs() << "\n :body [";
+    if ((int)body.size() != 0) {
+      for (int i = 0; i < (int)body.size(); i++) {
+        body[i]->printAST();
+      }
+    }
+    llvm::outs() << "]";
+  }
+  llvm::outs() << "}\n";
 }
 
 class DefaultStatement : public Statement {
 public:
+  std::vector<Node *> body;
   DefaultStatement(Node loc);
+  void setBody(std::vector<Node *> b);
   void printAST();
 };
 
@@ -1741,9 +1770,22 @@ DefaultStatement::DefaultStatement(Node loc) {
   setLocation(loc);
 }
 
+void DefaultStatement::setBody(std::vector<Node *> b) {
+  body = b;
+}
+
 void DefaultStatement::printAST() {
   llvm::outs() << "{:kind \"" << kind << "\"";
   PrintLocation();
+  if (getChangeCase()) {
+    llvm::outs() << "\n :body [";
+    if ((int)body.size() != 0) {
+      for (int i = 0; i < (int)body.size(); i++) {
+        body[i]->printAST();
+      }
+    }
+    llvm::outs() << "]";
+  }
   llvm::outs() << "}\n";
 }
 
@@ -3587,6 +3629,50 @@ public:
     return body;
   }
 
+  // caseのASTを変形
+  std::vector<Node *> changeCase(std::vector<Node *> body, bool opt) {
+    if ((int)body.size() == 0) {
+      return body;
+    }
+    for (int i = 0; i < (int)body.size(); i++) {
+      std::string kind = body[i]->getKind();
+      body[i]->setChangeCase(opt);
+      if (kind == "Case") {
+        std::vector<Node *> caseBody;
+        int j = i + 1;
+        while (body[j]->getKind() != "Case" && body[j]->getKind() != "Default") {
+          caseBody.push_back(body[j]);
+          body.erase(body.begin() + j);
+        }
+        body[i]->setBody(caseBody);
+      } else if (kind == "Default") {
+        std::vector<Node *> defaultBody;
+        int j = i + 1;
+        while (j != (int)body.size()) {
+          defaultBody.push_back(body[j]);
+          body.erase(body.begin() + j);
+        }
+        body[i]->setBody(defaultBody);
+      } else if (kind == "FuncDecl") {
+        body[i]->setBody(changeCase(body[i]->getBody(), opt));
+      } else if (kind == "While") {
+        body[i]->setBody(changeCase(body[i]->getBody(), opt));
+      } else if (kind == "Do") {
+        body[i]->setBody(changeCase(body[i]->getBody(), opt));
+      } else if (kind == "For") {
+        body[i]->setBody(changeCase(body[i]->getBody(), opt));
+      } else if (kind == "If") {
+        body[i]->setThen(changeCase(body[i]->getThen(), opt));
+        body[i]->setElse(changeCase(body[i]->getElse(), opt));
+      } else if (kind == "Switch") {
+        body[i]->setBody(changeCase(body[i]->getBody(), opt));
+      } else if (kind == "CompoundStatement") {
+        body[i]->setBody(changeCase(body[i]->getBody(), opt));
+      }
+    }
+    return body;
+  }
+
   std::vector<Node *> getNode () {
     return prog;
   }
@@ -3623,6 +3709,9 @@ public:
     if (dCompaund) {
       Visitor.setNode(Visitor.searchCompound(Visitor.getNode(), dCompaund));
     }
+    if (ccase) {
+      Visitor.setNode(Visitor.changeCase(Visitor.getNode(), ccase));
+    }
     llvm::outs() << "\n[";
     Visitor.printAST();
     llvm::outs() << "] \n\n";
@@ -3644,6 +3733,10 @@ public:
     dCompaund = opt;
   }
 
+  static void setCcase(bool opt) {
+    ccase = opt;
+  }
+
 private:
   MyAstVisitor Visitor;
   llvm::StringRef analysisFile;
@@ -3651,12 +3744,14 @@ private:
   static bool cLabel;
   static bool alladdlabel;
   static bool dCompaund;
+  static bool ccase;
 };
 
 bool MyAstConsumer::dIncFile;
 bool MyAstConsumer::cLabel;
 bool MyAstConsumer::alladdlabel;
 bool MyAstConsumer::dCompaund;
+bool MyAstConsumer::ccase;
 
 class MyAnalysisAction : public clang::ASTFrontendAction {
 public:
@@ -3672,6 +3767,7 @@ static cl::opt<bool> Dincfile("d-incfile", cl::desc("Delete the include file"));
 static cl::opt<bool> Clabel("change-label", cl::desc("Change label AST"));
 static cl::opt<bool> AllAddLabel("all-add-label", cl::desc("Add label to all nodes"));
 static cl::opt<bool> Dcompound("d-compound", cl::desc("Delete compound statement"));
+static cl::opt<bool> Ccase("change-case", cl::desc("Change Case processing"));
 
 int main(int argc, const char *argv[]) {
   CommonOptionsParser OptionsParser(argc, argv);
@@ -3689,6 +3785,9 @@ int main(int argc, const char *argv[]) {
   }
   if (Dcompound) {
     MyAstConsumer::setDcompound(Dcompound);
+  }
+  if (Ccase) {
+    MyAstConsumer::setCcase(Ccase);
   }
 
   return Tool.run(newFrontendActionFactory<MyAnalysisAction>());

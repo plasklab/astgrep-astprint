@@ -1,4 +1,5 @@
 *.sh
+.*
 /llvm/
 /extra/clang-apply-replacements/
 /extra/clang-query/
